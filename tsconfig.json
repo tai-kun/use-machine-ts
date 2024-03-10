@@ -1,0 +1,19 @@
+{
+  "extends": [
+    "./node_modules/@tsconfig/node21/tsconfig.json",
+    "./node_modules/@tsconfig/strictest/tsconfig.json"
+  ],
+  "include": [
+    "@types/**/*",
+    "config/**/*",
+    "examples/**/*",
+    "scripts/**/*",
+    "src/**/*"
+  ],
+  "compilerOptions": {
+    "noEmit": true,
+    "sourceMap": true,
+    "module": "Preserve",
+    "moduleResolution": "Bundler"
+  }
+}

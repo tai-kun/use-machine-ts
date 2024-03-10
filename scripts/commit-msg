@@ -1,0 +1,43 @@
+#!/usr/bin/env bash
+
+MESSAGE="$1"
+
+function regex() {
+    [[ "$(echo -n "$MESSAGE" | grep -oP "$1")" != '' ]]
+}
+
+function listup() {
+    local dir="$1"
+    local max=4
+    local abs=false
+    local OPT
+
+    shift
+
+    while getopts "m:a" OPT; do
+        case "$OPT" in
+        m) max="$OPTARG" ;;
+        a) abs=true ;;
+        *) exit 1 ;;
+        esac
+    done
+
+    if [ $abs = true ]; then
+        res="$(find "$dir" -mindepth 1 -maxdepth "$max" -type d | paste -sd '|')"
+    else
+        res="$(find "$dir" -mindepth 1 -maxdepth "$max" -type d | sed "s|^$dir/||" | paste -sd '|')"
+    fi
+
+    echo "$res"
+}
+
+TYPE='(docs|style|refactor|perf|test|chore|revert|feat|fix)'
+
+src_scope="$(listup src)"
+scope="(ci|@types|config|docs|examples|scripts|src|$src_scope)"
+
+regex "^$TYPE(\(${scope//$/\\$}\))?: .+$" && exit 0
+regex "^build(\((deps|deps-dev)\))?: .+$" && exit 0
+
+echo 'Invalid commit message format.'
+exit 1
