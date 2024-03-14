@@ -24,7 +24,7 @@ export function log(
     level: "debug" | "error"
   },
   groupLabel: string | readonly [string, ...string[]],
-  ...messages: readonly (readonly [string, unknown])[]
+  ...messages: readonly (readonly [string, unknown?])[]
 ): void {
   const {
     level,
@@ -61,15 +61,15 @@ export function log(
     }
   }
 
-  for (const [label, value] of messages) {
+  for (const message of messages) {
     switch (level) {
       case "debug":
-        cons.log(label, value)
+        cons.log(...message)
 
         break
 
       case "error":
-        ;(cons.error || cons.log)(label, value)
+        ;(cons.error || cons.log)(...message)
 
         break
 

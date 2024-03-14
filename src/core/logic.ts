@@ -396,7 +396,7 @@ export function applyDispatch(
             { ...conf, level: "debug" },
             `Transition from '${state.value}' to '${nextStateValue}'`
               + " denied by guard.",
-            ["Cause", formatGuardResult(guardResult as GuardResult)],
+            [formatGuardResult(guardResult as GuardResult)],
             ["Event", event],
             ["Context", context],
           )
