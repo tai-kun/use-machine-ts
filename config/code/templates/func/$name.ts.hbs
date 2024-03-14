@@ -1,10 +1,9 @@
-export default function {{basename outpath}}() {}
+export function {{basename outpath}}() {}
 
-if (cfgTest?.url === import.meta.url) {
-  const { assert, describe, test } = cfgTest
+if (cfgTest && cfgTest.url === import.meta.url) {
+  const { describe, test } = cfgTest
 
   describe("{{dirname outpath}}/{{basename outpath}}", () => {
-    test.todo("Not implemented")
+    test.todo("Should be tested")
   })
 }
-
