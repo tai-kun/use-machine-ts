@@ -2,7 +2,7 @@
   "name": "use-machine-ts",
   "version": "0.0.0",
   "license": "MIT",
-  "description": "The state machine hook for React",
+  "description": "The tiny state machine hook for React",
   "sideEffects": false,
   "repository": "git+https://github.com/tai-kun/use-machine-ts.git",
   "author": {
@@ -84,5 +84,11 @@
   ],
   "volta": {
     "node": "21.7.1"
-  }
+  },
+  "keywords": [
+    "state-machine",
+    "typescript",
+    "react",
+    "hooks"
+  ]
 }
