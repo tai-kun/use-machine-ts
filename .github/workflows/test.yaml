@@ -37,6 +37,9 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
+      - name: Prepare for tsd
+        run: touch dist/index.d.ts
+
       - name: Type check
         run: npm run tsc
 
