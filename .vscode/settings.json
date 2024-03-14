@@ -28,5 +28,6 @@
     "editor.formatOnSave": true,
     "editor.defaultFormatter": "dprint.dprint"
   },
-  "typescript.tsdk": "node_modules/typescript/lib"
+  "typescript.tsdk": "node_modules/typescript/lib",
+  "typescript.referencesCodeLens.enabled": true
 }
