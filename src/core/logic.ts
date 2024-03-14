@@ -1107,7 +1107,6 @@ if (cfgTest && cfgTest.url === import.meta.url) {
               },
               {
                 args: [
-                  "Cause",
                   [
                     "isAllowed",
                     "^^^^^^^^^",
