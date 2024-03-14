@@ -1,25 +1,74 @@
 {
   "name": "use-machine-ts",
   "version": "0.0.0",
+  "license": "MIT",
+  "description": "The state machine hook for React",
+  "sideEffects": false,
+  "repository": "git+https://github.com/tai-kun/use-machine-ts.git",
+  "author": {
+    "name": "tai-kun",
+    "url": "https://github.com/tai-kun/"
+  },
+  "files": [
+    "dist",
+    "src"
+  ],
+  "main": "dist/index.cjs",
+  "module": "dist/index.mjs",
+  "types": "dist/index.d.ts",
+  "peerDependencies": {
+    "react": "^18.0.0"
+  },
   "devDependencies": {
+    "@size-limit/preset-small-lib": "~11.0.3",
     "@swc-node/register": "~1.9.0",
+    "@testing-library/react": "~14.2.1",
     "@tsconfig/node21": "~21.0.1",
     "@tsconfig/strictest": "~2.0.3",
-    "@types/node": "~20.11.25",
-    "cfg-test": "~0.4.3",
+    "@types/node": "~20.11.26",
+    "@types/react": "^18.2.65",
+    "cfg-test": "~0.5.0",
     "dprint": "~0.45.0",
     "esbuild": "~0.20.1",
+    "global-jsdom": "~24.0.0",
+    "jsdom": "~24.0.0",
     "plop": "~4.0.1",
+    "react": "^18.2.0",
+    "size-limit": "~11.0.3",
+    "tsd": "~0.30.7",
     "typescript": "~5.4.2"
   },
   "scripts": {
     "add": "plop --plopfile config/code/plopfile.mjs",
-    "tsc": "tsc --noEmit",
+    "tsc": "tsc --noEmit && tsd -f '@types/**/*.d.ts' -f 'src/**/*.{ts,tsx}'",
     "fmt": "dprint fmt",
     "lint": "exit 0",
     "test": "node --enable-source-maps --import cfg-test --test 'src/**/*.ts' --test 'src/**/*.tsx'",
-    "build": "scripts/build.sh"
+    "build": "scripts/build.sh",
+    "size": "size-limit"
   },
+  "size-limit": [
+    {
+      "path": ".temp/dist/.min.production.min.mjs",
+      "gzip": true
+    },
+    {
+      "path": ".temp/dist/index.production.min.mjs",
+      "gzip": true
+    },
+    {
+      "path": ".temp/dist/use-machine.production.min.mjs",
+      "gzip": true
+    },
+    {
+      "path": ".temp/dist/use-shared-machine.production.min.mjs",
+      "gzip": true
+    },
+    {
+      "path": ".temp/dist/use-synced-machine.production.min.mjs",
+      "gzip": true
+    }
+  ],
   "volta": {
     "node": "21.7.1"
   }
