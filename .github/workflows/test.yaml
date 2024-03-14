@@ -38,7 +38,7 @@ jobs:
         run: npm ci
 
       - name: Prepare for tsd
-        run: touch dist/index.d.ts
+        run: mkdir dist && touch dist/index.d.ts
 
       - name: Type check
         run: npm run tsc
