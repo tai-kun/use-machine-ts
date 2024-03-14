@@ -24,10 +24,7 @@ type _Get<T, P, F> =
  * @template P - The type of path to get the value at.
  * @template F - The type of fallback value. Default is `undefined`.
  */
-export type Get<T, P, F = undefined> =
-  P extends ReadonlyArray<keyof any>
-    ? _Get<T, P, F>
-    : never
+export type Get<T, P extends ReadonlyArray<any>, F = undefined> = _Get<T, P, F>
 
 /**
  * Check if the given type is a literal string.

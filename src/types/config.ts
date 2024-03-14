@@ -190,7 +190,7 @@ type _InferAllTransitionEventTypesForStateValue<D, V> =
  * @template D - The state machine definition.
  * @template V - The state value.
  */
-type TransitionEventForStateValue<D, V> =
+export type TransitionEventForStateValue<D, V> =
   // Reserved event types.
   | (
       // If the state value is the initial state, return the initial event. 
@@ -209,6 +209,10 @@ type TransitionEventForStateValue<D, V> =
       D,
       _InferAllTransitionEventTypesForStateValue<D, V>
     >
+
+export namespace TransitionEventForStateValue {
+  export type Signature = TransitionEvent.Signature
+}
 
 /*******************************************************************************
  * 

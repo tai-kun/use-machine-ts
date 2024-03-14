@@ -12,7 +12,7 @@ import type { Get, Tagged } from "./utils"
  */
 export type State<
   D,
-  V = keyof Get<D, "states">,
+  V = keyof Get<D, ["states"]>,
 > = {
   /**
    * The current state value.
@@ -25,7 +25,7 @@ export type State<
   /**
    * The event that caused the state transition.
    */
-  readonly event: Config.EntryEvent<D, V>
+  readonly event: Config.TransitionEventForStateValue<D, V>
   /**
    * The next events that can be sent to the state machine.
    */
@@ -45,7 +45,7 @@ export namespace State {
     /**
      * The event that caused the state transition.
      */
-    readonly event: Config.EntryEvent.Signature
+    readonly event: Config.TransitionEventForStateValue.Signature
     /**
      * The next events that can be sent to the state machine.
      */
