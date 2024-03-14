@@ -16,6 +16,23 @@
   "main": "dist/index.cjs",
   "module": "dist/index.mjs",
   "types": "dist/index.d.ts",
+  "exports": {
+    "./standard": {
+      "types": "./dist/useMachine.d.ts",
+      "import": "./dist/useMachine.mjs",
+      "require": "./dist/useMachine.cjs"
+    },
+    "./shared": {
+      "types": "./dist/useSharedMachine.d.ts",
+      "import": "./dist/useSharedMachine.mjs",
+      "require": "./dist/useSharedMachine.cjs"
+    },
+    "./synced": {
+      "types": "./dist/useSyncedMachine.d.ts",
+      "import": "./dist/useSyncedMachine.mjs",
+      "require": "./dist/useSyncedMachine.cjs"
+    }
+  },
   "peerDependencies": {
     "react": "^18.0.0"
   },
@@ -48,10 +65,6 @@
     "size": "size-limit"
   },
   "size-limit": [
-    {
-      "path": ".temp/dist/.min.production.min.mjs",
-      "gzip": true
-    },
     {
       "path": ".temp/dist/index.production.min.mjs",
       "gzip": true

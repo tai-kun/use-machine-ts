@@ -8,7 +8,7 @@ import path from "node:path"
 export default [
   // ESM
 
-  ...[true, false].map(jsx => (
+  ...[false].map(jsx => (
     create({
       jsx,
       format: "esm",
@@ -17,7 +17,7 @@ export default [
 
   // CJS
 
-  ...[true, false].map(jsx => (
+  ...[false].map(jsx => (
     create({
       jsx,
       format: "cjs",
@@ -28,6 +28,9 @@ export default [
 
   ...[
     "index.ts",
+    "useMachine.ts",
+    "useSharedMachine.ts",
+    "useSyncedMachine.ts",
   ].flatMap(entrypoint => [
     bundle({
       format: "esm",
@@ -92,7 +95,10 @@ function create(options) {
     pure: [
       "Symbol",
     ],
-    define: buildDefine,
+    define: {
+      ...buildDefine,
+      "import.meta.url": "undefined",
+    },
     minifySyntax: true,
 
     // Source maps
@@ -162,6 +168,7 @@ function bundle(options) {
     define: {
       ...buildDefine,
       __DEV__: "false",
+      "import.meta.url": "undefined",
     },
     minify: true,
   }
