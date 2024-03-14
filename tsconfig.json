@@ -13,7 +13,8 @@
   "compilerOptions": {
     "noEmit": true,
     "sourceMap": true,
-    "module": "Preserve",
+    "lib": ["DOM", "ESNext"],
+    "module": "ESNext",
     "moduleResolution": "Bundler"
   }
 }
