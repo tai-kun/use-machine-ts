@@ -93,6 +93,24 @@ console.log(state)
 //   event: { type: "TOGGLE" }, nextEvents: ["TOGGLE"] }
 ```
 
+## Contents
+
+- [API](#api)
+  - [useMachine](#usemachine)
+    - [state](#state)
+    - [send](#send)
+    - [State Machine Definition](#state-machine-definition)
+    - [Defining States](#defining-states)
+    - [Using Guards](#using-guards)
+    - [Using Effects](#using-effects)
+    - [Extended State](#extended-state)
+    - [Schema](#Schema)
+    - [Logging](#logging)
+  - [useSharedMachine](#usesharedmachine)
+  - [useSyncedMachine](#usesyncedmachine)
+  - [transfer](#transfer)
+- [Async Orchestration](#async-orchestration)
+
 # API
 
 ## useMachine
@@ -348,6 +366,7 @@ The effect function takes as a parameter an object (`entryParams`) with four pro
 | `context`    | `any`      | The extended state of the state machine.                                                                                                                                             |
 | `send`       | `function` | Function for sending events to the state machine.                                                                                                                                    |
 | `setContext` | `function` | Function for updating the extended state of the state machine. Since it returns an object with a `send` property, you can write `context` updates and state transitions in one line. |
+| `isMounted`  | `function` | Function to check whether the component is mounted.                                                                                                                                  |
 
 The function returned by the effect function takes as a parameter an object (`exitParams`) with four properties:
 
@@ -357,6 +376,7 @@ The function returned by the effect function takes as a parameter an object (`ex
 | `context`    | `any`      | The extended state of the state machine.                                                                                                                                             |
 | `send`       | `function` | Function for sending events to the state machine.                                                                                                                                    |
 | `setContext` | `function` | Function for updating the extended state of the state machine. Since it returns an object with a `send` property, you can write `context` updates and state transitions in one line. |
+| `isMounted`  | `function` | Function to check whether the component is mounted.                                                                                                                                  |
 
 The following example updates `retryCount` each time it enters a failure state, and transitions to an error state when the limit is reached.
 
@@ -731,3 +751,68 @@ function ToggleButton(props: { onToggle?: (isActive: boolean) => void }) {
   )
 }
 ```
+
+# AsyncOrchestration
+
+> [!WARNING]
+> In use-machine-ts, you should avoid updating the state machine state asynchronously.
+
+There are a few things to keep in mind when updating state machine state asynchronously. Each of the three hooks (`useMachine`, `useSharedMachine`, `useSyncedMachine`) provided by use-machine-ts has different points to note.
+
+## useMachine
+
+Inside `useMachine`, you can call the `send` and `setContext` functions asynchronously as long as the component is mounted. However, if the component is already unmounted, these functions instead of changing the state will display an error message like this:
+
+```text
+Cannot dispatch an action to the state machine after it is unmounted.
+Action { type: "SEND", payload: { type: "TOGGLE" } }
+```
+
+For `setContext`, the value of the `type` property is `"SET_CONTEXT"`.
+
+To check if a component is unmounted beforehand, you can use the `isMounted` property of the parameter passed to the `effect` function. The `isMounted` function returns `true` if the component is mounted, `false` otherwise.
+
+```ts
+import { useMachine } from "use-machine-ts"
+
+const [state, send] = useMachine(
+  {
+    initial: "inactive",
+    states: {
+      inactive: {
+        on: { TOGGLE: "active" },
+      },
+      active: {
+        on: { TOGGLE: "inactive" },
+      },
+    },
+  },
+  {
+    effects: {
+      onActive: ({ send, isMounted }) => {
+        setTimeout(() => {
+          if (isMounted()) {
+            send("TOGGLE")
+          }
+        }, 1000)
+      },
+    },
+  },
+)
+```
+
+## useSharedMachine
+
+Inside `useSharedMachine`, you can call `send`, `setContext`, or `dispatch` on the shared machine asynchronously, regardless of the mounted state of the component. Note that no error or warning messages are displayed. To check if a component is unmounted beforehand, you can use the `isMounted` function, similar to `useMachine`.
+
+## useSyncedMachine
+
+The `send` and `setContext` functions cannot be called asynchronously within `useSyncedMachine`, regardless of the mounted state of the component. These functions are unlocked just before the effect starts and locked after it ends. If you call these functions while locked, you will receive an error message similar to the following:
+
+```text
+Send function not available. Must be used synchronously within an effect.
+State { value: "inactive", event: { type: "$init" }, nextEvents: ["TOGGLE"], context: undefined }
+Event: { type: "TOGGLE" }
+```
+
+However, the `send` function returned by `useSyncedMachine` warns you with an error message that the component is unmounted.

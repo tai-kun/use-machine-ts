@@ -93,6 +93,24 @@ console.log(state)
 //   event: { type: "TOGGLE" }, nextEvents: ["TOGGLE"] }
 ```
 
+## Contents
+
+- [API](#api)
+  - [useMachine](#usemachine)
+    - [state](#state)
+    - [send](#send)
+    - [State Machine Definition](#state-machine-definition)
+    - [Defining States](#defining-states)
+    - [Using Guards](#using-guards)
+    - [Using Effects](#using-effects)
+    - [Extended State](#extended-state)
+    - [Schema](#Schema)
+    - [Logging](#logging)
+  - [useSharedMachine](#usesharedmachine)
+  - [useSyncedMachine](#usesyncedmachine)
+  - [transfer](#transfer)
+- [Async Orchestration](#async-orchestration)
+
 # API
 
 ## useMachine
@@ -348,6 +366,7 @@ const [state, send] = useMachine(
 | `context` | `any` | ステートマシンの拡張された状態です。 |
 | `send` | `function` | ステートマシンにイベントを送信するための関数です。 |
 | `setContext` | `function` | ステートマシンの拡張された状態を更新するための関数です。`send` プロパティを持つオブジェクトを返すため、`context` の更新と状態遷移を 1　行で書くことができます。 |
+| `isMounted` | `function` | コンポーネントがマウントされているかどうかを確認するための関数です。 |
 
 エフェクト関数が返す関数は、次の 4 つのプロパティを持つオブジェクト (`exitParams`) をパラメーターとして受け取ります。
 
@@ -357,6 +376,7 @@ const [state, send] = useMachine(
 | `context` | `any` | ステートマシンの拡張された状態です。 |
 | `send` | `function` | ステートマシンにイベントを送信するための関数です。 |
 | `setContext` | `function` | ステートマシンの拡張された状態を更新するための関数です。`send` プロパティを持つオブジェクトを返すため、`context` の更新と状態遷移を 1　行で書くことができます。 |
+| `isMounted` | `function` | コンポーネントがマウントされているかどうかを確認するための関数です。 |
 
 次の例では、失敗状態になるたびに `retryCount` を更新して、上限に達した場合はエラー状態に遷移します。
 
@@ -731,3 +751,68 @@ function ToggleButton(props: { onToggle?: (isActive: boolean) => void }) {
   )
 }
 ```
+
+# Async Orchestration
+
+> [!WARNING]
+> use-machine-ts において、非同期的にステートマシンの状態を更新することは避けるべきです。
+
+非同期的にステートマシンの状態を更新するにあたって、いくつかの注意事項があります。use-machine-ts が提供する 3 つのフック (`useMachine`、`useSharedMachine`、`useSyncedMachine`) のそれぞれで注意点が異なります。
+
+## useMachine
+
+`useMachine` の中では、コンポーネントがマウントされている限り、非同期的に `send` と `setContext` 関数を呼び出すことはできます。ただし、コンポーネントがすでにアンマウントされている場合、これらの関数は状態を変更する代わりに、次のようなエラーメッセージを表示します。
+
+```text
+Cannot dispatch an action to the state machine after it is unmounted.
+Action { type: "SEND", payload: { type: "TOGGLE" } }
+```
+
+`setContext` の場合は `type` プロパティの値が `"SET_CONTEXT"` になります。
+
+事前にコンポーネントがアンマウントされているかどうかを確認するために、`effect` 関数に渡されるパラメーターの `isMounted` プロパティを使用することができます。`isMounted` 関数はコンポーネントがマウントされていれば `true` を返し、それ以外の場合は `false` を返します。
+
+```ts
+import { useMachine } from "use-machine-ts"
+
+const [state, send] = useMachine(
+  {
+    initial: "inactive",
+    states: {
+      inactive: {
+        on: { TOGGLE: "active" },
+      },
+      active: {
+        on: { TOGGLE: "inactive" },
+      },
+    },
+  },
+  {
+    effects: {
+      onActive: ({ send, isMounted }) => {
+        setTimeout(() => {
+          if (isMounted()) {
+            send("TOGGLE")
+          }
+        }, 1000)
+      },
+    },
+  },
+)
+```
+
+## useSharedMachine
+
+`useSharedMachine` の中では、コンポーネントのマウント状態に関係なく、非同期的に `send`、`setContext` または共有されたマシーンの `dispatch` を呼び出すことができます。エラーメッセージも警告メッセージも表示されないことに注意してください。事前にコンポーネントがアンマウントされているかどうかを確認するためには、`useMachine` と同様に `isMounted` 関数を使用することができます。
+
+## useSyncedMachine
+
+`useSyncedMachine` の中では、コンポーネントのマウント状態に関係なく、非同期的に `send` と `setContext` 関数を呼び出すことはできません。それらの関数はエフェクトの開始直前にアンロックされ、終了後にロックされます。ロックされた状態でこれらの関数を呼び出すと、次のようなエラーメッセージが表示されます。
+
+```text
+Send function not available. Must be used synchronously within an effect.
+State { value: "inactive", event: { type: "$init" }, nextEvents: ["TOGGLE"], context: undefined }
+Event: { type: "TOGGLE" }
+```
+
+ただし、`useSyncedMachine` が返す `send` 関数は、コンポーネントがアンマウントされていることをエラーメッセージで警告します。
