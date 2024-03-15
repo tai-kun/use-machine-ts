@@ -6,6 +6,7 @@
 [![Release on NPM](https://github.com/tai-kun/use-machine-ts/actions/workflows/release.yaml/badge.svg)](https://github.com/tai-kun/use-machine-ts/actions/workflows/release.yaml)
 [![Canary Release on NPM](https://github.com/tai-kun/use-machine-ts/actions/workflows/canary-release.yaml/badge.svg)](https://github.com/tai-kun/use-machine-ts/actions/workflows/canary-release.yaml)
 
+![npm bundle size](https://img.shields.io/bundlephobia/minzip/use-machine-ts)
 [![npm version](https://img.shields.io/npm/v/use-machine-ts)](https://www.npmjs.com/package/use-machine-ts)
 ![npm canary version](https://img.shields.io/npm/v/use-machine-ts/canary)
 
