@@ -155,6 +155,8 @@ function doGuardForDev(
         allow: true,
       },
     )
+    memo.pass = pass
+    allow === false && (memo.pass = true)
 
     return {
       op: "and",
@@ -193,6 +195,8 @@ function doGuardForDev(
       },
     )
     memo.cause = cause // unlock cause
+    memo.pass = pass
+    allow === false && (memo.pass = true)
 
     return {
       op: "or",
@@ -920,6 +924,71 @@ if (cfgTest && cfgTest.url === import.meta.url) {
           [
             "(isOk && (!isOk || !isOk) && isOk)",
             "         ^^^^^^^^^^^^^^^^         ",
+          ].join("\n"),
+        )
+        assert.equal(
+          res.allow,
+          doGuard({ guards }, cond, {} as Config.GuardParams.Signature),
+        )
+      })
+
+      test("readme example", () => {
+        const guards = {
+          isReady: () => true,
+          isStopped: () => true,
+          isDestroyed: () => true,
+        }
+        const cond = and(or("isReady", "isStopped"), not("isDestroyed"))
+        const res = doGuardForDev(
+          { guards },
+          cond,
+          {} as Config.GuardParams.Signature,
+        )
+
+        console.debug(JSON.stringify(res, null, 2))
+
+        assert.deepEqual(res, {
+          op: "and",
+          source: [
+            {
+              op: "or",
+              source: [
+                {
+                  op: "eq",
+                  source: "isReady",
+                  cause: false,
+                  allow: true,
+                },
+                {
+                  op: "eq",
+                  source: "isStopped",
+                  cause: false,
+                  allow: undefined,
+                },
+              ],
+              cause: false,
+              allow: true,
+            },
+            {
+              op: "not",
+              source: {
+                op: "eq",
+                source: "isDestroyed",
+                cause: false,
+                allow: true,
+              },
+              cause: true,
+              allow: false,
+            },
+          ],
+          cause: false,
+          allow: false,
+        })
+        assert.equal(
+          formatGuardResult(res),
+          [
+            "((isReady || isStopped) && !isDestroyed)",
+            "                           ^^^^^^^^^^^^ ",
           ].join("\n"),
         )
         assert.equal(
