@@ -274,7 +274,7 @@ const [state, send] = useMachine(
         on: {
           TOGGLE: {
             target: "active",
-            guard: or("isReady", and("isStopped", not("isDestroyed"))),
+            guard: and(or("isReady", "isStopped"), not("isDestroyed")),
           },
         },
       },
@@ -296,17 +296,17 @@ const [state, send] = useMachine(
 The `and` function can simply be replaced with an array.
 
 ```ts
-or("isReady", and("isStopped", not("isDestroyed")))
+and(or("isReady", "isStopped"), not("isDestroyed"))
 // equals
-or("isReady", ["isStopped", not("isDestroyed")])
+[or("isReady", "isStopped"), not("isDestroyed")]
 ```
 
 If `guard` eventually returns `false`, you will see a log similar to the following:
 
-```text
+```log
 Transition from 'inactive' to 'active' denied by guard.
-(isReady || (isStopped && !isDestroyed))
-                           ^^^^^^^^^^^^
+((isReady || isStopped) && !isDestroyed)
+                           ^^^^^^^^^^^^ 
 Event { type: "TOGGLE" }
 Context undefined
 ```
@@ -763,7 +763,7 @@ There are a few things to keep in mind when updating state machine state asynchr
 
 Inside `useMachine`, you can call the `send` and `setContext` functions asynchronously as long as the component is mounted. However, if the component is already unmounted, these functions instead of changing the state will display an error message like this:
 
-```text
+```log
 Cannot dispatch an action to the state machine after it is unmounted.
 Action { type: "SEND", payload: { type: "TOGGLE" } }
 ```
@@ -809,7 +809,7 @@ Inside `useSharedMachine`, you can call `send`, `setContext`, or `dispatch` on t
 
 The `send` and `setContext` functions cannot be called asynchronously within `useSyncedMachine`, regardless of the mounted state of the component. These functions are unlocked just before the effect starts and locked after it ends. If you call these functions while locked, you will receive an error message similar to the following:
 
-```text
+```log
 Send function not available. Must be used synchronously within an effect.
 State { value: "inactive", event: { type: "$init" }, nextEvents: ["TOGGLE"], context: undefined }
 Event: { type: "TOGGLE" }
