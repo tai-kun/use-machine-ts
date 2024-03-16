@@ -135,6 +135,7 @@ function useMachine(arg0: any, arg1?: any): [any, any] {
 }
 
 export { useMachine }
+export { isTransfer, type Transfer, transfer } from "./core/hooks"
 export { and, not, or } from "./core/logic"
 export { createMachine } from "./createMachine"
 export type * from "./types"
