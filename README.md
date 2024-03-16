@@ -20,10 +20,26 @@ use-machine-ts is a tiny hook for designing state machines in React. Easily mana
 
 use-machine-ts is inspired by [@cassiozen/usestatemachine](https://github.com/cassiozen/useStateMachine).
 
+<details>
+  <summary>Difference between use-machine-ts and @cassiozen/usestatemachine</summary>
+
+  - The state machine definition has been split into two parts instead of one. The separated items are debugging settings and the body of guard functions and effect functions. Since the implementation is not included in the state transition definition, you get the following benefits:
+    - You can concentrate more on thinking about state transitions.
+    - Logs when state transitions are guarded are now clearer, making debugging easier. (See: [Using Guards](#using-guards))
+  - No need for special functions `t` for context and event type definitions.
+  - State machines can be created in advance.
+  - Asynchronous state machine state updates are now relatively safe. Specifically, behavior has been improved when the component is already unmounted. (See: [Async Orchestration](#async-orchestration))
+  - In addition to `useMachine`, two other useful hooks are provided.
+    - `useSharedMachine`: Allows you to share state between multiple React components. You can also manage state transitions from outside your React component.
+    - `useSyncedMachine`: Re-rendering is not triggered on every state transition. This hook provides a function that returns a snapshot of the state rather than the current state.
+  - 😢 The required React version has been increased from 16.8 to 18.
+  - 😢 File size has increased. Comparing `useMachine`, it's an increase of about 400 bytes (+60%).
+</details>
+
 ## Basic Features
 
 - useMachine: Essentially a wrapper around `useState` and `useEffect`. Manages state transitions, similar to `useState`.
-- useSharedMachine: Essentially a wrapper around `usuSyncExternalState` and `useEffect`. You can also manage state transitions from outside your React component.
+- useSharedMachine: Essentially a wrapper around `usuSyncExternalState` and `useEffect`. You can share state between multiple React components. You can also manage state transitions from outside your React component.
 - useSyncedMachine: Similar to useMachine, but does not trigger a re-render on every state transition. This hook provides a function that returns a snapshot of the state rather than the current state.
 - createMachine: Create a state machine. This is useful for reusing State Machine Definitions in different components. Can be used with useMachine and useSyncedMachine.
 - createSharedMachine: Similar to createMachine, but only available with useSharedMachine.
@@ -110,6 +126,9 @@ console.log(state)
   - [useSyncedMachine](#usesyncedmachine)
   - [transfer](#transfer)
 - [Async Orchestration](#async-orchestration)
+  - [useMachine](#usemachine-1)
+  - [useSharedMachine](#usesharedmachine-1)
+  - [useSyncedMachine](#usesyncedmachine-1)
 
 # API
 
@@ -752,7 +771,7 @@ function ToggleButton(props: { onToggle?: (isActive: boolean) => void }) {
 }
 ```
 
-# AsyncOrchestration
+# Async Orchestration
 
 > [!WARNING]
 > In use-machine-ts, you should avoid updating the state machine state asynchronously.

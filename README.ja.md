@@ -20,10 +20,26 @@ use-machine-ts は React でステートマシンをデザインするための�
 
 use-machine-ts は [@cassiozen/usestatemachine](https://github.com/cassiozen/useStateMachine) に触発されています。
 
+<details>
+  <summary>use-machine-ts と @cassiozen/usestatemachine の違い</summary>
+
+  - ステートマシンの定義は 1 つから 2 つに分割されています。分離された項目はデバッグに関する設定と、ガード関数とエフェクト関数の実体です。状態遷移の定義の中に実装が含まれないため、次の恩恵を得られます。
+    - 状態遷移の熟慮により集中できます。
+    - 状態遷移がガードされたときのログが明確になり、デバッグが容易になります。 (参照: [Using Guards](#using-guards))
+  - コンテキストとイベントの型定義のための特別な関数 `t` が必要ありません。
+  - ステートマシンを事前に作成することができます。
+  - 非同期的なステートマシンの状態更新が比較的安全になりました。具体的には、コンポーネントがすでにアンマウントされている状態での動作が改善されました。 (参照: [Async Orchestration](#async-orchestration))
+  - `useMachine` 以外にも、2 つの便利なフックが提供されています。
+    - `useSharedMachine`: 複数の React コンポーネントの間で状態を共有することができます。また、React コンポーネントの外側から状態遷移を管理することもできます。
+    - `useSyncedMachine`: 状態が遷移するたびに再レンダリングがトリガーされることはありません。このフックは現在の状態ではなく、状態のスナップショットを返す関数提供します。
+  - 😢 必要な React のバージョンは 16.8 から、18 に引き上げられています。
+  - 😢 ファイルサイズが増加しました。`useMachine` を比較すると、約 400 バイト (+60%) の増加です。
+</details>
+
 ## Basic Features
 
 - useMachine: 本質的には `useState` と `useEffect` のラッパーです。`useState` と同じように、状態遷移を管理します。
-- useSharedMachine: 本質的には `usuSyncExternalState` と `useEffect` のラッパーです。React コンポーネントの外側から状態遷移を管理することもできます。
+- useSharedMachine: 本質的には `usuSyncExternalState` と `useEffect` のラッパーです。複数の React コンポーネントの間で状態を共有することができます。また、React コンポーネントの外側から状態遷移を管理することもできます。
 - useSyncedMachine: useMachine と似ていますが、状態が遷移するたびに再レンダリングがトリガーされることはありません。このフックは現在の状態ではなく、状態のスナップショットを返す関数提供します。
 - createMachine: ステートマシンを作成します。State Machine Definitionを異なるコンポーネントで使いまわすのに便利です。useMachine と useSyncedMachine で使用できます。
 - createSharedMachine: createMachine と似ていますが、useSharedMachine でのみ使用できます。
@@ -110,6 +126,9 @@ console.log(state)
   - [useSyncedMachine](#usesyncedmachine)
   - [transfer](#transfer)
 - [Async Orchestration](#async-orchestration)
+  - [useMachine](#usemachine-1)
+  - [useSharedMachine](#usesharedmachine-1)
+  - [useSyncedMachine](#usesyncedmachine-1)
 
 # API
 
