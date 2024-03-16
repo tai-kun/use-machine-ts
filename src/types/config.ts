@@ -567,10 +567,15 @@ export type EffectParams<D, V> = {
   readonly setContext: SetContext<D>
   /**
    * The function to check if the component is mounted.
-   * 
-   * @returns `true` if the component is mounted, `false` otherwise.
    */
-  readonly isMounted: () => boolean
+  readonly isMounted: {
+    /**
+     * Check if the component is mounted.
+     * 
+     * @returns `true` if the component is mounted, `false` otherwise.
+     */
+    (): boolean
+  }
 }
 
 export namespace EffectParams {
@@ -593,10 +598,15 @@ export namespace EffectParams {
     readonly setContext: SetContext.Signature
     /**
      * The function to check if the component is mounted.
-     * 
-     * @returns `true` if the component is mounted, `false` otherwise.
      */
-    readonly isMounted: () => boolean
+    readonly isMounted: {
+      /**
+       * Check if the component is mounted.
+       * 
+       * @returns `true` if the component is mounted, `false` otherwise.
+       */
+      (): boolean
+    }
   }
 }
 
@@ -625,10 +635,15 @@ export type EffectCleanupParams<D, V> = {
   readonly setContext: SetContext<D>
   /**
    * The function to check if the component is mounted.
-   * 
-   * @returns `true` if the component is mounted, `false` otherwise.
    */
-  readonly isMounted: () => boolean
+  readonly isMounted: {
+    /**
+     * Check if the component is mounted.
+     * 
+     * @returns `true` if the component is mounted, `false` otherwise.
+     */
+    (): boolean
+  }
 }
 
 export namespace EffectCleanupParams {
@@ -651,10 +666,15 @@ export namespace EffectCleanupParams {
     readonly setContext: SetContext.Signature
     /**
      * The function to check if the component is mounted.
-     * 
-     * @returns `true` if the component is mounted, `false` otherwise.
      */
-    readonly isMounted: () => boolean
+    readonly isMounted: {
+      /**
+       * Check if the component is mounted.
+       * 
+       * @returns `true` if the component is mounted, `false` otherwise.
+       */
+      (): boolean
+    }
   }
 }
 
