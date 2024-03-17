@@ -7,17 +7,16 @@ export { useMachine } from "./useMachine"
 export { useSharedMachine } from "./useSharedMachine"
 export { useSyncedMachine } from "./useSyncedMachine"
 
-// This test is based on the following file:
-// https://github.com/cassiozen/useStateMachine/blob/main/test/index.test.ts
 if (cfgTest && cfgTest.url === import.meta.url) {
   await import("global-jsdom/register")
-  const { useMemo, useSyncExternalStore } = await import("react")
+  const { useEffect, useMemo, useSyncExternalStore } = await import("react")
   const { act, renderHook } = await import("@testing-library/react")
   const { createMachine } = await import("./createMachine")
   const { createSharedMachine } = await import("./createSharedMachine")
   const { useMachine } = await import("./useMachine")
   const { useSharedMachine } = await import("./useSharedMachine")
   const { useSyncedMachine } = await import("./useSyncedMachine")
+  const { transfer } = await import("./core/hooks")
   const { assert, describe, mock, test } = cfgTest
 
   function createInvocationCallOrder() {
@@ -86,7 +85,7 @@ if (cfgTest && cfgTest.url === import.meta.url) {
   }
 
   const hooks = {
-    useMachine,
+    useMachineOrigin: useMachine,
     useMachineUsingMachineFactory,
     useMachineUsingPredefinedMachine,
     useMachineUsingUseSharedMachine,
@@ -95,6 +94,9 @@ if (cfgTest && cfgTest.url === import.meta.url) {
 
   for (const [hookName, useHook] of Object.entries(hooks)) {
     describe(hookName, () => {
+      // These tests are based on the following file:
+      // https://github.com/cassiozen/useStateMachine/blob/main/test/index.test.ts
+
       describe("States & Transitions", () => {
         test("should set initial state", () => {
           const { result } = renderHook(() =>
@@ -857,4 +859,294 @@ if (cfgTest && cfgTest.url === import.meta.url) {
       })
     })
   }
+
+  // These tests are the original tests for use-machine-ts.
+
+  describe("useMachine", () => {
+    test("definition and config should be immutable", () => {
+      const onToggle1 = mock.fn()
+      const onToggle2 = mock.fn()
+      const { result, rerender } = renderHook(
+        ({ onToggle }) =>
+          useMachine(
+            {
+              initial: "inactive",
+              states: {
+                inactive: {
+                  on: { TOGGLE: "active" },
+                  effect: "onToggle",
+                },
+                active: {
+                  on: { TOGGLE: "inactive" },
+                  effect: "onToggle",
+                },
+              },
+            },
+            {
+              effects: {
+                onToggle: () => {
+                  onToggle()
+                },
+              },
+            },
+          ),
+        {
+          initialProps: {
+            onToggle: onToggle1,
+          },
+        },
+      )
+      const callCountOfOnToggle1 = onToggle1.mock.callCount()
+
+      assert(callCountOfOnToggle1 > 0)
+
+      rerender({
+        onToggle: onToggle2,
+      })
+
+      const [, send] = result.current
+
+      act(() => {
+        send("TOGGLE")
+      })
+
+      assert(onToggle1.mock.callCount() > callCountOfOnToggle1)
+      assert(onToggle2.mock.callCount() === 0)
+    })
+
+    test("should transfer prop to state machine", () => {
+      const machine = (onToggle: any) => {
+        return createMachine(
+          {
+            initial: "inactive",
+            states: {
+              inactive: {
+                on: { TOGGLE: "active" },
+                effect: "onToggle",
+              },
+              active: {
+                on: { TOGGLE: "inactive" },
+                effect: "onToggle",
+              },
+            },
+          },
+          {
+            effects: {
+              onToggle: () => {
+                onToggle.current()
+              },
+            },
+          },
+        )
+      }
+      const onToggle1 = mock.fn()
+      const onToggle2 = mock.fn()
+      const { result, rerender } = renderHook(
+        ({ onToggle }) => useMachine(machine, [transfer(onToggle)]),
+        {
+          initialProps: {
+            onToggle: onToggle1,
+          },
+        },
+      )
+      const callCountOfOnToggle1 = onToggle1.mock.callCount()
+
+      assert(callCountOfOnToggle1 > 0)
+
+      rerender({
+        onToggle: onToggle2,
+      })
+
+      const [, send] = result.current
+
+      act(() => {
+        send("TOGGLE")
+      })
+
+      assert(onToggle1.mock.callCount() === callCountOfOnToggle1)
+      assert(onToggle2.mock.callCount() > 0)
+    })
+
+    test("should logs when `send` function is called asynchronously", () => {
+      const groupSpy = mock.fn()
+      const errorSpy = mock.fn()
+      let sendFn: () => void
+      const { unmount } = renderHook(() =>
+        useMachine(
+          {
+            $schema: {} as {
+              events: {
+                TOGGLE: {
+                  mount: boolean
+                }
+              }
+            },
+            initial: "inactive",
+            states: {
+              inactive: {
+                on: { TOGGLE: "active" },
+                effect: "entry",
+              },
+              active: {},
+            },
+          },
+          {
+            effects: {
+              entry: ({ send, isMounted }) => {
+                sendFn = () => {
+                  send({
+                    type: "TOGGLE",
+                    mount: isMounted(),
+                  })
+                }
+              },
+            },
+            console: {
+              log() {},
+              error: errorSpy,
+              group: groupSpy,
+              groupEnd() {},
+            },
+          },
+        )
+      )
+      unmount()
+      sendFn!()
+
+      assert.deepEqual(
+        groupSpy.mock.calls.map(call => call.arguments),
+        [
+          [
+            "Cannot dispatch an action to the state machine after it is unmounted.",
+          ],
+        ],
+      )
+      assert.deepEqual(
+        errorSpy.mock.calls.map(call => call.arguments),
+        [
+          [
+            "Action",
+            {
+              type: "SEND",
+              payload: {
+                type: "TOGGLE",
+                mount: false,
+              },
+            },
+          ],
+        ],
+      )
+    })
+  })
+
+  describe("useSharedMachine", () => {
+    test("should share state machine state between hooks", () => {
+      const machine = createSharedMachine({
+        initial: "inactive",
+        states: {
+          inactive: {
+            on: { TOGGLE: "active" },
+          },
+          active: {
+            on: { TOGGLE: "inactive" },
+          },
+        },
+      })
+      const { result: result1 } = renderHook(() => useSharedMachine(machine))
+      const [state1, sendFrom1] = result1.current
+
+      assert.deepEqual(state1, {
+        context: undefined,
+        event: { type: "$init" },
+        value: "inactive",
+        nextEvents: ["TOGGLE"],
+      })
+
+      act(() => {
+        sendFrom1("TOGGLE")
+      })
+
+      const [state1_2] = result1.current
+
+      assert.deepEqual(state1_2, {
+        context: undefined,
+        event: { type: "TOGGLE" },
+        value: "active",
+        nextEvents: ["TOGGLE"],
+      })
+
+      const { result: result2 } = renderHook(() => useSharedMachine(machine))
+      const [state2, sendFrom2] = result2.current
+
+      assert.deepEqual(state2, {
+        context: undefined,
+        event: { type: "TOGGLE" },
+        value: "active",
+        nextEvents: ["TOGGLE"],
+      })
+
+      act(() => {
+        sendFrom2("TOGGLE")
+      })
+
+      const [state2_2] = result2.current
+      const [state1_3] = result1.current
+
+      assert.deepEqual(state2_2, {
+        context: undefined,
+        event: { type: "TOGGLE" },
+        value: "inactive",
+        nextEvents: ["TOGGLE"],
+      })
+      assert.deepEqual(state2_2, state1_3)
+    })
+  })
+
+  describe("useSyncedMachine", () => {
+    test("should not be re-rendered even after state transition", () => {
+      let renderCount = 0
+      const { result } = renderHook(() => {
+        const machine = useSyncedMachine({
+          initial: "inactive",
+          states: {
+            inactive: {
+              on: { TOGGLE: "active" },
+            },
+            active: {
+              on: { TOGGLE: "inactive" },
+            },
+          },
+        })
+        useEffect(() => {
+          renderCount++
+        })
+
+        return machine
+      })
+      const [state1, send] = result.current
+
+      assert.equal(renderCount, 1)
+      assert.deepEqual(state1(), {
+        context: undefined,
+        event: { type: "$init" },
+        value: "inactive",
+        nextEvents: ["TOGGLE"],
+      })
+
+      act(() => {
+        send("TOGGLE")
+      })
+
+      const [state2] = result.current
+
+      assert.equal(renderCount, 1)
+      assert.deepEqual(state2(), {
+        context: undefined,
+        event: { type: "TOGGLE" },
+        value: "active",
+        nextEvents: ["TOGGLE"],
+      })
+      assert.equal(state1, state2)
+    })
+  })
 }
