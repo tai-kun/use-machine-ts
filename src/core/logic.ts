@@ -1313,20 +1313,7 @@ if (cfgTest && cfgTest.url === import.meta.url) {
       })
 
       test("should error if dispatch is called asynchronously in sync mode", async () => {
-        // @ts-ignore
-        Promise.withResolvers ||= (): any => {
-          let resolve, reject
-          const promise = new Promise((res, rej) => {
-            resolve = res
-            reject = rej
-          })
-
-          return { promise, resolve, reject }
-        }
-
-        const { promise, resolve } =
-          // @ts-ignore
-          Promise.withResolvers<void>()
+        const { promise, resolve } = Promise.withResolvers<void>()
         const errorMock = mock.fn(() => {})
         const dispatchMock = mock.fn(() => {})
         const def = {
