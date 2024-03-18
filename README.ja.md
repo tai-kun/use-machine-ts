@@ -6,15 +6,27 @@
 [![Release on NPM](https://github.com/tai-kun/use-machine-ts/actions/workflows/release.yaml/badge.svg)](https://github.com/tai-kun/use-machine-ts/actions/workflows/release.yaml)
 [![Canary Release on NPM](https://github.com/tai-kun/use-machine-ts/actions/workflows/canary-release.yaml/badge.svg)](https://github.com/tai-kun/use-machine-ts/actions/workflows/canary-release.yaml)
 
-![npm bundle size](https://img.shields.io/bundlephobia/minzip/use-machine-ts/latest)
+[![npm bundle size](https://img.shields.io/bundlephobia/minzip/use-machine-ts/latest)](https://bundlephobia.com/package/use-machine-ts)
 [![npm version](https://img.shields.io/npm/v/use-machine-ts)](https://www.npmjs.com/package/use-machine-ts)
-![npm canary version](https://img.shields.io/npm/v/use-machine-ts/canary)
+[![npm canary version](https://img.shields.io/npm/v/use-machine-ts/canary)](https://www.npmjs.com/package/use-machine-ts?activeTab=versions)
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-red.svg)](https://opensource.org/licenses/MIT)
 
 <p align="center"><a href="./README.md">English (MT)</a> | 日本語</p>
 
 use-machine-ts は React でステートマシンをデザインするための小さなフックです。すでに慣れ親しんでいる慣用的な React のパターンに従い、状態遷移を簡単に管理できます。
+
+<details>
+  <summary>ファイルサイズ</summary>
+
+  | source | min+brotli (KB) |
+  | :-- | --: |
+  | `import { useMachine } from "use-machine-ts"` | 1.05 |
+  | `import * from "use-machine-ts"`              | 1.46 |
+  | `import * from "use-machine-ts/standard"`     | 1.09 |
+  | `import * from "use-machine-ts/shared"`       | 1.06 |
+  | `import * from "use-machine-ts/synced"`       | 1.18 |
+</details>
 
 ## Respect
 

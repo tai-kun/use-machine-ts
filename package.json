@@ -71,20 +71,19 @@
   },
   "size-limit": [
     {
-      "path": ".temp/dist/index.production.min.mjs",
-      "gzip": true
+      "path": ".temp/dist/baseline.production.min.mjs"
     },
     {
-      "path": ".temp/dist/use-machine.production.min.mjs",
-      "gzip": true
+      "path": ".temp/dist/index.production.min.mjs"
     },
     {
-      "path": ".temp/dist/use-shared-machine.production.min.mjs",
-      "gzip": true
+      "path": ".temp/dist/use-machine.production.min.mjs"
     },
     {
-      "path": ".temp/dist/use-synced-machine.production.min.mjs",
-      "gzip": true
+      "path": ".temp/dist/use-shared-machine.production.min.mjs"
+    },
+    {
+      "path": ".temp/dist/use-synced-machine.production.min.mjs"
     }
   ],
   "volta": {

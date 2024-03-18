@@ -27,6 +27,7 @@ export default [
   // Bundles
 
   ...[
+    "baseline.ts",
     "index.ts",
     "useMachine.ts",
     "useSharedMachine.ts",
