@@ -815,7 +815,7 @@ export type ConsoleInterface = {
    */
   readonly groupEnd?: (() => void) | undefined
   /**
-   * An alias for {@link group}.
+   * An alias for {@link group} in Node.js.
    */
   readonly groupCollapsed?: ((...label: string[]) => void) | undefined
 }

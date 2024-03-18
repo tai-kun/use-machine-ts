@@ -40,10 +40,10 @@ export function log(
     groupLabel = [groupLabel]
   }
 
-  const isCollapsible = !!(cons.group || cons.groupCollapsed) && !!cons.groupEnd
+  const isCollapsible = !!(cons.groupCollapsed || cons.group) && !!cons.groupEnd
 
   if (isCollapsible) {
-    ;(cons.group || cons.groupCollapsed)!(...groupLabel)
+    ;(cons.groupCollapsed || cons.group)!(...groupLabel)
   } else {
     switch (level) {
       case "debug":
