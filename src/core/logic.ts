@@ -400,7 +400,10 @@ export function applyDispatch(
             { ...conf, level: "debug" },
             `Transition from '${state.value}' to '${nextStateValue}'`
               + " denied by guard.",
-            [formatGuardResult(guardResult as GuardResult)],
+            [
+              `%c${formatGuardResult(guardResult as GuardResult)}`,
+              "font-family: monospace",
+            ],
             ["Event", event],
             ["Context", context],
           )
@@ -1177,9 +1180,12 @@ if (cfgTest && cfgTest.url === import.meta.url) {
               {
                 args: [
                   [
+                    // dprint-ignore
+                    "%c" +
                     "isAllowed",
                     "^^^^^^^^^",
                   ].join("\n"),
+                  "font-family: monospace",
                 ],
               },
               {
