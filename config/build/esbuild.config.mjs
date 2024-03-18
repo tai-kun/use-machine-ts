@@ -143,7 +143,7 @@ function bundle(options) {
     // Output contents
 
     format,
-    ...(format === "cjs" ? { target: "ES2015" } : {}),
+    target: format === "cjs" ? "ES2015" : "ES2022",
 
     // Output location
 
