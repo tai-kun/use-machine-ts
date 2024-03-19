@@ -404,7 +404,10 @@ export function applyDispatch(
             ),
           }
 
-          if (guardResult.allow !== prodGuardResult.allow) {
+          if (
+            typeof guardResult.allow === "boolean"
+            && guardResult.allow !== prodGuardResult.allow
+          ) {
             console.error(
               "!!! EMERGENCY (use-machine-ts) !!!\n"
                 + "Guard results differ between development and production environments. "

@@ -507,7 +507,7 @@ if (cfgTest && cfgTest.url === import.meta.url) {
 
           const [state] = result.current
 
-          assert.equal(guard.mock.callCount(), 1)
+          assert.equal(guard.mock.callCount(), 2) // Called twice in development environment
           assert.deepEqual(state, {
             context: undefined,
             event: { type: "$init" },
@@ -551,7 +551,7 @@ if (cfgTest && cfgTest.url === import.meta.url) {
 
           const [state] = result.current
 
-          assert.equal(guard.mock.callCount(), 1)
+          assert.equal(guard.mock.callCount(), 2) // Called twice in development environment
           assert.deepEqual(state, {
             context: undefined,
             event: {
