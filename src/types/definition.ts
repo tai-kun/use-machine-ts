@@ -151,6 +151,8 @@ type _EventTypeConstraint<D> =
     ? keyof Get<D, ["$schema", "events"]>
     : string
 
+declare const NEVER: unique symbol
+
 /**
  * The type of definition how a state machine will transition when it receives a specific event.
  * 
@@ -163,8 +165,10 @@ export type On<
   P extends ReadonlyArray<keyof any>,
   G extends string,
 > =
+    [keyof Get<D, P>] extends [never]
+  ? { [NEVER]?: never }
   // If the event is not a literal string, return an error.
-    IsLiteralString<keyof Get<D, P>> extends false
+  : IsLiteralString<keyof Get<D, P>> extends false
   ? "Error: Event types must be literal strings."
   // Else, return the transitions.
   : {
@@ -303,9 +307,12 @@ export type Schema<
    * The event types that are allowed in the state machine.
    */
   readonly events?:
+    // If no events are defined, return an empty object.
+      [keyof _E] extends [never]
+    ? { [NEVER]?: never }
     // If the event type is not a literal string, return an error.
-      IsLiteralString<keyof _E> extends false
-    ? "Error: Event type must be a literal string."
+    : IsLiteralString<keyof _E> extends false
+    ? "Error: Event types must be literal strings."
     // Else, return the event type.
     : {
         [T in keyof _E]:
@@ -346,7 +353,10 @@ export type Shape<
    */
   readonly initial:
     // If no states are defined, return an error.
-      [keyof _S] extends [never]
+      IsPlainObject<_S> extends false
+    ? "Error: States must be a plain object."
+    // If no states are defined, return an error.
+    : [keyof _S] extends [never]
     ? "Error: No states defined."
     // If the state value is not a literal string, return an error.
     : IsLiteralString<keyof _S> extends false
@@ -357,8 +367,14 @@ export type Shape<
    * The state definitions.
    */
   readonly states:
-    /// If the state value is not a literal string, return an error.
-      IsLiteralString<keyof _S> extends false
+    // If no states are defined, return an error.
+      IsPlainObject<_S> extends false
+    ? "Error: States must be a plain object."
+    // If no states are defined, return an empty object.
+    : [keyof _S] extends [never]
+    ? { [NEVER]?: never }
+    // If the state value is not a literal string, return an error.
+    : IsLiteralString<keyof _S> extends false
     ? "Error: State values must be literal strings."
     // Else, return the state definition.
     : {
@@ -511,9 +527,16 @@ if (cfgTest && cfgTest.url === import.meta.url) {
     })
 
     describe("On", () => {
+      test("should be inferred as an empty object the event types are not defined", () => {
+        type Expected = { [NEVER]?: never }
+        type Actual = On<{}, ["on"], never>
+
+        expectType<Expected>({} as Actual)
+      })
+
       test("should be inferred as an error when the event types are not literal strings", () => {
         type Expected = "Error: Event types must be literal strings."
-        type Actual = On<{}, ["on"], never>
+        type Actual = On<{ on: { 1: {} } }, ["on"], never>
 
         expectType<Expected>({} as Actual)
       })
