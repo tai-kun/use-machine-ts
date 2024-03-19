@@ -10,6 +10,41 @@ import { useState } from "./core/react"
 import type { Config, Definition, Machine, Send, State } from "./types"
 
 /**
+ * Use a state machine using a pre-created machine.
+ *
+ * @template D - The type of state machine definition.
+ * @param machine - The state machine factory.
+ * @returns An array with two elements:
+ * - The first element is the current state of the state machine.
+ * - The second element is a function that sends an event to the state machine.
+ */
+function useMachine<D>(
+  machine: () => Machine<D>,
+): [
+  state: State<D>,
+  send: Send<D>,
+]
+
+/**
+ * Use a state machine using a pre-created machine.
+ *
+ * @template D - The type of state machine definition.
+ * @template A - The type of arguments for the state machine factory.
+ * @param machine - The state machine factory.
+ * @param args - The arguments for the state machine factory.
+ * @returns An array with two elements:
+ * - The first element is the current state of the state machine.
+ * - The second element is a function that sends an event to the state machine.
+ */
+function useMachine<D, A extends readonly any[]>(
+  machine: (...args: A) => Machine<D>,
+  args: A,
+): [
+  state: State<D>,
+  send: Send<D>,
+]
+
+/**
  * Create a state machine and use it.
  *
  * @template D - The type of state machine definition.
@@ -60,41 +95,6 @@ function useMachine<
  */
 function useMachine<D>(
   machine: Machine<D>,
-): [
-  state: State<D>,
-  send: Send<D>,
-]
-
-/**
- * Use a state machine using a pre-created machine.
- *
- * @template D - The type of state machine definition.
- * @param machine - The state machine factory.
- * @returns An array with two elements:
- * - The first element is the current state of the state machine.
- * - The second element is a function that sends an event to the state machine.
- */
-function useMachine<D>(
-  machine: () => Machine<D>,
-): [
-  state: State<D>,
-  send: Send<D>,
-]
-
-/**
- * Use a state machine using a pre-created machine.
- *
- * @template D - The type of state machine definition.
- * @template A - The type of arguments for the state machine factory.
- * @param machine - The state machine factory.
- * @param args - The arguments for the state machine factory.
- * @returns An array with two elements:
- * - The first element is the current state of the state machine.
- * - The second element is a function that sends an event to the state machine.
- */
-function useMachine<D, A extends readonly any[]>(
-  machine: (...args: A) => Machine<D>,
-  args: A,
 ): [
   state: State<D>,
   send: Send<D>,

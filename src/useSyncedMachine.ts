@@ -10,6 +10,41 @@ import { useEffect, useRef } from "./core/react"
 import type { Config, Definition, Machine, Send, State } from "./types"
 
 /**
+ * Use a state machine using a pre-created machine.
+ *
+ * @template D - The type of state machine definition.
+ * @param machine - The state machine factory.
+ * @returns An array with two elements:
+ * - The first element is a function that returns the current state of the state machine.
+ * - The second element is a function that sends an event to the state machine.
+ */
+function useSyncedMachine<D>(
+  machine: () => Machine<D>,
+): [
+  getState: () => State<D>,
+  send: Send<D>,
+]
+
+/**
+ * Use a state machine using a pre-created machine.
+ *
+ * @template D - The type of state machine definition.
+ * @template A - The type of arguments for the state machine factory.
+ * @param machine - The state machine factory.
+ * @param args - The arguments for the state machine factory.
+ * @returns An array with two elements:
+ * - The first element is a function that returns the current state of the state machine.
+ * - The second element is a function that sends an event to the state machine.
+ */
+function useSyncedMachine<D, A extends readonly any[]>(
+  machine: (...args: A) => Machine<D>,
+  args: A,
+): [
+  getState: () => State<D>,
+  send: Send<D>,
+]
+
+/**
  * Create a state machine and use it.
  *
  * @template D - The type of state machine definition.
@@ -60,41 +95,6 @@ function useSyncedMachine<
  */
 function useSyncedMachine<D>(
   machine: Machine<D>,
-): [
-  getState: () => State<D>,
-  send: Send<D>,
-]
-
-/**
- * Use a state machine using a pre-created machine.
- *
- * @template D - The type of state machine definition.
- * @param machine - The state machine factory.
- * @returns An array with two elements:
- * - The first element is a function that returns the current state of the state machine.
- * - The second element is a function that sends an event to the state machine.
- */
-function useSyncedMachine<D>(
-  machine: () => Machine<D>,
-): [
-  getState: () => State<D>,
-  send: Send<D>,
-]
-
-/**
- * Use a state machine using a pre-created machine.
- *
- * @template D - The type of state machine definition.
- * @template A - The type of arguments for the state machine factory.
- * @param machine - The state machine factory.
- * @param args - The arguments for the state machine factory.
- * @returns An array with two elements:
- * - The first element is a function that returns the current state of the state machine.
- * - The second element is a function that sends an event to the state machine.
- */
-function useSyncedMachine<D, A extends readonly any[]>(
-  machine: (...args: A) => Machine<D>,
-  args: A,
 ): [
   getState: () => State<D>,
   send: Send<D>,
