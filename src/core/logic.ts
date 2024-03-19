@@ -394,6 +394,34 @@ export function applyDispatch(
           },
         ]
 
+      if (__DEV__) {
+        if (typeof transition !== "string") {
+          const prodGuardResult = {
+            allow: transition.guard === undefined || doGuard(
+              conf,
+              transition.guard,
+              { event, context },
+            ),
+          }
+
+          if (guardResult.allow !== prodGuardResult.allow) {
+            console.error(
+              "!!! EMERGENCY (use-machine-ts) !!!\n"
+                + "Guard results differ between development and production environments. "
+                + "This is probably a serious bug in the library. "
+                + "Could you please let me know under what conditions this bug occurs?\n\n"
+                + "Issue: https://github.com/tai-kun/use-machine-ts/issues/new\n\n"
+                + "Thank you,\n"
+                + "tai-kun\n",
+              "Event",
+              event,
+              "Transition",
+              transition,
+            )
+          }
+        }
+      }
+
       if (!guardResult.allow) {
         if (__DEV__) {
           log(
