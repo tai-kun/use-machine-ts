@@ -7,6 +7,7 @@ import type {
   IsLiteralBoolean,
   IsLiteralString,
   IsPlainObject,
+  RequiredKeysOf,
   Tagged,
 } from "./utils"
 
@@ -389,12 +390,22 @@ export type Shape<
    * The definition how a state machine will transition when it receives a specific event.
    */
   readonly on?: On<D, ["on"], G>
-  /**
-   * The context of the state machine.
-   */
-  readonly context?: Context<D>
   readonly $schema?: Schema<D, ["$schema"]>
-}
+} & (
+  "context" extends keyof Get<D, ["$schema"]>
+    ? {
+      /**
+       * The context of the state machine.
+       */
+      readonly context: Context<D>
+    }
+    : {
+      /**
+       * The context of the state machine.
+       */
+      readonly context?: Context<D>
+    }
+)
 
 /**
  * Infer the narrowest type from the state machine definition.
@@ -669,6 +680,23 @@ if (cfgTest && cfgTest.url === import.meta.url) {
         type Actual = Shape<Def, never, never>["states"]
 
         expectType<Expected>({} as Actual)
+      })
+
+      test("should require `context` when it is defined in `$schema`", () => {
+        type DefHasNoCtx1 = {}
+        type DefHasNoCtx2 = {
+          $schema: {}
+        }
+        type DefHasCtx = {
+          $schema: {
+            context: {}
+          }
+        }
+        type Actual<D> = RequiredKeysOf<Shape<D, never, never>>
+
+        expectType<"initial" | "states">({} as Actual<DefHasNoCtx1>)
+        expectType<"initial" | "states">({} as Actual<DefHasNoCtx2>)
+        expectType<"initial" | "states" | "context">({} as Actual<DefHasCtx>)
       })
     })
   })

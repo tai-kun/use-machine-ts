@@ -114,6 +114,17 @@ type Primitive = string | number | boolean | null | undefined
  */
 export type Tagged<V extends Primitive, T extends string> = V & { __tag?: T }
 
+/**
+ * Extract all required keys from the given type.
+ * 
+ * @see https://github.com/sindresorhus/type-fest/blob/main/source/required-keys-of.d.ts
+ */
+export type RequiredKeysOf<T extends object> = Exclude<ValueOf<{
+  [P in keyof T]: T extends Record<P, T[P]>
+    ? P
+    : never
+}>, undefined>
+
 if (cfgTest && cfgTest.url === import.meta.url) {
   const { expectType } = await import("tsd")
   const { describe, test } = cfgTest
@@ -232,6 +243,18 @@ if (cfgTest && cfgTest.url === import.meta.url) {
             b: number
           }>
         >({} as string | number)
+      })
+    })
+
+    describe("RequiredKeysOf", () => {
+      test("should extract all required keys from the given type", () => {
+        expectType<
+          RequiredKeysOf<{
+            a: string
+            b?: number
+            c: string | undefined
+          }>
+        >({} as "a" | "c")
       })
     })
   })
