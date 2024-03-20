@@ -34,7 +34,7 @@ function listup() {
 TYPE='(docs|style|refactor|perf|test|chore|revert|feat|fix)'
 
 src_scope="$(listup src)"
-scope="(ci|@types|config|docs|examples|scripts|src|$src_scope)"
+scope="(ci|types|config|docs|examples|scripts|src|$src_scope)"
 
 regex "^$TYPE(\(${scope//$/\\$}\))?: .+$" && exit 0
 regex "^build(\((deps|deps-dev)\))?: .+$" && exit 0
