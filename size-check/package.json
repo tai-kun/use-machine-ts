@@ -1,0 +1,16 @@
+{
+  "type": "module",
+  "scripts": {
+    "build": "node build.mjs"
+  },
+  "dependencies": {
+    "@cassiozen/usestatemachine": "~1.0.1",
+    "@xstate/react": "~4.1.0",
+    "esbuild": "~0.20.2",
+    "use-machine-ts": "file:..",
+    "xstate": "~5.9.1"
+  },
+  "volta": {
+    "node": "20.11.1"
+  }
+}

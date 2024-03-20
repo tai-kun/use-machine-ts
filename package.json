@@ -67,24 +67,16 @@
     "lint": "exit 0",
     "test": "node --enable-source-maps --import cfg-test --test 'src/**/*.ts' --test 'src/**/*.tsx'",
     "build": "scripts/build.sh",
-    "size": "size-limit"
+    "size-check": "npm run build && (cd size-check && npm ci && npm run build) && size-limit"
   },
   "size-limit": [
-    {
-      "path": ".temp/dist/baseline.production.min.mjs"
-    },
-    {
-      "path": ".temp/dist/index.production.min.mjs"
-    },
-    {
-      "path": ".temp/dist/use-machine.production.min.mjs"
-    },
-    {
-      "path": ".temp/dist/use-shared-machine.production.min.mjs"
-    },
-    {
-      "path": ".temp/dist/use-synced-machine.production.min.mjs"
-    }
+    { "path": "size-check/dist/xstate/react.js" },
+    { "path": "size-check/dist/@cassiozen/usestatemachine.js" },
+    { "path": "size-check/dist/use-machine-ts/baseline.js" },
+    { "path": "size-check/dist/use-machine-ts/index.js" },
+    { "path": "size-check/dist/use-machine-ts/standard.js" },
+    { "path": "size-check/dist/use-machine-ts/shared.js" },
+    { "path": "size-check/dist/use-machine-ts/synced.js" }
   ],
   "volta": {
     "node": "21.7.1"
