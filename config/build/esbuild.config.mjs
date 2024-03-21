@@ -23,25 +23,6 @@ export default [
       format: "cjs",
     })
   )),
-
-  // Bundles
-
-  ...[
-    "baseline.ts",
-    "index.ts",
-    "useMachine.ts",
-    "useSharedMachine.ts",
-    "useSyncedMachine.ts",
-  ].flatMap(entrypoint => [
-    bundle({
-      format: "esm",
-      entrypoint,
-    }),
-    bundle({
-      format: "cjs",
-      entrypoint,
-    }),
-  ]),
 ]
 
 /**
@@ -116,62 +97,6 @@ function create(options) {
         format,
       }),
     ],
-  }
-}
-
-/**
- * @param {object} options
- * @param {"esm" | "cjs"} options.format
- * @param {string} options.entrypoint
- * @returns {import("esbuild").BuildOptions}
- */
-function bundle(options) {
-  const { format, entrypoint } = options
-
-  return {
-    // General
-
-    bundle: true,
-    platform: "node",
-
-    // Input
-
-    entryPoints: [
-      `src/${entrypoint}`,
-    ],
-
-    // Output contents
-
-    format,
-    target: format === "cjs" ? "ES2015" : "ES2022",
-
-    // Output location
-
-    write: true,
-    outfile: [
-      ".temp/dist/",
-      // camelCase to kebab-case
-      entrypoint
-        .slice(0, -1 * path.extname(entrypoint).length)
-        .replace(/[A-Z]/g, m => `-${m.toLowerCase()}`),
-      ".production.min.",
-      format === "cjs"
-        ? "cjs"
-        : "mjs",
-    ].join(""),
-
-    // Path resolution
-
-    packages: "external",
-
-    // Optimization
-
-    define: {
-      ...buildDefine,
-      __DEV__: "false",
-      "import.meta.url": "undefined",
-    },
-    minify: true,
   }
 }
 

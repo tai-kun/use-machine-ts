@@ -3,10 +3,6 @@
 set -e
 
 function cleanup() {
-    if [ -f src/baseline.ts ]; then
-        rm src/baseline.ts
-    fi
-
     if [ -f tsconfig.build.json ]; then
         rm tsconfig.build.json
     fi
@@ -22,7 +18,6 @@ fi
 
 # build scripts
 
-echo 'export { useMachine } from "./useMachine"' >src/baseline.ts
 node ./scripts/build.mjs
 
 # build types
