@@ -29,16 +29,16 @@ function useMachine<D>(
  * Use a state machine using a pre-created machine.
  *
  * @template D - The type of state machine definition.
- * @template A - The type of arguments for the state machine factory.
+ * @template P - The type of props for the state machine factory.
  * @param machine - The state machine factory.
- * @param args - The arguments for the state machine factory.
+ * @param props - The props for the state machine factory.
  * @returns An array with two elements:
  * - The first element is the current state of the state machine.
  * - The second element is a function that sends an event to the state machine.
  */
-function useMachine<D, A extends readonly any[]>(
-  machine: (...args: A) => Machine<D>,
-  args: A,
+function useMachine<D, P>(
+  machine: (props: () => P) => Machine<D>,
+  props: P,
 ): [
   state: State<D>,
   send: Send<D>,
@@ -135,7 +135,6 @@ function useMachine(arg0: any, arg1?: any): [any, any] {
 }
 
 export { useMachine }
-export { isTransfer, type Transfer, transfer } from "./core/hooks"
 export { and, not, or } from "./core/logic"
 export { createMachine } from "./createMachine"
 export type * from "./types"

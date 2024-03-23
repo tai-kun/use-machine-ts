@@ -35,7 +35,6 @@ function createMachine(...args: any) {
 }
 
 export { createMachine }
-export { isTransfer, type Transfer, transfer } from "./core/hooks"
 export { and, not, or } from "./core/logic"
 export type * from "./types"
 

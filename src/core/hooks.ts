@@ -73,48 +73,6 @@ export function useIsMounted(): { readonly current: boolean } {
   return isMounted
 }
 
-const $tf = Symbol("$tf")
-
-/**
- * A value to transfer so that the state machine can reference the component's value.
- *
- * @template T - The type of the value to transfer.
- */
-export type Transfer<T = unknown> = {
-  /**
-   * The current value of the reference.
-   */
-  readonly current: T
-  /**
-   * ! Do not remove this property.
-   */
-  readonly [$tf]: never
-}
-
-/**
- * Transfers a value to a state machine.
- *
- * @template T - The type of the value.
- * @param value - The value to transfer.
- * @returns The value with a transfer marker.
- */
-export function transfer<T>(value: T): Transfer<T> {
-  return Object.freeze({
-    current: value,
-    [$tf]: 0 as never,
-  })
-}
-
-/**
- * Checks if a value is a transferable value.
- *
- * @param value - The value to check.
- * @returns `true` if the value is a transferable value, otherwise `false`.
- */
-export function isTransfer(value: unknown): value is Transfer {
-  return typeof value === "object" && value !== null && $tf in value
-}
-
 /**
  * A hook to use a state machine definition and configuration.
  *
@@ -128,16 +86,9 @@ export function useInstance(
   arg0:
     | Definition.Signature
     | Machine.Signature
-    | ((...args: any) => Machine.Signature),
-  arg1: Config.Signature | readonly any[] | undefined,
-): readonly [Definition.Signature, Config.Signature?] {
-  let logOptions: LogOptions | undefined
-
-  if (arg1 && !Array.isArray(arg1)) {
-    arg0 = [arg0 as Definition.Signature, arg1]
-    arg1 = undefined
-  }
-
+    | ((props?: () => any) => Machine.Signature),
+  arg1: Config.Signature | {/* props */} | undefined,
+): Machine.Signature {
   if (__DEV__) {
     useDetectChanges(
       arg0,
@@ -167,76 +118,28 @@ export function useInstance(
         },
       },
     )
-    useDetectChanges(
-      arg1 || [],
-      (curr, next) => {
-        if (curr.length !== next.length) {
-          log(
-            { ...logOptions, level: "error" },
-            "Cannot change the arguments after the machine is used.",
-            ["Current", curr],
-            ["Next", next],
-          )
-        }
-
-        curr.forEach((arg, i) => {
-          if (isTransfer(arg) !== isTransfer(next[i])) {
-            log(
-              { ...logOptions, level: "error" },
-              [
-                "A state machine hook is changing ",
-                `from a ${isTransfer(arg) ? "" : "non-"}transferable value `,
-                `to a ${isTransfer(next[i]) ? "" : "non-"}transferable value `,
-                `at index ${i} of the argument list.`,
-                "Each transferable argument is transferred by useRef, ",
-                "so their order and number cannot be changed.",
-              ].join(""),
-              ["Index of argument", i],
-              ["Current", arg],
-              ["Next", next[i]],
-            )
-          }
-        })
-      },
-      {
-        equalityFn(curr, next) {
-          return curr.length === next.length
-            && curr.every((arg, i) => isTransfer(arg) === isTransfer(next[i]))
-        },
-      },
-    )
   }
 
-  const params = arg1?.map(arg =>
-    isTransfer(arg)
-      ? useSyncedRef(arg.current)
-      : arg
+  let logOptions: LogOptions | undefined
+  const propsRef = useRef<{}>()
+
+  if (typeof arg0 === "function") {
+    propsRef.current = arg1
+  } else if (!Array.isArray(arg0)) {
+    arg0 = arg1 ? [arg0, arg1] : [arg0]
+  }
+
+  const machine = useSingleton(() =>
+    typeof arg0 === "function"
+      ? arg0(() => propsRef.current)
+      : arg0 as Machine.Signature // cast for tsd
   )
 
   if (__DEV__) {
-    const [def, ...other] = useSingleton(() =>
-      typeof arg0 === "function"
-        ? arg0(...params || [])
-        : Array.isArray(arg0)
-        ? arg0
-        : [arg0]
-    )
-    const [conf = {}] = other
-    logOptions = {
-      ...("verbose" in conf ? { verbose: conf.verbose } : {}),
-      ...("console" in conf ? { console: conf.console } : {}),
-    }
-
-    return [def, ...other]
+    ;[, logOptions] = machine
   }
 
-  return useSingleton(() =>
-    typeof arg0 === "function"
-      ? arg0(...params || [])
-      : Array.isArray(arg0)
-      ? arg0
-      : [arg0]
-  )
+  return machine
 }
 
 /**
@@ -312,25 +215,6 @@ if (cfgTest && cfgTest.url === import.meta.url) {
             exit: false,
           },
         })
-      })
-    })
-
-    describe("transfer, isTransfer", () => {
-      test("should return a transferable value", () => {
-        const value = { foo: "bar" }
-        const transferred = transfer(value)
-
-        assert.deepEqual(transferred, {
-          current: value,
-          [$tf]: 0,
-        })
-      })
-
-      test("transferred object is Transfer", () => {
-        const value = { foo: "bar" }
-        const transferred = transfer(value)
-
-        assert(isTransfer(transferred))
       })
     })
 

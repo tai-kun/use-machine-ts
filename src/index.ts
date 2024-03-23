@@ -1,4 +1,3 @@
-export { isTransfer, type Transfer, transfer } from "./core/hooks"
 export { and, not, or } from "./core/logic"
 export { createMachine } from "./createMachine"
 export { createSharedMachine } from "./createSharedMachine"
@@ -16,7 +15,6 @@ if (cfgTest && cfgTest.url === import.meta.url) {
   const { useMachine } = await import("./useMachine")
   const { useSharedMachine } = await import("./useSharedMachine")
   const { useSyncedMachine } = await import("./useSyncedMachine")
-  const { transfer } = await import("./core/hooks")
   const { assert, describe, mock, test } = cfgTest
 
   function createInvocationCallOrder() {
@@ -914,8 +912,8 @@ if (cfgTest && cfgTest.url === import.meta.url) {
       assert(onToggle2.mock.callCount() === 0)
     })
 
-    test("should transfer prop to state machine", () => {
-      const machine = (onToggle: any) => {
+    test("should transfer props to state machine", () => {
+      const machine = (props: () => { onToggle: any }) => {
         return createMachine(
           {
             initial: "inactive",
@@ -933,7 +931,8 @@ if (cfgTest && cfgTest.url === import.meta.url) {
           {
             effects: {
               onToggle: () => {
-                onToggle.current()
+                const { onToggle } = props()
+                onToggle()
               },
             },
           },
@@ -942,7 +941,7 @@ if (cfgTest && cfgTest.url === import.meta.url) {
       const onToggle1 = mock.fn()
       const onToggle2 = mock.fn()
       const { result, rerender } = renderHook(
-        ({ onToggle }) => useMachine(machine, [transfer(onToggle)]),
+        ({ onToggle }) => useMachine(machine, { onToggle }),
         {
           initialProps: {
             onToggle: onToggle1,
