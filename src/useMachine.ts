@@ -1,11 +1,13 @@
 import { log } from "./core/devutils"
 import {
+  type Action,
+  applyDispatch,
+  createInitialState,
   useInstance,
   useIsMounted,
   useSingleton,
   useSyncState,
-} from "./core/hooks"
-import { type Action, applyDispatch, createInitialState } from "./core/logic"
+} from "./core/logic"
 import { useState } from "./core/react"
 import type { Config, Definition, Machine, Send, State } from "./types"
 

@@ -1,4 +1,4 @@
-import { useIsMounted, useSyncState } from "./core/hooks"
+import { useIsMounted, useSyncState } from "./core/logic"
 import { useSyncExternalStore } from "./core/react"
 import type { Send, SharedMachine, State } from "./types"
 
