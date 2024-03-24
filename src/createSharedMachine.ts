@@ -92,7 +92,7 @@ function createSharedMachine(...args: [any, any?]) {
 }
 
 export { createSharedMachine }
-export { and, not, or } from "./core/logic"
+export { and, not, or } from "./core/guard"
 export type * from "./types"
 
 if (cfgTest && cfgTest.url === import.meta.url) {

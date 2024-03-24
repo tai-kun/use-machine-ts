@@ -39,6 +39,6 @@ function useSharedMachine<D>(
 }
 
 export { useSharedMachine }
-export { and, not, or } from "./core/logic"
+export { and, not, or } from "./core/guard"
 export { createSharedMachine } from "./createSharedMachine"
 export type * from "./types"

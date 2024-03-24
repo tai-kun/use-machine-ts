@@ -137,6 +137,6 @@ function useMachine(arg0: any, arg1?: any): [any, any] {
 }
 
 export { useMachine }
-export { and, not, or } from "./core/logic"
+export { and, not, or } from "./core/guard"
 export { createMachine } from "./createMachine"
 export type * from "./types"

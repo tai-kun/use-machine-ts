@@ -1,4 +1,4 @@
-export { and, not, or } from "./core/logic"
+export { and, not, or } from "./core/guard"
 export { createMachine } from "./createMachine"
 export { createSharedMachine } from "./createSharedMachine"
 export type * from "./types"
