@@ -19,13 +19,16 @@ use-machine-ts is a tiny hook for designing state machines in React. Easily mana
 <details>
   <summary>File Size</summary>
 
-  | source | min+brotli (KB) |
+  | source | min+brotli |
   | :-- | --: |
-  | `import { useMachine } from "use-machine-ts"` | 1.05 |
-  | `import * from "use-machine-ts"`              | 1.46 |
-  | `import * from "use-machine-ts/standard"`     | 1.09 |
-  | `import * from "use-machine-ts/shared"`       | 1.06 |
-  | `import * from "use-machine-ts/synced"`       | 1.18 |
+  | `import { useMachine } from "use-machine-ts"` | 978 B |
+  | `import * from "use-machine-ts"`              | 1.38 KB |
+  | `import * from "use-machine-ts/standard"`     | 1 KB |
+  | `import * from "use-machine-ts/shared"`       | 1.03 KB |
+  | `import * from "use-machine-ts/synced"`       | 1.08 KB |
+  |||
+  | `import { createMachine } from "xstate@5.9.1"` &   ||
+  | `import { useMachine } from "@xstate/react@4.1.0"` | 11.12 KB |
 </details>
 
 ## Respect
@@ -136,7 +139,6 @@ console.log(state)
     - [Logging](#logging)
   - [useSharedMachine](#usesharedmachine)
   - [useSyncedMachine](#usesyncedmachine)
-  - [transfer](#transfer)
 - [Async Orchestration](#async-orchestration)
   - [useMachine](#usemachine-1)
   - [useSharedMachine](#usesharedmachine-1)
@@ -501,16 +503,16 @@ function Component(props: { onActive: () => void }) {
 You might find the above example redundant and end up writing code like this: However, this can lead to serious bugs.
 
 ```ts
-function Component(props: { onActive: () => void }) {
-  const { onActive } = props
+function Component(props: { onToggle: (isActive: boolean) => void }) {
+  const { onToggle } = props
   const [state, send] = useMachine(
     /* State Machine Definition */,
     {
       effects: {
         onActive: () => {
-          // If props.onActive is changed, the change will not be reflected.
+          // If props.onToggle is changed, the change will not be reflected.
           // Always refers to the first defined value, which can lead to serious bugs.
-          onActive()
+          onToggle()
         },
       },
     },
@@ -521,15 +523,15 @@ function Component(props: { onActive: () => void }) {
 You can also work around this problem by using `useRef` to always refer to the latest function, like this:
 
 ```ts
-function Component(props: { onActive: () => void }) {
-  const onActive = React.useRef(props.onActive)
-  onActive.current = props.onActive
+function Component(props: { onToggle: (isActive: boolean) => void }) {
+  const onToggle = React.useRef(props.onToggle)
+  onToggle.current = props.onToggle
   const [state, send] = useMachine(
     /* State Machine Definition */,
     {
       effects: {
         onActive: () => {
-          onActive.current()
+          onToggle.current(true)
         },
       },
     },
@@ -537,7 +539,55 @@ function Component(props: { onActive: () => void }) {
 }
 ```
 
-However, there is still the possibility of human error. For practical purposes, we recommend using the `transfer` function to transfer values that depend on React components. See [transfer](#transfer) for details.
+However, there is still the possibility of human error. In practice, we recommend using predefined machines to transfer values that depend on React components.
+
+```ts
+import { createMachine } from "use-machine-ts"
+
+function machine(
+  props: () => {
+    initial: "inactive" | "active"
+    onToggle: ((isActive: boolean) => void) | undefined
+  }
+) {
+  return createMachine(
+    {
+      initial: props().initial,
+      states: {
+        inactive: {
+          on: { TOGGLE: "active" },
+          effect: "onInactive",
+        },
+        active: {
+          on: { TOGGLE: "inactive" },
+          effect: "onActive",
+        },
+      },
+    },
+    {
+      effects: {
+        onActive: ({ context }) => {
+          const { onToggle } = props()
+          onToggle?.(true)
+        },
+        onInactive: ({ context }) => {
+          const { onToggle } = props()
+          onToggle?.(false)
+        },
+      },
+    },
+  )
+}
+
+function ToggleButton(props: { onToggle?: (isActive: boolean) => void }) {
+  const [state, send] = useMachine(machine, {
+    initial: "inactive",
+    onToggle: props.onToggle,
+  })
+}
+```
+
+The machine predefined in the form of functions can accept one argument. This argument must be a function. This function is a wrapper around `useRef` and always returns the latest value.
 
 ### Extended State
 
@@ -730,57 +780,6 @@ send("TOGGLE")
 console.log(getState())
 // { value: "active", context: undefined,
 // event: { type: "TOGGLE" }, nextEvents: ["TOGGLE"] }
-```
-
-## transfer
-
-When using a state machine pre-created with `createMachine` in a React hook, you can use the `transfer` function to transfer dependent values to the React component.
-
-`Transfer` marks the arguments of the function that creates the state machine as transferable. When used in React hooks, you need to use the `transfer` function to transfer values. For transferable values, a reference is created with `useRef`, and the state machine uses the value via that reference. Therefore, the argument must be of fixed length. Also, you cannot dynamically mix transportable and non-transferable values.
-
-```ts
-import { createMachine, type Transfer, transfer } from "use-machine-ts"
-
-function machine(
-  initial: "inactive" | "active",
-  onToggle: Transfer<((isActive: boolean) => void) | undefined>,
-) {
-  return createMachine(
-    {
-      initial,
-      states: {
-        inactive: {
-          on: { TOGGLE: "active" },
-          effect: "onInactive",
-        },
-        active: {
-          on: { TOGGLE: "inactive" },
-          effect: "onActive",
-        },
-      },
-    },
-    {
-      effects: {
-        onActive: ({ context }) => {
-          onToggle.current?.(true)
-        },
-        onInactive: ({ context }) => {
-          onToggle.current?.(false)
-        },
-      },
-    },
-  )
-}
-
-function ToggleButton(props: { onToggle?: (isActive: boolean) => void }) {
-  const [state, send] = useMachine(
-    machine,
-    [
-      "inactive",
-      transfer(props.onToggle),
-    ],
-  )
-}
 ```
 
 # Async Orchestration

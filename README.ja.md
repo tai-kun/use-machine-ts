@@ -19,13 +19,16 @@ use-machine-ts は React でステートマシンをデザインするための�
 <details>
   <summary>ファイルサイズ</summary>
 
-  | source | min+brotli (KB) |
+  | source | min+brotli |
   | :-- | --: |
-  | `import { useMachine } from "use-machine-ts"` | 1.05 |
-  | `import * from "use-machine-ts"`              | 1.46 |
-  | `import * from "use-machine-ts/standard"`     | 1.09 |
-  | `import * from "use-machine-ts/shared"`       | 1.06 |
-  | `import * from "use-machine-ts/synced"`       | 1.18 |
+  | `import { useMachine } from "use-machine-ts"` | 978 B |
+  | `import * from "use-machine-ts"`              | 1.38 KB |
+  | `import * from "use-machine-ts/standard"`     | 1 KB |
+  | `import * from "use-machine-ts/shared"`       | 1.03 KB |
+  | `import * from "use-machine-ts/synced"`       | 1.08 KB |
+  |||
+  | `import { createMachine } from "xstate@5.9.1"` &   ||
+  | `import { useMachine } from "@xstate/react@4.1.0"` | 11.12 KB |
 </details>
 
 ## Respect
@@ -136,7 +139,6 @@ console.log(state)
     - [Logging](#logging)
   - [useSharedMachine](#usesharedmachine)
   - [useSyncedMachine](#usesyncedmachine)
-  - [transfer](#transfer)
 - [Async Orchestration](#async-orchestration)
   - [useMachine](#usemachine-1)
   - [useSharedMachine](#usesharedmachine-1)
@@ -501,16 +503,16 @@ function Component(props: { onActive: () => void }) {
 上記の例を冗長的に感じて、次のようなコードを書いてしまうかもしれません。しかし、これは重大なバグを引き起こす可能性があります。
 
 ```ts
-function Component(props: { onActive: () => void }) {
-  const { onActive } = props
+function Component(props: { onToggle: (isActive: boolean) => void }) {
+  const { onToggle } = props
   const [state, send] = useMachine(
     /* State Machine Definition */,
     {
       effects: {
         onActive: () => {
-          // props.onActive が変更されても、その変更は反映されません。
+          // props.onToggle が変更されても、その変更は反映されません。
           // 常に最初に定義された値を参照するため、重大なバグを引き起こす可能性があります。
-          onActive()
+          onToggle(true)
         },
       },
     },
@@ -521,15 +523,15 @@ function Component(props: { onActive: () => void }) {
 次のように `useRef` を使用して常に最新の関数を参照することで、この問題を回避することもできます。
 
 ```ts
-function Component(props: { onActive: () => void }) {
-  const onActive = React.useRef(props.onActive)
-  onActive.current = props.onActive
+function Component(props: { onToggle: (isActive: boolean) => void }) {
+  const onToggle = React.useRef(props.onToggle)
+  onToggle.current = props.onToggle
   const [state, send] = useMachine(
     /* State Machine Definition */,
     {
       effects: {
         onActive: () => {
-          onActive.current()
+          onToggle.current(true)
         },
       },
     },
@@ -537,7 +539,55 @@ function Component(props: { onActive: () => void }) {
 }
 ```
 
-しかし、まだヒューマンエラーの可能性が残っています。実用的には `transfer` 関数を使用して、React コンポーネントに依存した値を転送する方法を推奨します。詳細は [transfer](#transfer) を参照してください。
+しかし、まだヒューマンエラーの可能性が残っています。実用的には、事前に定義されたマシーンを使用して、React コンポーネントに依存した値を転送する方法を推奨します。
+
+```ts
+import { createMachine } from "use-machine-ts"
+
+function machine(
+  props: () => {
+    initial: "inactive" | "active"
+    onToggle: (isActive: boolean) => void
+  }
+) {
+  return createMachine(
+    {
+      initial: props().initial,
+      states: {
+        inactive: {
+          on: { TOGGLE: "active" },
+          effect: "onInactive",
+        },
+        active: {
+          on: { TOGGLE: "inactive" },
+          effect: "onActive",
+        },
+      },
+    },
+    {
+      effects: {
+        onActive: ({ context }) => {
+          const { onToggle } = props()
+          onToggle(true)
+        },
+        onInactive: ({ context }) => {
+          const { onToggle } = props()
+          onToggle(false)
+        },
+      },
+    },
+  )
+}
+
+function ToggleButton(props: { onToggle: (isActive: boolean) => void }) {
+  const [state, send] = useMachine(machine, {
+    initial: "inactive",
+    onToggle: props.onToggle,
+  })
+}
+```
+
+関数形式で事前に定義されたマシーンは、1 つの引数を受け取ることができます。この引数は必ず関数でなければなりません。この関数は `useRef` のラッパーであり、常に最新の値を返します。
 
 ### Extended State
 
@@ -730,57 +780,6 @@ send("TOGGLE")
 console.log(getState())
 // { value: "active", context: undefined,
 //   event: { type: "TOGGLE" }, nextEvents: ["TOGGLE"] }
-```
-
-## transfer
-
-`createMachine` で事前に作成されたステートマシンを React フックで使用する場合、`transfer` 関数を使用して、React コンポーネントに依存した値を転送することができます。
-
-`Transfer` はステートマシンを作成する関数の引数を転送可能としてマークします。 React フックで使用するとき、`transfer` 関数を使用して値を転送する必要があります。転送可能な値は `useRef` で参照が作成され、ステートマシンはその参照を介して値を利用します。したがって、引数は固定長である必要があります。また、転送可能な値とそうでない値を動的に混在させることはできません。
-
-```ts
-import { createMachine, transfer, type Transfer } from "use-machine-ts"
-
-function machine(
-  initial: "inactive" | "active",
-  onToggle: Transfer<((isActive: boolean) => void) | undefined>
-) {
-  return createMachine(
-    {
-      initial,
-      states: {
-        inactive: {
-          on: { TOGGLE: "active" },
-          effect: "onInactive",
-        },
-        active: {
-          on: { TOGGLE: "inactive" },
-          effect: "onActive",
-        },
-      },
-    },
-    {
-      effects: {
-        onActive: ({ context }) => {
-          onToggle.current?.(true)
-        },
-        onInactive: ({ context }) => {
-          onToggle.current?.(false)
-        },
-      },
-    },
-  )
-}
-
-function ToggleButton(props: { onToggle?: (isActive: boolean) => void }) {
-  const [state, send] = useMachine(
-    machine,
-    [
-      "inactive",
-      transfer(props.onToggle),
-    ],
-  )
-}
 ```
 
 # Async Orchestration
