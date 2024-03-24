@@ -24,23 +24,24 @@ jobs:
         run: npm run build
 
       - name: Pin version
-        run: npm --no-git-tag-version version "${GITHUB_REF#refs/*/}"
+        run: npm --no-git-tag-version version "${{ github.ref_name }}"
+
+      - name: Set parameters
+        id: params
+        run: |
+          ver="${{ github.ref_name }}"
+          suf="${ver#*-}"
+          pre=$([[ "$suf" == "$ver" ]] && echo false || echo true)
+          echo "releaseTag=$($pre && echo "${suf%%.*}" || echo latest)" >> $GITHUB_OUTPUT
+          echo "prerelease=$pre" >> $GITHUB_OUTPUT
+          echo "makeLatest=$($pre && echo legacy || echo latest)" >> $GITHUB_OUTPUT
 
       - name: Publish to NPM
         uses: JS-DevTools/npm-publish@v3
         with:
           token: ${{ secrets.NPM_TOKEN }}
           access: public
-
-  release-on-github:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Get action parameters
-        id: params
-        run: |
-          prerelease=$(echo ${{ github.ref_name }} | grep -q -E "v[0-9]+\.[0-9]+\.[0-9]+-.*" && echo true || echo false)
-          echo ::set-output name=prerelease::$prerelease
-          echo ::set-output name=makeLatest::$($prerelease && echo "legacy" || echo "latest")
+          tag: ${{ steps.params.outputs.releaseTag }}
 
       - name: Create a GitHub release
         uses: ncipollo/release-action@v1
@@ -56,7 +57,6 @@ jobs:
   action-timeline:
     needs:
       - build-and-publish
-      - release-on-github
     permissions:
       actions: read
     runs-on: ubuntu-latest
