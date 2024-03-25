@@ -21,14 +21,13 @@ use-machine-ts is a tiny hook for designing state machines in React. Easily mana
 
   | source | min+brotli |
   | :-- | --: |
-  | `import { useMachine } from "use-machine-ts"` | 978 B |
-  | `import * from "use-machine-ts"`              | 1.38 KB |
+  | `import { useMachine } from "use-machine-ts"` | 973 B |
+  | `import * from "use-machine-ts"`              | 1.37 KB |
   | `import * from "use-machine-ts/standard"`     | 1 KB |
-  | `import * from "use-machine-ts/shared"`       | 1.03 KB |
+  | `import * from "use-machine-ts/shared"`       | 1.04 KB |
   | `import * from "use-machine-ts/synced"`       | 1.08 KB |
   |||
-  | `import { createMachine } from "xstate@5.9.1"` &   ||
-  | `import { useMachine } from "@xstate/react@4.1.0"` | 11.12 KB |
+  | `import { createMachine } from "xstate@5.9.1"` & `import { useMachine } from "@xstate/react@4.1.0"`  | 11.12 KB |
 </details>
 
 ## Respect
