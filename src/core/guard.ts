@@ -1,5 +1,6 @@
 import type { Config, Definition } from "../types"
-import { assertNever } from "./devutils"
+import type { Tagged } from "../types/utils"
+import { assertNever, log } from "./devutils"
 
 /**
  * Inverts the boolean value returned by the guard function.
@@ -68,22 +69,96 @@ export function doGuard(
     : guard.value.some(g => doGuard(conf, g, params))
 }
 
-/**
- * The type of the result of a guard for development.
- */
 type GuardResult =
   & (
-    | { op: "eq"; source: string }
-    | { op: "not"; source: GuardResult }
-    | { op: "and"; source: GuardResult[] }
-    | { op: "or"; source: GuardResult[] }
+    | { op: "eq"; by: Tagged<string, "GuardName"> }
+    | { op: "or"; by: GuardResult[] }
+    | { op: "and"; by: GuardResult[] }
+    | { op: "not"; by: GuardResult }
   )
-  & {
-    /** Whether the cause of the failure. */
-    cause: boolean
-    /** Whether the guard has passed. */
-    allow: boolean | undefined
+  & { ok: boolean | undefined }
+
+type GuardContext = {
+  done: boolean
+  end(): void
+  revert(): void
+  doGuard(name: Tagged<string, "GuardName">): boolean
+}
+
+/**
+ * Checks if the guard passes for development.
+ *
+ * @param ctx - The context of the guard.
+ * @param guard - The guard to check.
+ * @returns The result of the guard.
+ */
+export function innerDoGuardForDev(
+  ctx: GuardContext,
+  guard: Definition.Guard.Signature,
+): GuardResult {
+  if (typeof guard === "string") {
+    const { done } = ctx
+
+    return {
+      op: "eq",
+      ok: done ? undefined : ctx.doGuard(guard),
+      by: guard,
+    }
+  } else if (Array.isArray(guard)) {
+    const { done } = ctx
+    const by = guard.map(g => {
+      const res = innerDoGuardForDev(ctx, g)
+
+      if (res.ok === false) {
+        ctx.end()
+      }
+
+      return res
+    })
+
+    if (!done) {
+      ctx.revert()
+    }
+
+    return {
+      op: "and",
+      ok: done ? undefined : by.every(b => b.ok),
+      by,
+    }
+  } else if (guard.op === "not") {
+    const { done } = ctx
+    const by = innerDoGuardForDev(ctx, guard.value)
+
+    return {
+      op: "not",
+      ok: done ? undefined : !by.ok,
+      by,
+    }
+  } else if (guard.op === "or") {
+    const { done } = ctx
+    const by = guard.value.map(g => {
+      const res = innerDoGuardForDev(ctx, g)
+
+      if (res.ok === true) {
+        ctx.end()
+      }
+
+      return res
+    })
+
+    if (!done) {
+      ctx.revert()
+    }
+
+    return {
+      op: "or",
+      ok: done ? undefined : by.some(b => b.ok),
+      by,
+    }
+  } else {
+    assertNever(guard)
   }
+}
 
 /**
  * Checks if the guard passes for development.
@@ -97,171 +172,111 @@ export function doGuardForDev(
   conf: Config.Signature,
   guard: Definition.Guard.Signature,
   params: Config.GuardParams.Signature,
-  memo: {
-    /** Whether the guard has passed. */
-    pass?: true | undefined
-    /** Whether the guard has failed. */
-    cause?: true | undefined
-  } = {},
 ): GuardResult {
-  if (typeof guard === "string") {
-    let result: boolean | undefined
-
-    return {
-      op: "eq",
-      source: guard,
-      allow: memo.pass ? undefined : (result = conf.guards![guard]!(params)),
-      cause: result === false && !memo.cause && (memo.cause = true),
-    }
-  } else if (Array.isArray(guard)) {
-    const { pass } = memo
-    const { source, allow } = guard.reduce(
-      (acc, g) => {
-        const res = doGuardForDev(conf, g, params, memo)
-        acc.source.push(res)
-
-        if (res.allow === false) {
-          acc.allow = false
-          memo.pass = true
-
-          if (!memo.cause) {
-            res.cause = true
-            memo.cause = true
-          }
+  let done = false
+  const ctx: GuardContext = {
+    get done() {
+      return done
+    },
+    end() {
+      done = true
+    },
+    revert() {
+      done = false
+    },
+    doGuard(name) {
+      if (__DEV__) {
+        if (typeof conf.guards?.[name] !== "function") {
+          log(
+            { ...conf, level: "error" },
+            "The guard function is not defined in the configuration.",
+            ["Guard name", name],
+            ["Configuration", conf],
+          )
         }
+      }
 
-        return acc
-      },
-      {
-        source: [] as GuardResult[],
-        allow: true,
-      },
-    )
-    memo.pass = pass
-    allow === false && (memo.pass = true)
-
-    return {
-      op: "and",
-      source,
-      cause: false,
-      allow: pass ? undefined : allow,
-    }
-  } else if (guard.op === "not") {
-    const { pass } = memo
-    const result = doGuardForDev(conf, guard.value, params, memo)
-
-    return {
-      op: "not",
-      source: result,
-      cause: result.allow === true && !memo.cause && (memo.cause = true),
-      allow: pass ? undefined : !result.allow,
-    }
-  } else {
-    const { pass, cause } = memo
-    memo.cause = true // lock cause
-    const { source, allow } = guard.value.reduce(
-      (acc, g) => {
-        const res = doGuardForDev(conf, g, params, memo)
-        acc.source.push(res)
-
-        if (res.allow === true) {
-          acc.allow = true
-          memo.pass = true
-        }
-
-        return acc
-      },
-      {
-        source: [] as GuardResult[],
-        allow: false,
-      },
-    )
-    memo.cause = cause // unlock cause
-    memo.pass = pass
-    allow === false && (memo.pass = true)
-
-    return {
-      op: "or",
-      source,
-      cause: allow === false && !pass && !memo.cause && (memo.cause = true),
-      allow: pass ? undefined : allow,
-    }
+      return !!conf.guards?.[name]?.(params)
+    },
   }
+
+  return innerDoGuardForDev(ctx, guard)
 }
 
-/**
- * Formats the result of the guard for development.
- *
- * @param result - The result of the guard.
- * @param acc - State for the recursive function.
- * @returns The formatted result of the guard.
- */
-function innerFormatGuardResult(
-  result: GuardResult,
-  acc: { cause: string },
-): string {
-  const char = result.cause ? "^" : " "
+type FormatContext = {
+  code: string
+  cause: string
+}
 
-  switch (result.op) {
-    case "eq": {
-      const code = result.source
-      acc.cause += char.repeat(code.length)
+function innerFormatGuardResult(ctx: FormatContext, res: GuardResult): void {
+  switch (res.op) {
+    case "eq":
+      ctx.code += res.by
+      ctx.cause += res.ok === false
+        ? "^".repeat(res.by.length)
+        : " ".repeat(res.by.length)
 
-      return code
+      break
+
+    case "and":
+      ctx.code += "("
+      ctx.cause += " ".repeat("(".length)
+
+      res.by.forEach((r, i) => {
+        innerFormatGuardResult(ctx, r)
+
+        if (i < res.by.length - 1) {
+          ctx.code += " && "
+          ctx.cause += " ".repeat(" && ".length)
+        }
+      })
+
+      ctx.code += ")"
+      ctx.cause += " ".repeat(")".length)
+
+      break
+
+    case "or": {
+      let { code, cause } = ctx
+      ctx.code += "("
+      ctx.cause = ""
+
+      res.by.forEach((r, i) => {
+        innerFormatGuardResult(ctx, r)
+
+        if (i < res.by.length - 1) {
+          ctx.code += " || "
+        }
+      })
+
+      ctx.code += ")"
+      ctx.cause = cause + (
+        res.ok === false
+          ? "^".repeat(ctx.code.length - code.length)
+          : " ".repeat(ctx.code.length - code.length)
+      )
+
+      break
     }
 
     case "not": {
-      const acc2 = { cause: " " }
-      const code = `!${innerFormatGuardResult(result.source, acc2)}`
-      acc.cause += acc2.cause.includes("^")
-        ? acc2.cause
-        : char.repeat(code.length)
+      let { cause } = ctx
+      ctx.code += "!"
+      ctx.cause = " ".repeat("!".length)
 
-      return code
-    }
+      innerFormatGuardResult(ctx, res.by)
 
-    case "and": {
-      const JOIN = " && "
-      const acc2 = { cause: " ".repeat("(".length) }
-      const code = `(${
-        result.source
-          .map((res, idx, src) => {
-            const str = innerFormatGuardResult(res, acc2)
-            idx < src.length - 1 && (acc2.cause += " ".repeat(JOIN.length))
+      ctx.cause = cause + (
+        res.ok === false && (ctx.cause.trim() === "" || /^\^+$/.test(ctx.cause))
+          ? "^".repeat(ctx.cause.length)
+          : " ".repeat(ctx.cause.length)
+      )
 
-            return str
-          })
-          .join(JOIN)
-      })`
-      acc.cause += acc2.cause.includes("^")
-        ? acc2.cause + " ".repeat(")".length)
-        : char.repeat(code.length)
-
-      return code
-    }
-
-    case "or": {
-      const JOIN = " || "
-      const acc2 = { cause: " ".repeat("(".length) }
-      const code = `(${
-        result.source
-          .map((res, idx, src) => {
-            const str = innerFormatGuardResult(res, acc2)
-            idx < src.length - 1 && (acc2.cause += " ".repeat(JOIN.length))
-
-            return str
-          })
-          .join(JOIN)
-      })`
-      acc.cause += acc2.cause.includes("^")
-        ? acc2.cause + " ".repeat(")".length)
-        : char.repeat(code.length)
-
-      return code
+      break
     }
 
     default:
-      assertNever(result)
+      assertNever(res)
   }
 }
 
@@ -272,390 +287,595 @@ function innerFormatGuardResult(
  * @returns The formatted result of the guard.
  */
 export function formatGuardResult(result: GuardResult): string {
-  const acc = { cause: "" }
-  const code = innerFormatGuardResult(result, acc)
+  const ctx: FormatContext = { code: "", cause: "" }
 
-  return acc.cause.includes("^")
-    ? [code, acc.cause].join("\n")
-    : code
+  innerFormatGuardResult(ctx, result)
+
+  return ctx.cause.includes("^")
+    ? [ctx.code, ctx.cause].join("\n")
+    : ctx.code
 }
 
 if (cfgTest && cfgTest.url === import.meta.url) {
   const { assert, describe, test } = cfgTest
 
+  function doGuardForTest(
+    setup: {
+      guards: NonNullable<Config.Signature["guards"]>
+      guard: Definition.Guard.Signature
+      params?: Config.GuardParams.Signature
+    },
+  ) {
+    const { guards, guard, params = {} as Config.GuardParams.Signature } = setup
+    const dev = doGuardForDev({ guards }, guard, params)
+
+    return {
+      prd: doGuard({ guards }, guard, params),
+      dev,
+      fmt: formatGuardResult(dev).split("\n"),
+    }
+  }
+
   describe("src/core/guard", () => {
-    test("should return the result of the guard", () => {
-      const guards = {
-        isOk: () => true,
-      }
-      const cond = "isOk"
-      const res = doGuardForDev(
-        { guards },
-        cond,
-        {} as Config.GuardParams.Signature,
-      )
-
-      assert.deepEqual(res, {
-        op: "eq",
-        source: "isOk",
-        cause: false,
-        allow: true,
-      })
-      assert.equal(
-        formatGuardResult(res),
-        [
-          "isOk",
-        ].join("\n"),
-      )
-    })
-
-    test("should return the result of the guard", () => {
-      const guards = {
-        isOk: () => false,
-      }
-      const cond = "isOk"
-      const res = doGuardForDev(
-        { guards },
-        cond,
-        {} as Config.GuardParams.Signature,
-      )
-
-      assert.deepEqual(res, {
-        op: "eq",
-        source: "isOk",
-        cause: true,
-        allow: false,
-      })
-      assert.equal(
-        formatGuardResult(res),
-        [
-          "isOk",
-          "^^^^",
-        ].join("\n"),
-      )
-    })
-
-    test("should return the result of the guard with not", () => {
-      const guards = {
-        isOk: () => true,
-      }
-      const cond = not("isOk")
-      const res = doGuardForDev(
-        { guards },
-        cond,
-        {} as Config.GuardParams.Signature,
-      )
-
-      assert.deepEqual(res, {
-        op: "not",
-        source: {
-          op: "eq",
-          source: "isOk",
-          cause: false,
-          allow: true,
-        },
-        cause: true,
-        allow: false,
-      })
-      assert.equal(
-        formatGuardResult(res),
-        [
-          "!isOk",
-          "^^^^^",
-        ].join("\n"),
-      )
-      assert.equal(
-        res.allow,
-        doGuard({ guards }, cond, {} as Config.GuardParams.Signature),
-      )
-    })
-
-    test("should return the result of the guard with and", () => {
-      const guards = {
-        isOk: () => true,
-      }
-      const cond = and("isOk", "isOk")
-      const res = doGuardForDev(
-        { guards },
-        cond,
-        {} as Config.GuardParams.Signature,
-      )
-
-      assert.deepEqual(res, {
-        op: "and",
-        source: [
+    describe("eq", () => {
+      test("should return true if the guard passes", () => {
+        assert.deepEqual(
+          doGuardForTest({
+            guards: { isOk: () => true },
+            guard: "isOk",
+          }),
           {
-            op: "eq",
-            source: "isOk",
-            cause: false,
-            allow: true,
-          },
-          {
-            op: "eq",
-            source: "isOk",
-            cause: false,
-            allow: true,
-          },
-        ],
-        cause: false,
-        allow: true,
-      })
-      assert.equal(
-        formatGuardResult(res),
-        [
-          "(isOk && isOk)",
-        ].join("\n"),
-      )
-      assert.equal(
-        res.allow,
-        doGuard({ guards }, cond, {} as Config.GuardParams.Signature),
-      )
-    })
-
-    test("should return the result of the guard with or", () => {
-      const guards = {
-        isOk: () => true,
-      }
-      const cond = or("isOk", "isOk")
-      const res = doGuardForDev(
-        { guards },
-        cond,
-        {} as Config.GuardParams.Signature,
-      )
-
-      assert.deepEqual(res, {
-        op: "or",
-        source: [
-          {
-            op: "eq",
-            source: "isOk",
-            cause: false,
-            allow: true,
-          },
-          // No further validation is performed
-          // because the previous condition returned true in the or.
-          {
-            op: "eq",
-            source: "isOk",
-            cause: false,
-            allow: undefined,
-          },
-        ],
-        cause: false,
-        allow: true,
-      })
-      assert.equal(
-        formatGuardResult(res),
-        [
-          "(isOk || isOk)",
-        ].join("\n"),
-      )
-      assert.equal(
-        res.allow,
-        doGuard({ guards }, cond, {} as Config.GuardParams.Signature),
-      )
-    })
-
-    test("should return the result of the guard with not, and, or", () => {
-      const guards = {
-        isOk: () => true,
-      }
-      const cond = not(or("isOk", and("isOk", "isOk")))
-      const res = doGuardForDev(
-        { guards },
-        cond,
-        {} as Config.GuardParams.Signature,
-      )
-
-      assert.deepEqual(res, {
-        op: "not",
-        source: {
-          op: "or",
-          source: [
-            {
+            prd: true,
+            dev: {
               op: "eq",
-              source: "isOk",
-              cause: false,
-              allow: true,
+              ok: true,
+              by: "isOk",
             },
-            // No further validation is performed
-            // because the previous condition returned true in the or.
-            {
+            fmt: [
+              "isOk",
+            ],
+          },
+        )
+      })
+
+      test("should return false if the guard fails", () => {
+        assert.deepEqual(
+          doGuardForTest({
+            guards: { isOk: () => false },
+            guard: "isOk",
+          }),
+          {
+            prd: false,
+            dev: {
+              op: "eq",
+              ok: false,
+              by: "isOk",
+            },
+            fmt: [
+              "isOk",
+              "^^^^",
+            ],
+          },
+        )
+      })
+    })
+
+    describe("and", () => {
+      test("array means and", () => {
+        assert.deepEqual(
+          ["isOk", "isOk"],
+          and("isOk", "isOk"),
+        )
+      })
+
+      test("should return true if all guards pass", () => {
+        assert.deepEqual(
+          doGuardForTest({
+            guards: { isOk: () => true },
+            guard: ["isOk", "isOk"],
+          }),
+          {
+            prd: true,
+            dev: {
               op: "and",
-              source: [
+              ok: true,
+              by: [
                 {
                   op: "eq",
-                  source: "isOk",
-                  cause: false,
-                  allow: undefined,
+                  ok: true,
+                  by: "isOk",
                 },
                 {
                   op: "eq",
-                  source: "isOk",
-                  cause: false,
-                  allow: undefined,
+                  ok: true,
+                  by: "isOk",
                 },
               ],
-              cause: false,
-              allow: undefined,
             },
-          ],
-          cause: false,
-          allow: true,
-        },
-        cause: true,
-        allow: false,
+            fmt: [
+              "(isOk && isOk)",
+            ],
+          },
+        )
       })
-      assert.equal(
-        formatGuardResult(res),
-        [
-          "!(isOk || (isOk && isOk))",
-          "^^^^^^^^^^^^^^^^^^^^^^^^^",
-        ].join("\n"),
-      )
-      assert.equal(
-        res.allow,
-        doGuard({ guards }, cond, {} as Config.GuardParams.Signature),
-      )
+
+      test("should return false if one of the guards fails", () => {
+        assert.deepEqual(
+          doGuardForTest({
+            guards: { isOk: () => false },
+            guard: ["isOk", "isOk"],
+          }),
+          {
+            prd: false,
+            dev: {
+              op: "and",
+              ok: false,
+              by: [
+                {
+                  op: "eq",
+                  ok: false,
+                  by: "isOk",
+                },
+                {
+                  op: "eq",
+                  ok: undefined,
+                  by: "isOk",
+                },
+              ],
+            },
+            fmt: [
+              "(isOk && isOk)",
+              " ^^^^         ",
+            ],
+          },
+        )
+      })
+
+      test("nesting", () => {
+        assert.deepEqual(
+          doGuardForTest({
+            guards: { isOk: () => true },
+            guard: and("isOk", and("isOk", and("isOk", "isOk"))),
+          }),
+          {
+            prd: true,
+            dev: {
+              op: "and",
+              ok: true,
+              by: [
+                {
+                  op: "eq",
+                  ok: true,
+                  by: "isOk",
+                },
+                {
+                  op: "and",
+                  ok: true,
+                  by: [
+                    {
+                      op: "eq",
+                      ok: true,
+                      by: "isOk",
+                    },
+                    {
+                      op: "and",
+                      ok: true,
+                      by: [
+                        {
+                          op: "eq",
+                          ok: true,
+                          by: "isOk",
+                        },
+                        {
+                          op: "eq",
+                          ok: true,
+                          by: "isOk",
+                        },
+                      ],
+                    },
+                  ],
+                },
+              ],
+            },
+            fmt: [
+              "(isOk && (isOk && (isOk && isOk)))",
+            ],
+          },
+        )
+      })
     })
 
-    test("should return the result of the guard with not, and, or", () => {
-      const guards = {
-        isOk: () => true,
-      }
-      const cond = and("isOk", or(not("isOk"), not("isOk")), "isOk")
-      const res = doGuardForDev(
-        { guards },
-        cond,
-        {} as Config.GuardParams.Signature,
-      )
-
-      assert.deepEqual(res, {
-        op: "and",
-        source: [
+    describe("or", () => {
+      test("should return true if one of the guards passes", () => {
+        assert.deepEqual(
+          doGuardForTest({
+            guards: { isOk: () => true },
+            guard: or("isOk", "isOk"),
+          }),
           {
-            op: "eq",
-            source: "isOk",
-            cause: false,
-            allow: true,
-          },
-          {
-            op: "or",
-            source: [
-              {
-                op: "not",
-                source: {
+            prd: true,
+            dev: {
+              op: "or",
+              ok: true,
+              by: [
+                {
                   op: "eq",
-                  source: "isOk",
-                  cause: false,
-                  allow: true,
+                  ok: true,
+                  by: "isOk",
                 },
-                cause: false,
-                allow: false,
-              },
-              {
-                op: "not",
-                source: {
+                {
                   op: "eq",
-                  source: "isOk",
-                  cause: false,
-                  allow: true,
+                  ok: undefined,
+                  by: "isOk",
                 },
-                cause: false,
-                allow: false,
-              },
+              ],
+            },
+            fmt: [
+              "(isOk || isOk)",
             ],
-            cause: true,
-            allow: false,
           },
-          // No further validation is performed
-          // because the previous condition returned false in the and.
-          {
-            op: "eq",
-            source: "isOk",
-            cause: false,
-            allow: undefined,
-          },
-        ],
-        cause: false,
-        allow: false,
+        )
       })
-      assert.equal(
-        formatGuardResult(res),
-        [
-          "(isOk && (!isOk || !isOk) && isOk)",
-          "         ^^^^^^^^^^^^^^^^         ",
-        ].join("\n"),
-      )
-      assert.equal(
-        res.allow,
-        doGuard({ guards }, cond, {} as Config.GuardParams.Signature),
-      )
+
+      test("should return false if all guards fail", () => {
+        assert.deepEqual(
+          doGuardForTest({
+            guards: { isOk: () => false },
+            guard: or("isOk", "isOk"),
+          }),
+          {
+            prd: false,
+            dev: {
+              op: "or",
+              ok: false,
+              by: [
+                {
+                  op: "eq",
+                  ok: false,
+                  by: "isOk",
+                },
+                {
+                  op: "eq",
+                  ok: false,
+                  by: "isOk",
+                },
+              ],
+            },
+            fmt: [
+              "(isOk || isOk)",
+              "^^^^^^^^^^^^^^",
+            ],
+          },
+        )
+      })
+
+      test("nesting", () => {
+        assert.deepEqual(
+          doGuardForTest({
+            guards: { isOk: () => true },
+            guard: or(or(or("isOk", "isOk"))),
+          }),
+          {
+            prd: true,
+            dev: {
+              op: "or",
+              ok: true,
+              by: [
+                {
+                  op: "or",
+                  ok: true,
+                  by: [
+                    {
+                      op: "or",
+                      ok: true,
+                      by: [
+                        {
+                          op: "eq",
+                          ok: true,
+                          by: "isOk",
+                        },
+                        {
+                          op: "eq",
+                          ok: undefined,
+                          by: "isOk",
+                        },
+                      ],
+                    },
+                  ],
+                },
+              ],
+            },
+            fmt: [
+              "(((isOk || isOk)))",
+            ],
+          },
+        )
+      })
     })
 
-    test("readme example", () => {
-      const guards = {
-        isReady: () => true,
-        isStopped: () => true,
-        isDestroyed: () => true,
-      }
-      const cond = and(or("isReady", "isStopped"), not("isDestroyed"))
-      const res = doGuardForDev(
-        { guards },
-        cond,
-        {} as Config.GuardParams.Signature,
-      )
-
-      console.debug(JSON.stringify(res, null, 2))
-
-      assert.deepEqual(res, {
-        op: "and",
-        source: [
+    describe("not", () => {
+      test("should return true if the guard fails", () => {
+        assert.deepEqual(
+          doGuardForTest({
+            guards: { isOk: () => false },
+            guard: not("isOk"),
+          }),
           {
-            op: "or",
-            source: [
-              {
+            prd: true,
+            dev: {
+              op: "not",
+              ok: true,
+              by: {
                 op: "eq",
-                source: "isReady",
-                cause: false,
-                allow: true,
+                ok: false,
+                by: "isOk",
               },
-              {
-                op: "eq",
-                source: "isStopped",
-                cause: false,
-                allow: undefined,
-              },
-            ],
-            cause: false,
-            allow: true,
-          },
-          {
-            op: "not",
-            source: {
-              op: "eq",
-              source: "isDestroyed",
-              cause: false,
-              allow: true,
             },
-            cause: true,
-            allow: false,
+            fmt: [
+              "!isOk",
+            ],
           },
-        ],
-        cause: false,
-        allow: false,
+        )
       })
-      assert.equal(
-        formatGuardResult(res),
-        [
-          "((isReady || isStopped) && !isDestroyed)",
-          "                           ^^^^^^^^^^^^ ",
-        ].join("\n"),
-      )
-      assert.equal(
-        res.allow,
-        doGuard({ guards }, cond, {} as Config.GuardParams.Signature),
-      )
+
+      test("should return false if the guard passes", () => {
+        assert.deepEqual(
+          doGuardForTest({
+            guards: { isOk: () => true },
+            guard: not("isOk"),
+          }),
+          {
+            prd: false,
+            dev: {
+              op: "not",
+              ok: false,
+              by: {
+                op: "eq",
+                ok: true,
+                by: "isOk",
+              },
+            },
+            fmt: [
+              "!isOk",
+              "^^^^^",
+            ],
+          },
+        )
+      })
+
+      test("nesting", () => {
+        assert.deepEqual(
+          doGuardForTest({
+            guards: { isOk: () => true },
+            guard: not(not(not("isOk"))),
+          }),
+          {
+            prd: false,
+            dev: {
+              op: "not",
+              ok: false,
+              by: {
+                op: "not",
+                ok: true,
+                by: {
+                  op: "not",
+                  ok: false,
+                  by: {
+                    op: "eq",
+                    ok: true,
+                    by: "isOk",
+                  },
+                },
+              },
+            },
+            fmt: [
+              "!!!isOk",
+              "^^^^^^^",
+            ],
+          },
+        )
+      })
+    })
+
+    describe("complex", () => {
+      test("or(and(not('isOk')), 'isOk')", () => {
+        assert.deepEqual(
+          doGuardForTest({
+            guards: { isOk: () => true },
+            guard: or(and(not("isOk")), "isOk"),
+          }),
+          {
+            prd: true,
+            dev: {
+              op: "or",
+              ok: true,
+              by: [
+                {
+                  op: "and",
+                  ok: false,
+                  by: [
+                    {
+                      op: "not",
+                      ok: false,
+                      by: {
+                        op: "eq",
+                        ok: true,
+                        by: "isOk",
+                      },
+                    },
+                  ],
+                },
+                {
+                  op: "eq",
+                  ok: true,
+                  by: "isOk",
+                },
+              ],
+            },
+            fmt: [
+              "((!isOk) || isOk)",
+            ],
+          },
+        )
+      })
+
+      test("and('isOk', or(not('isOk'), not('isOk')), 'isOk')", () => {
+        assert.deepEqual(
+          doGuardForTest({
+            guards: { isOk: () => true },
+            guard: and("isOk", or(not("isOk"), not("isOk")), "isOk"),
+          }),
+          {
+            prd: false,
+            dev: {
+              op: "and",
+              ok: false,
+              by: [
+                {
+                  op: "eq",
+                  ok: true,
+                  by: "isOk",
+                },
+                {
+                  op: "or",
+                  ok: false,
+                  by: [
+                    {
+                      op: "not",
+                      ok: false,
+                      by: {
+                        op: "eq",
+                        ok: true,
+                        by: "isOk",
+                      },
+                    },
+                    {
+                      op: "not",
+                      ok: false,
+                      by: {
+                        op: "eq",
+                        ok: true,
+                        by: "isOk",
+                      },
+                    },
+                  ],
+                },
+                {
+                  op: "eq",
+                  ok: undefined,
+                  by: "isOk",
+                },
+              ],
+            },
+            fmt: [
+              "(isOk && (!isOk || !isOk) && isOk)",
+              "         ^^^^^^^^^^^^^^^^         ",
+            ],
+          },
+        )
+      })
+
+      test("and(or('isReady', 'isStopped'), not('isDestroyed'))", () => {
+        assert.deepEqual(
+          doGuardForTest({
+            guards: {
+              isReady: () => true,
+              isStopped: () => true,
+              isDestroyed: () => true,
+            },
+            guard: and(or("isReady", "isStopped"), not("isDestroyed")),
+          }),
+          {
+            prd: false,
+            dev: {
+              op: "and",
+              ok: false,
+              by: [
+                {
+                  op: "or",
+                  ok: true,
+                  by: [
+                    {
+                      op: "eq",
+                      ok: true,
+                      by: "isReady",
+                    },
+                    {
+                      op: "eq",
+                      ok: undefined,
+                      by: "isStopped",
+                    },
+                  ],
+                },
+                {
+                  op: "not",
+                  ok: false,
+                  by: {
+                    op: "eq",
+                    ok: true,
+                    by: "isDestroyed",
+                  },
+                },
+              ],
+            },
+            fmt: [
+              "((isReady || isStopped) && !isDestroyed)",
+              "                           ^^^^^^^^^^^^ ",
+            ],
+          },
+        )
+      })
+
+      test("and(not('isDestroyed'), or('isReady', 'isStopped'))", () => {
+        assert.deepEqual(
+          doGuardForTest({
+            guards: {
+              isReady: () => true,
+              isStopped: () => true,
+              isDestroyed: () => true,
+            },
+            guard: and(not("isDestroyed"), or("isReady", "isStopped")),
+          }),
+          {
+            prd: false,
+            dev: {
+              op: "and",
+              ok: false,
+              by: [
+                {
+                  op: "not",
+                  ok: false,
+                  by: {
+                    op: "eq",
+                    ok: true,
+                    by: "isDestroyed",
+                  },
+                },
+                {
+                  op: "or",
+                  ok: undefined,
+                  by: [
+                    {
+                      op: "eq",
+                      ok: undefined,
+                      by: "isReady",
+                    },
+                    {
+                      op: "eq",
+                      ok: undefined,
+                      by: "isStopped",
+                    },
+                  ],
+                },
+              ],
+            },
+            fmt: [
+              "(!isDestroyed && (isReady || isStopped))",
+              " ^^^^^^^^^^^^                           ",
+            ],
+          },
+        )
+      })
     })
   })
 }

@@ -99,13 +99,13 @@ export function applyDispatch(
       const [nextStateValue, guardResult] = typeof transition === "string"
         ? [
           transition,
-          { allow: true },
+          { ok: true },
         ]
         : __DEV__
         ? [
           transition.target,
           transition.guard === undefined
-            ? { allow: true }
+            ? { ok: true }
             : doGuardForDev(
               conf,
               transition.guard,
@@ -115,7 +115,7 @@ export function applyDispatch(
         : [
           transition.target,
           {
-            allow: transition.guard === undefined || doGuard(
+            ok: transition.guard === undefined || doGuard(
               conf,
               transition.guard,
               { event, context },
@@ -126,17 +126,17 @@ export function applyDispatch(
       if (__DEV__) {
         if (
           typeof transition !== "string"
-          && typeof guardResult.allow === "boolean"
+          && typeof guardResult.ok === "boolean"
         ) {
           const prodGuardResult = {
-            allow: transition.guard === undefined || doGuard(
+            ok: transition.guard === undefined || doGuard(
               conf,
               transition.guard,
               { event, context },
             ),
           }
 
-          if (guardResult.allow !== prodGuardResult.allow) {
+          if (guardResult.ok !== prodGuardResult.ok) {
             console.error(
               "!!! EMERGENCY (use-machine-ts) !!!\n"
                 + "Guard results differ between development and production environments. "
@@ -158,7 +158,7 @@ export function applyDispatch(
         }
       }
 
-      if (!guardResult.allow) {
+      if (!guardResult.ok) {
         if (__DEV__) {
           log(
             { ...conf, level: "debug" },
