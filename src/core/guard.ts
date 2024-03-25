@@ -92,7 +92,7 @@ type GuardContext = {
  * @param guard - The guard to check.
  * @returns The result of the guard.
  */
-export function innerDoGuardForDev(
+function innerDoGuardForDev(
   ctx: GuardContext,
   guard: Definition.Guard.Signature,
 ): GuardResult {
@@ -122,7 +122,7 @@ export function innerDoGuardForDev(
 
     return {
       op: "and",
-      ok: done ? undefined : by.every(b => b.ok),
+      ok: done ? undefined : by.every(b => b.ok !== false),
       by,
     }
   } else if (guard.op === "not") {
@@ -152,7 +152,7 @@ export function innerDoGuardForDev(
 
     return {
       op: "or",
-      ok: done ? undefined : by.some(b => b.ok),
+      ok: done ? undefined : by.some(b => b.ok !== false),
       by,
     }
   } else {
