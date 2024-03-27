@@ -483,6 +483,26 @@ if (cfgTest && cfgTest.url === import.meta.url) {
           },
         )
       })
+
+      test("should return true if there are no guards", () => {
+        assert.deepEqual(
+          doGuardForTest({
+            guards: {},
+            guard: [],
+          }),
+          {
+            prd: true,
+            dev: {
+              op: "and",
+              ok: true,
+              by: [],
+            },
+            fmt: [
+              "()",
+            ],
+          },
+        )
+      })
     })
 
     describe("or", () => {
@@ -587,6 +607,27 @@ if (cfgTest && cfgTest.url === import.meta.url) {
             },
             fmt: [
               "(((isOk || isOk)))",
+            ],
+          },
+        )
+      })
+
+      test("should return false if there are no guards", () => {
+        assert.deepEqual(
+          doGuardForTest({
+            guards: {},
+            guard: or(),
+          }),
+          {
+            prd: false,
+            dev: {
+              op: "or",
+              ok: false,
+              by: [],
+            },
+            fmt: [
+              "()",
+              "^^",
             ],
           },
         )

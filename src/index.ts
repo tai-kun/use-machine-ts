@@ -7,9 +7,21 @@ export { useSharedMachine } from "./useSharedMachine"
 export { useSyncedMachine } from "./useSyncedMachine"
 
 if (cfgTest && cfgTest.url === import.meta.url) {
+  const tty = await import("node:tty")
+  const { Console } = await import("node:console")
   await import("global-jsdom/register")
-  const { useEffect, useMemo, useSyncExternalStore } = await import("react")
-  const { act, renderHook } = await import("@testing-library/react")
+  const {
+    createElement,
+    useEffect,
+    useMemo,
+    useSyncExternalStore,
+  } = await import("react")
+  const {
+    act,
+    fireEvent,
+    render,
+    renderHook,
+  } = await import("@testing-library/react")
   const { createMachine } = await import("./createMachine")
   const { createSharedMachine } = await import("./createSharedMachine")
   const { useMachine } = await import("./useMachine")
@@ -1146,6 +1158,96 @@ if (cfgTest && cfgTest.url === import.meta.url) {
         nextEvents: ["TOGGLE"],
       })
       assert.equal(state1, state2)
+    })
+
+    test("should update the state synchronously", () => {
+      const logs: unknown[] = []
+      const stdout = new tty.WriteStream(1)
+      const console = new Console(stdout)
+      mock.method(stdout, "write", (data: any) => {
+        logs.push(
+          (data = data.toString().trim()).startsWith("state ")
+            ? JSON.parse(data.slice("state ".length))
+            : data,
+        )
+
+        return true // Keep the stream open
+      })
+
+      function Switch(_: {}) {
+        const [getState, send] = useSyncedMachine({
+          initial: "off",
+          context: 0,
+          states: {
+            off: {
+              on: { TOGGLE: "on" },
+              effect: "onChange",
+            },
+            on: {
+              on: { TOGGLE: "off" },
+              effect: "onChange",
+            },
+          },
+        }, {
+          effects: {
+            onChange: ({ setContext }) => {
+              console.count("entryEffect")
+
+              setContext(ctx => ctx + 1)
+
+              return () => {
+                console.count("exitEffect")
+              }
+            },
+          },
+        })
+
+        return createElement("button", {
+          type: "button",
+          onClick() {
+            console.count("beforeSend")
+            console.debug("state", JSON.stringify(getState()))
+
+            send("TOGGLE")
+
+            console.count("afterSend")
+            console.debug("state", JSON.stringify(getState()))
+          },
+        })
+      }
+
+      const { getByRole, unmount } = render(createElement(Switch))
+      const button = getByRole("button")
+      fireEvent.click(button)
+      unmount()
+      stdout.end() // Close the write stream
+
+      assert.deepEqual(logs, [
+        // The first effect callback is invoked inside `React.useEffect`.
+        "entryEffect: 1",
+        // Clicking the button triggers the state transition.
+        "beforeSend: 1",
+        {
+          event: { type: "$init" },
+          value: "off",
+          context: 1,
+          nextEvents: ["TOGGLE"],
+        },
+        // The effect callback is invoked synchronously,
+        // regardless of the React lifecycle.
+        "exitEffect: 1",
+        "entryEffect: 2",
+        // The state has been updated at this point.
+        "afterSend: 1",
+        {
+          event: { type: "TOGGLE" },
+          value: "on",
+          context: 2,
+          nextEvents: ["TOGGLE"],
+        },
+        // The exit-effect callback is invoked when it is unmounted.
+        "exitEffect: 2",
+      ])
     })
   })
 }
