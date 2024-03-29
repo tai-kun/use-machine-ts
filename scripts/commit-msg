@@ -1,43 +1,65 @@
 #!/usr/bin/env bash
 
-MESSAGE="$1"
-
-function regex() {
-    [[ "$(echo -n "$MESSAGE" | grep -oP "$1")" != '' ]]
-}
+KIND='(chore|docs|feat|fix|perf|refactor|release|revert|style|test)'
+EXCLUDES=('.*' 'build' 'debug' 'dist' 'node_modules' 'out' 'src' 'target')
 
 function listup() {
     local dir="$1"
+    local pfx=''
     local max=4
-    local abs=false
     local OPT
+    local find_opt
 
     shift
 
-    while getopts "m:a" OPT; do
+    while getopts "p:m:a" OPT; do
         case "$OPT" in
+        p) pfx="$OPTARG" ;;
         m) max="$OPTARG" ;;
-        a) abs=true ;;
         *) exit 1 ;;
         esac
     done
 
-    if [ $abs = true ]; then
-        res="$(find "$dir" -mindepth 1 -maxdepth "$max" -type d | paste -sd '|')"
-    else
-        res="$(find "$dir" -mindepth 1 -maxdepth "$max" -type d | sed "s|^$dir/||" | paste -sd '|')"
-    fi
+    find_opt="-mindepth 1 -maxdepth $max -type d"
 
-    echo "$res"
+    for EXD in "${EXCLUDES[@]}"; do
+        find_opt+=" ! \\( -name '$EXD' -o -path '*/$EXD/*' \\)"
+    done
+
+    (cd "$dir" && eval find . "$find_opt" | sed 's|[@#]||g' | sed "s|^./|$pfx|" | paste -sd '|')
 }
 
-TYPE='(docs|style|refactor|perf|test|chore|revert|feat|fix)'
+MSG="$1"
 
-src_scope="$(listup src)"
-scope="(ci|types|config|docs|examples|scripts|src|$src_scope)"
+function match() {
+    if [ "$(echo -n "$MSG" | grep -oP "$1")" != '' ]; then
+        exit 0
+    fi
+}
 
-regex "^$TYPE(\(${scope//$/\\$}\))?: .+$" && exit 0
-regex "^build(\((deps|deps-dev)\))?: .+$" && exit 0
+function check() {
+    local scope=''
+    local i
+
+    for i in "$@"; do
+        if [ "$i" != '' ]; then
+            if [ "$scope" = '' ]; then
+                scope="$i"
+            else
+                scope="$scope|$i"
+            fi
+        fi
+    done
+
+    if [ "$scope" != '' ]; then
+        match "^$KIND\((${scope//$/\\$})\): ."
+    fi
+}
+
+match "^$KIND: ."
+match "^chore\((deps|deps-dev)\): ."
+check "$(listup . -m 1)"
+check "$(listup src)"
 
 echo 'Invalid commit message format.'
 exit 1
