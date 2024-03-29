@@ -47,6 +47,22 @@ function useMachine<D, P>(
 ]
 
 /**
+ * Use a state machine using a pre-created machine.
+ *
+ * @template D - The type of state machine definition.
+ * @param machine - The state machine.
+ * @returns An array with two elements:
+ * - The first element is the current state of the state machine.
+ * - The second element is a function that sends an event to the state machine.
+ */
+function useMachine<D>(
+  machine: Machine<D>,
+): [
+  state: State<D>,
+  send: Send<D>,
+]
+
+/**
  * Create a state machine and use it.
  *
  * @template D - The type of state machine definition.
@@ -81,22 +97,6 @@ function useMachine<
 >(
   definition: Definition.Exact<D>,
   config: Config.Exact<D, G, E>,
-): [
-  state: State<D>,
-  send: Send<D>,
-]
-
-/**
- * Use a state machine using a pre-created machine.
- *
- * @template D - The type of state machine definition.
- * @param machine - The state machine.
- * @returns An array with two elements:
- * - The first element is the current state of the state machine.
- * - The second element is a function that sends an event to the state machine.
- */
-function useMachine<D>(
-  machine: Machine<D>,
 ): [
   state: State<D>,
   send: Send<D>,
