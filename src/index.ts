@@ -1166,8 +1166,8 @@ if (cfgTest && cfgTest.url === import.meta.url) {
       const console = new Console(stdout)
       mock.method(stdout, "write", (data: any) => {
         logs.push(
-          (data = data.toString().trim()).startsWith("state ")
-            ? JSON.parse(data.slice("state ".length))
+          (data = data.toString().trim()).startsWith("<JSON> ")
+            ? JSON.parse(data.slice("<JSON> ".length))
             : data,
         )
 
@@ -1202,16 +1202,18 @@ if (cfgTest && cfgTest.url === import.meta.url) {
           },
         })
 
+        console.debug("render")
+
         return createElement("button", {
           type: "button",
           onClick() {
             console.count("beforeSend")
-            console.debug("state", JSON.stringify(getState()))
+            console.debug("<JSON>", JSON.stringify(getState()))
 
             send("TOGGLE")
 
             console.count("afterSend")
-            console.debug("state", JSON.stringify(getState()))
+            console.debug("<JSON>", JSON.stringify(getState()))
           },
         })
       }
@@ -1223,6 +1225,7 @@ if (cfgTest && cfgTest.url === import.meta.url) {
       stdout.end() // Close the write stream
 
       assert.deepEqual(logs, [
+        "render",
         // The first effect callback is invoked inside `React.useEffect`.
         "entryEffect: 1",
         // Clicking the button triggers the state transition.
