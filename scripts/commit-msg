@@ -57,7 +57,7 @@ function check() {
 }
 
 match "^$KIND: ."
-match "^chore\((deps|deps-dev)\): ."
+match "^chore\((deps|deps-dev|ci)\): ."
 check "$(listup . -m 1)"
 check "$(listup src)"
 
