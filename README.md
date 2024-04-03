@@ -2,7 +2,7 @@
 
 **The tiny _state machine_ hook for React**
 
-[![Test](https://github.com/tai-kun/use-machine-ts/actions/workflows/test.yaml/badge.svg)](https://github.com/tai-kun/use-machine-ts/actions/workflows/test.yaml)
+[![CI](https://github.com/tai-kun/use-machine-ts/actions/workflows/ci.yaml/badge.svg)](https://github.com/tai-kun/use-machine-ts/actions/workflows/ci.yaml)
 [![Release on NPM](https://github.com/tai-kun/use-machine-ts/actions/workflows/release.yaml/badge.svg)](https://github.com/tai-kun/use-machine-ts/actions/workflows/release.yaml)
 [![Canary Release on NPM](https://github.com/tai-kun/use-machine-ts/actions/workflows/canary-release.yaml/badge.svg)](https://github.com/tai-kun/use-machine-ts/actions/workflows/canary-release.yaml)
 
