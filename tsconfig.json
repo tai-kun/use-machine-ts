@@ -4,11 +4,11 @@
     "./node_modules/@tsconfig/strictest/tsconfig.json"
   ],
   "include": [
-    "@types/**/*",
-    "config/**/*",
-    "examples/**/*",
-    "scripts/**/*",
-    "src/**/*"
+    "./@types/**/*",
+    "./config/**/*",
+    "./examples/**/*",
+    "./scripts/**/*",
+    "./src/**/*"
   ],
   "compilerOptions": {
     "noEmit": true,
