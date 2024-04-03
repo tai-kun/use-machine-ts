@@ -8,3 +8,8 @@ updates:
       time: "07:30"
       timezone: "Asia/Tokyo"
     open-pull-requests-limit: 1
+    groups:
+      dev-dependencies:
+        dependency-type: development
+        update-types: ["major", "patch"]
+        patterns: ["*"]
