@@ -44,7 +44,7 @@
   "devDependencies": {
     "@size-limit/preset-small-lib": "~11.1.1",
     "@swc-node/register": "~1.9.0",
-    "@testing-library/react": "~14.2.2",
+    "@testing-library/react": "~15.0.1",
     "@tsconfig/node21": "~21.0.1",
     "@tsconfig/strictest": "~2.0.3",
     "@types/node": "~20.11.30",
