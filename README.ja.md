@@ -123,6 +123,13 @@ console.log(state)
 //   event: { type: "TOGGLE" }, nextEvents: ["TOGGLE"] }
 ```
 
+## TODO
+
+- [x] 基本的な機能を実装する。
+- [ ] 一部の不完全なテストを修正する。
+- [ ] `preact/compat` でもテストする。
+- [ ] React v19 との互換性を確認する。
+
 ## Contents
 
 - [API](#api)
