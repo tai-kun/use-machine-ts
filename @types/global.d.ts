@@ -19,14 +19,4 @@ declare module globalThis {
       o: T,
     ): Extract<keyof T, string>[]
   }
-
-  // For avoiding errors in tsd.
-  // TODO: Delete this when tsd supports it.
-  interface PromiseConstructor {
-    withResolvers<T>(): {
-      promise: Promise<T>
-      resolve: (value: T | PromiseLike<T>) => void
-      reject: (reason?: any) => void
-    }
-  }
 }
