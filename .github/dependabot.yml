@@ -3,11 +3,10 @@ updates:
   - package-ecosystem: "npm"
     directory: "/"
     schedule:
-      interval: "weekly"
-      day: "saturday"
+      interval: "daily"
       time: "07:30"
       timezone: "Asia/Tokyo"
-    open-pull-requests-limit: 1
+    open-pull-requests-limit: 3
     groups:
       dev-dependencies:
         dependency-type: development
