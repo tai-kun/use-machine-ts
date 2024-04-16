@@ -1222,7 +1222,6 @@ if (cfgTest && cfgTest.url === import.meta.url) {
       const button = getByRole("button")
       fireEvent.click(button)
       unmount()
-      stdout.end() // Close the write stream
 
       assert.deepEqual(logs, [
         "render",
