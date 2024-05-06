@@ -12,3 +12,6 @@ updates:
         dependency-type: development
         update-types: ["major", "patch"]
         patterns: ["*"]
+    ignore:
+      - dependency-name: "@swc-node/register"
+        versions: ["1.9.1"]
