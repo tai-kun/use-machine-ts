@@ -141,10 +141,9 @@ export function applyDispatch(
               "!!! EMERGENCY (use-machine-ts) !!!\n"
                 + "Guard results differ between development and production environments. "
                 + "This is probably a serious bug in the library. "
-                + "Could you please let me know under what conditions this bug occurs?\n\n"
-                + "Issue: https://github.com/tai-kun/use-machine-ts/issues/new\n\n"
-                + "Thank you,\n"
-                + "tai-kun\n",
+                + "Could you please let me know under what conditions this bug occurs?\n"
+                + "  Issue: https://github.com/tai-kun/use-machine-ts/issues/new \n"
+                + "Thank you very much for your help!\n",
               "Event",
               event,
               "Transition",
@@ -272,7 +271,7 @@ export function applyEffect(
       } else if (__DEV__) {
         log(
           { ...conf, level: "error" },
-          "Send function not available. "
+          "`send()` not available. "
             + "Must be used synchronously within an effect.",
           ["State", state],
           ["Event", event],
@@ -289,7 +288,7 @@ export function applyEffect(
       } else if (__DEV__) {
         log(
           { ...conf, level: "error" },
-          "Set context function not available. "
+          "`setContext()` not available. "
             + "Must be used synchronously within an effect.",
           ["State", state],
           ["Action", action],

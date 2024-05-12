@@ -114,7 +114,8 @@ function useMachine(arg0: any, arg1?: any): [any, any] {
       } else if (__DEV__) {
         log(
           { ...conf, level: "error" },
-          "Cannot dispatch an action to the state machine after it is unmounted.",
+          "Cannot dispatch an action to the state machine "
+            + "after the component is unmounted.",
           ["Action", action],
         )
       }
