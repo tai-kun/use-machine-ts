@@ -134,10 +134,8 @@ export function isPlainObject<T>(value: T): value is Exclude<
  *
  * @param cause - Cause of the error.
  */
-export function assertNever(
-  cause: never,
-): never {
-  throw new Error("Reached code that should be unreachable", { cause })
+export function assertNever(cause: never): never {
+  throw new Error("unreachable", { cause })
 }
 
 if (cfgTest && cfgTest.url === import.meta.url) {
@@ -147,7 +145,7 @@ if (cfgTest && cfgTest.url === import.meta.url) {
 
   describe("src/core/devutils", () => {
     describe("log", () => {
-      test("Should log messages", () => {
+      test("should log messages", () => {
         const logMock = mock.fn()
         const options: LogOptions = {
           verbose: true,
@@ -177,7 +175,7 @@ if (cfgTest && cfgTest.url === import.meta.url) {
         )
       })
 
-      test("Should log messages with group label", () => {
+      test("should log messages with group label", () => {
         const logMock = mock.fn()
         const options: LogOptions = {
           verbose: true,
@@ -386,7 +384,7 @@ if (cfgTest && cfgTest.url === import.meta.url) {
     })
 
     describe("useDetectChanges", () => {
-      test("Should call the callback when the value changes", () => {
+      test("should call the callback when the value changes", () => {
         const callback = mock.fn()
         const { rerender } = renderHook(
           ({ value }) => {
@@ -415,7 +413,7 @@ if (cfgTest && cfgTest.url === import.meta.url) {
         )
       })
 
-      test("Should call the callback with the custom equality function", () => {
+      test("should call the callback with the custom equality function", () => {
         const callback = mock.fn()
         const { rerender } = renderHook(
           props => {
@@ -454,12 +452,12 @@ if (cfgTest && cfgTest.url === import.meta.url) {
     })
 
     describe("isPlainObject", () => {
-      test("Should return true if the value is a plain object", () => {
+      test("should return true if the value is a plain object", () => {
         assert(isPlainObject({}))
         assert(isPlainObject(Object.create(null)))
       })
 
-      test("Should return false if the value is not a plain object", () => {
+      test("should return false if the value is not a plain object", () => {
         assert(!isPlainObject([]))
         assert(!isPlainObject(() => {}))
         assert(!isPlainObject(null))
@@ -471,13 +469,13 @@ if (cfgTest && cfgTest.url === import.meta.url) {
     })
 
     describe("assertNever", () => {
-      test("Should throw an error", () => {
+      test("should throw an error", () => {
         assert.throws(
           () => {
             assertNever("value" as never)
           },
           {
-            message: "Reached code that should be unreachable",
+            message: "unreachable",
           },
         )
       })

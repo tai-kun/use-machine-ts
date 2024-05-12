@@ -800,7 +800,7 @@ console.log(getState())
 `useMachine` の中では、コンポーネントがマウントされている限り、非同期的に `send` と `setContext` 関数を呼び出すことはできます。ただし、コンポーネントがすでにアンマウントされている場合、これらの関数は状態を変更する代わりに、次のようなエラーメッセージを表示します。
 
 ```log
-Cannot dispatch an action to the state machine after it is unmounted.
+Cannot dispatch an action to the state machine after the component is unmounted.
 Action { type: "SEND", payload: { type: "TOGGLE" } }
 ```
 

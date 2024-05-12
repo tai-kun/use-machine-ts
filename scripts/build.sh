@@ -22,5 +22,5 @@ node ./scripts/build.mjs
 
 # build types
 
-cp config/build/tsconfig.build.json tsconfig.build.json
+cp .config/build/tsconfig.build.json tsconfig.build.json
 npx tsc -p tsconfig.build.json

@@ -800,7 +800,7 @@ There are a few things to keep in mind when updating state machine state asynchr
 Inside `useMachine`, you can call the `send` and `setContext` functions asynchronously as long as the component is mounted. However, if the component is already unmounted, these functions instead of changing the state will display an error message like this:
 
 ```log
-Cannot dispatch an action to the state machine after it is unmounted.
+Cannot dispatch an action to the state machine after the component is unmounted.
 Action { type: "SEND", payload: { type: "TOGGLE" } }
 ```
 
