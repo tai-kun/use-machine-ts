@@ -79,7 +79,7 @@
     { "path": "size-check/dist/use-machine-ts/synced.js" }
   ],
   "volta": {
-    "node": "21.7.1"
+    "node": "22.1.0"
   },
   "keywords": [
     "state-machine",
