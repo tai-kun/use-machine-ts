@@ -1028,7 +1028,7 @@ if (cfgTest && cfgTest.url === import.meta.url) {
         groupSpy.mock.calls.map(call => call.arguments),
         [
           [
-            "Cannot dispatch an action to the state machine after it is unmounted.",
+            "Cannot dispatch an action to the state machine after the component is unmounted.",
           ],
         ],
       )

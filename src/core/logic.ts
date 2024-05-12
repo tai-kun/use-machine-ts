@@ -885,7 +885,7 @@ if (cfgTest && cfgTest.url === import.meta.url) {
           [
             {
               args: [
-                "Send function not available. Must be used synchronously within an effect.",
+                "`send()` not available. Must be used synchronously within an effect.",
               ],
             },
             {
