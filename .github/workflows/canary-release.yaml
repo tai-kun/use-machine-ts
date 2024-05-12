@@ -6,7 +6,6 @@ on:
       - main
     paths:
       - ".github/workflows/canary-release.yaml"
-      - "@types/**"
       - "config/build/**"
       - "scripts/**"
       - "src/**"

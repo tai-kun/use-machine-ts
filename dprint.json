@@ -8,7 +8,6 @@
   },
   "includes": [
     ".vscode/**/*.json",
-    "@types/**/*",
     "config/**/*",
     "docs/**/*",
     "examples/**/*",
