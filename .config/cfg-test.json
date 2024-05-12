@@ -4,6 +4,6 @@
     "__DEV__": true
   },
   "require": [
-    "./config/promise-with-resolvers-polyfill.cjs"
+    "./.config/promise-with-resolvers-polyfill.cjs"
   ]
 }
