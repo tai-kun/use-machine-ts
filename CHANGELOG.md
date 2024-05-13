@@ -1,3 +1,7 @@
+## <small>v0.2.1 (2024-05-13)</small>
+
+Improved log messages.
+
 ## <small>v0.2.0 (2024-03-30)</small>
 
 ### Features
