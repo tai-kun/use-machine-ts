@@ -1,18 +1,30 @@
 #!/usr/bin/env bash
 
 KIND='(chore|docs|feat|fix|perf|refactor|release|revert|style|test)'
-EXCLUDES=('.*' 'build' 'debug' 'dist' 'node_modules' 'out' 'src' 'target')
+EXCLUDES=(
+    'cache' '.cache'
+    'temp' '.temp' 'tmp' '.tmp'
+    '.git' '.history'
+    '.Trash'
+    'target' 'debug'
+    'node_modules'
+    'dist'
+    'src'
+)
 
 function listup() {
     local dir="$1"
     local pfx=''
     local max=4
+    local EXD
     local OPT
-    local find_opt
+    local OPTARG
+    local OPTIND=1
+    local find_opts
 
     shift
 
-    while getopts "p:m:a" OPT; do
+    while getopts p:m: OPT; do
         case "$OPT" in
         p) pfx="$OPTARG" ;;
         m) max="$OPTARG" ;;
@@ -20,13 +32,13 @@ function listup() {
         esac
     done
 
-    find_opt="-mindepth 1 -maxdepth $max -type d"
+    find_opts="-mindepth 1 -maxdepth $max -type d"
 
     for EXD in "${EXCLUDES[@]}"; do
-        find_opt+=" ! \\( -name '$EXD' -o -path '*/$EXD/*' \\)"
+        find_opts+=" ! \\( -name '$EXD' -o -path '*/$EXD/*' \\)"
     done
 
-    (cd "$dir" && eval find . "$find_opt" | sed 's|[@#]||g' | sed "s|^./|$pfx|" | paste -sd '|')
+    (cd "$dir" && eval find . "$find_opts" | sed "s|^./|$pfx|" | sed 's|^[@#]||g' | paste -sd '|')
 }
 
 MSG="$1"

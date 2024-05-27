@@ -342,7 +342,7 @@ and(or("isReady", "isStopped"), not("isDestroyed"))
 
 If `guard` eventually returns `false`, you will see a log similar to the following:
 
-```log
+```console
 Transition from 'inactive' to 'active' denied by guard.
 ((isReady || isStopped) && !isDestroyed)
                            ^^^^^^^^^^^^ 
@@ -799,7 +799,7 @@ There are a few things to keep in mind when updating state machine state asynchr
 
 Inside `useMachine`, you can call the `send` and `setContext` functions asynchronously as long as the component is mounted. However, if the component is already unmounted, these functions instead of changing the state will display an error message like this:
 
-```log
+```console
 Cannot dispatch an action to the state machine after the component is unmounted.
 Action { type: "SEND", payload: { type: "TOGGLE" } }
 ```
@@ -845,7 +845,7 @@ Inside `useSharedMachine`, you can call `send`, `setContext`, or `dispatch` on t
 
 The `send` and `setContext` functions cannot be called asynchronously within `useSyncedMachine`, regardless of the mounted state of the component. These functions are unlocked just before the effect starts and locked after it ends. If you call these functions while locked, you will receive an error message similar to the following:
 
-```log
+```console
 Send function not available. Must be used synchronously within an effect.
 State { value: "inactive", event: { type: "$init" }, nextEvents: ["TOGGLE"], context: undefined }
 Event: { type: "TOGGLE" }

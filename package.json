@@ -58,6 +58,7 @@
     "react": "^18.3.1",
     "size-limit": "~11.1.2",
     "tsd": "~0.31.0",
+    "typedoc": "^0.25.13",
     "typescript": "~5.4.5"
   },
   "scripts": {
@@ -67,16 +68,31 @@
     "lint": "exit 0",
     "test": "node --enable-source-maps --import cfg-test --test 'src/**/*.ts' --test 'src/**/*.tsx'",
     "build": "scripts/build.sh",
-    "size-check": "npm run build && (cd size-check && npm ci && npm run build) && size-limit"
+    "size-check": "npm run build && (cd size-check && npm ci && npm run build) && size-limit",
+    "docs": "typedoc src/index.ts"
   },
   "size-limit": [
-    { "path": "size-check/dist/xstate/react.js" },
-    { "path": "size-check/dist/@cassiozen/usestatemachine.js" },
-    { "path": "size-check/dist/use-machine-ts/baseline.js" },
-    { "path": "size-check/dist/use-machine-ts/index.js" },
-    { "path": "size-check/dist/use-machine-ts/standard.js" },
-    { "path": "size-check/dist/use-machine-ts/shared.js" },
-    { "path": "size-check/dist/use-machine-ts/synced.js" }
+    {
+      "path": "size-check/dist/xstate/react.js"
+    },
+    {
+      "path": "size-check/dist/@cassiozen/usestatemachine.js"
+    },
+    {
+      "path": "size-check/dist/use-machine-ts/baseline.js"
+    },
+    {
+      "path": "size-check/dist/use-machine-ts/index.js"
+    },
+    {
+      "path": "size-check/dist/use-machine-ts/standard.js"
+    },
+    {
+      "path": "size-check/dist/use-machine-ts/shared.js"
+    },
+    {
+      "path": "size-check/dist/use-machine-ts/synced.js"
+    }
   ],
   "volta": {
     "node": "22.1.0"

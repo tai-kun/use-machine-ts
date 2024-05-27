@@ -9,7 +9,6 @@
   "includes": [
     ".vscode/**/*.json",
     "config/**/*",
-    "docs/**/*",
     "examples/**/*",
     "scripts/**/*",
     "src/**/*",

@@ -12,13 +12,66 @@ import { useEffect, useRef } from "./core/react"
 import type { Config, Definition, Machine, Send, State } from "./types"
 
 /**
- * Use a state machine using a pre-created machine.
+ * Uses a synced state machine with the constructor.
+ *
+ * This hook can transition the state of the state machine without re-rendering.
+ *
+ * The state machine constructor is executed only once per hook.
+ * It is idempotent unless it depends on external mutable values within the constructor.
+ *
+ * In most cases, `useSyncedMachine` used in conjunction with `props`.
+ * It is intended to serve as a filter to determine whether multiple event sources,
+ * including the DOM, have triggered a state transition.
  *
  * @template D - The type of state machine definition.
  * @param machine - The state machine factory.
  * @returns An array with two elements:
  * - The first element is a function that returns the current state of the state machine.
  * - The second element is a function that sends an event to the state machine.
+ * @example
+ * ```tsx
+ * import { useSyncedMachine, createMachine } from "use-machine-ts"
+ *
+ * function machine() {
+ *   return createMachine({
+ *     // definition
+ *     {
+ *       initial: "inactive",
+ *       states: {
+ *         inactive: {
+ *           on: { TOGGLE: "active" },
+ *           effect: "onInactive",
+ *         },
+ *         active: {
+ *           on: { TOGGLE: "inactive" },
+ *           effect: "onActive",
+ *         },
+ *       },
+ *     },
+ *     // configuration
+ *     {
+ *       effects: {
+ *         onActive: () => {
+ *           console.log("Just activated!")
+ *         },
+ *         onInactive: () => {
+ *           console.log("Just deactivated!")
+ *         },
+ *       },
+ *     },
+ *   })
+ * }
+ *
+ * function ToggleButton(props: {}) {
+ *   const [getState, send] = useSyncedMachine(machine)
+ *
+ *   return (
+ *     <button onClick={() => send("TOGGLE")} type="button">
+ *       Toggle
+ *     </button>
+ *   )
+ * }
+ * ```
  */
 function useSyncedMachine<D>(
   machine: () => Machine<D>,
@@ -28,7 +81,19 @@ function useSyncedMachine<D>(
 ]
 
 /**
- * Use a state machine using a pre-created machine.
+ * Uses a synced state machine with the constructor and props.
+ *
+ * This hook can transition the state of the state machine without re-rendering.
+ *
+ * The state machine constructor is executed only once per hook.
+ * It is idempotent unless it depends on external mutable values within the constructor.
+ *
+ * The `props` passed to the state machine constructor are different from the `props` of a React component; they are represented as a function.
+ * When this function is executed, it returns a reference to the `props` passed to the hook.
+ * This mechanism is implemented using `React.useRef`, ensuring that it always returns a reference to the latest `props`.
+ *
+ * It is intended to serve as a filter to determine whether multiple event sources,
+ * including the DOM, have triggered a state transition.
  *
  * @template D - The type of state machine definition.
  * @template P - The type of props for the state machine factory.
@@ -37,23 +102,124 @@ function useSyncedMachine<D>(
  * @returns An array with two elements:
  * - The first element is a function that returns the current state of the state machine.
  * - The second element is a function that sends an event to the state machine.
+ * @example
+ * ```tsx
+ * import { useSyncedMachine, createMachine } from "use-machine-ts"
+ *
+ * function machine(props: () => { onToggle }) {
+ *   return createMachine({
+ *     // definition
+ *     {
+ *       initial: "inactive",
+ *       states: {
+ *         inactive: {
+ *           on: { TOGGLE: "active" },
+ *           effect: "onInactive",
+ *         },
+ *         active: {
+ *           on: { TOGGLE: "inactive" },
+ *           effect: "onActive",
+ *         },
+ *       },
+ *     },
+ *     // configuration
+ *     {
+ *       effects: {
+ *         onActive: () => {
+ *           const { onToggle } = props()
+ *           onToggle("active")
+ *         },
+ *         onInactive: () => {
+ *           const { onToggle } = props()
+ *           onToggle("inactive")
+ *         },
+ *       },
+ *     },
+ *   })
+ * }
+ *
+ * function ToggleButton(props: { onToggle: (value: "active" | "inactive") => void }) {
+ *   const [, send] = useSyncedMachine(machine, props)
+ *
+ *   return (
+ *     <button onClick={() => send("TOGGLE")} type="button">
+ *       Toggle
+ *     </button>
+ *   )
+ * }
+ * ```
  */
 function useSyncedMachine<D, P>(
   machine: (props: () => P) => Machine<D>,
   props: P,
 ): [
-  state: State<D>,
+  getState: () => State<D>,
   send: Send<D>,
 ]
 
 /**
- * Use a state machine using a pre-created machine.
+ * Uses a synced state machine with the pre-created instance.
+ *
+ * This hook can transition the state of the state machine without re-rendering.
+ *
+ * We can use a pre-created state machine instance with the hook.
+ * It is idempotent unless it depends on external mutable values within the `effect`.
+ * In most cases, it is better to define the state machine using the constructor instead.
+ *
+ * To enable tree shaking, you can indicate to the bundler that this function has no side effects
+ * by using the `@__PURE__` or `#__PURE__` annotation as needed.
+ *
+ * In most cases, `useSyncedMachine` used in conjunction with `props`.
+ * It is intended to serve as a filter to determine whether multiple event sources,
+ * including the DOM, have triggered a state transition.
  *
  * @template D - The type of state machine definition.
  * @param machine - The state machine.
  * @returns An array with two elements:
  * - The first element is a function that returns the current state of the state machine.
  * - The second element is a function that sends an event to the state machine.
+ * @example
+ * ```tsx
+ * import { useSyncedMachine, createMachine } from "use-machine-ts"
+ *
+ * const machine = createMachine({
+ *   // definition
+ *   {
+ *     initial: "inactive",
+ *     states: {
+ *       inactive: {
+ *         on: { TOGGLE: "active" },
+ *         effect: "onInactive",
+ *       },
+ *       active: {
+ *         on: { TOGGLE: "inactive" },
+ *         effect: "onActive",
+ *       },
+ *     },
+ *   },
+ *   // configuration
+ *   {
+ *     effects: {
+ *       onActive: () => {
+ *         console.log("Just activated!")
+ *       },
+ *       onInactive: () => {
+ *         console.log("Just deactivated!")
+ *       },
+ *     },
+ *   },
+ * })
+ *
+ * function ToggleButton(props: {}) {
+ *   const [getState, send] = useSyncedMachine(machine)
+ *
+ *   return (
+ *     <button onClick={() => send("TOGGLE")} type="button">
+ *       Toggle
+ *     </button>
+ *   )
+ * }
+ * ```
  */
 function useSyncedMachine<D>(
   machine: Machine<D>,
@@ -63,13 +229,50 @@ function useSyncedMachine<D>(
 ]
 
 /**
- * Create a state machine and use it.
+ * Define a synced state machine and uses it.
+ *
+ * This hook can transition the state of the state machine without re-rendering.
+ *
+ * This approach is useful when you want to quickly define and use a simple state machine on the spot.
+ * For complex definitions, it is usually better to write them in a separate file and import it.
+ * However, if the definition does not impair readability, keeping it within the component can actually make it more readable.
+ *
+ * In most cases, `useSyncedMachine` used in conjunction with `props`.
+ * It is intended to serve as a filter to determine whether multiple event sources,
+ * including the DOM, have triggered a state transition.
  *
  * @template D - The type of state machine definition.
  * @param definition - The state machine definition.
  * @returns An array with two elements:
  * - The first element is a function that returns the current state of the state machine.
  * - The second element is a function that sends an event to the state machine.
+ * @example
+ * ```tsx
+ * import { useSyncedMachine } from "use-machine-ts"
+ *
+ * function ToggleButton(props: {}) {
+ *   const [getState, send] = useSyncedMachine(
+ *     // definition
+ *     {
+ *       initial: "inactive",
+ *       states: {
+ *         inactive: {
+ *           on: { TOGGLE: "active" },
+ *         },
+ *         active: {
+ *           on: { TOGGLE: "inactive" },
+ *         },
+ *       },
+ *     },
+ *   )
+ *
+ *   return (
+ *     <button onClick={() => send("TOGGLE")} type="button">
+ *       Toggle
+ *     </button>
+ *   )
+ * }
+ * ```
  */
 function useSyncedMachine<D extends Definition.Shape<D, never, never>>(
   definition: Definition.Exact<D>,
@@ -79,7 +282,17 @@ function useSyncedMachine<D extends Definition.Shape<D, never, never>>(
 ]
 
 /**
- * Create a state machine and use it.
+ * Define a synced state machine and uses it.
+ *
+ * This hook can transition the state of the state machine without re-rendering.
+ *
+ * This approach is useful when you want to quickly define and use a simple state machine on the spot.
+ * For complex definitions, it is usually better to write them in a separate file and import it.
+ * However, if the definition does not impair readability, keeping it within the component can actually make it more readable.
+ *
+ * In most cases, `useSyncedMachine` used in conjunction with `props`.
+ * It is intended to serve as a filter to determine whether multiple event sources,
+ * including the DOM, have triggered a state transition.
  *
  * @template D - The type of state machine definition.
  * @template G - The type of guards for state machine functions.
