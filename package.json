@@ -50,7 +50,7 @@
     "@types/node": "~20.12.8",
     "@types/react": "^18.3.1",
     "cfg-test": "~0.6.1",
-    "dprint": "~0.45.1",
+    "dprint": "~0.46.1",
     "esbuild": "~0.21.1",
     "global-jsdom": "~24.0.0",
     "jsdom": "~24.1.0",
