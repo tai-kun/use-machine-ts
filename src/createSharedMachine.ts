@@ -23,6 +23,10 @@ function createSharedMachine<D extends Definition.Shape<D, never, never>>(
 /**
  * Create a shared state machine.
  *
+ * This function is used in conjunction with `useSharedMachine`.
+ * It cannot be used with `useMachine` or `useSyncedMachine`.
+ * In those cases, use `createMachine` instead.
+ *
  * @template D - The type of shared state machine definition.
  * @template G - The type of guards for shared state machine functions.
  * @template E - The type of effects for shared state machine functions.

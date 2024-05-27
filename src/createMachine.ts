@@ -3,6 +3,10 @@ import type { Config, Definition, Machine } from "./types"
 /**
  * Create a state machine.
  *
+ * This function is used in conjunction with `useMachine` and `useSyncedMachine`.
+ * It cannot be used with `useSharedMachine`.
+ * In that case, use `createSharedMachine` instead.
+ *
  * @template D - The type of state machine definition.
  * @param definition - The state machine definition.
  * @returns The state machine.
@@ -13,6 +17,10 @@ function createMachine<D extends Definition.Shape<D, never, never>>(
 
 /**
  * Create a state machine.
+ *
+ * This function is used in conjunction with `useMachine` and `useSyncedMachine`.
+ * It cannot be used with `useSharedMachine`.
+ * In that case, use `createSharedMachine` instead.
  *
  * @template D - The type of state machine definition.
  * @template G - The type of guards for state machine functions.
