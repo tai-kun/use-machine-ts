@@ -342,7 +342,7 @@ and(or("isReady", "isStopped"), not("isDestroyed"))
 
 `guard` が最終的に `false` を返す場合、次のようなログが出力されます。
 
-```log
+```console
 Transition from 'inactive' to 'active' denied by guard.
 ((isReady || isStopped) && !isDestroyed)
                            ^^^^^^^^^^^^ 
@@ -799,7 +799,7 @@ console.log(getState())
 
 `useMachine` の中では、コンポーネントがマウントされている限り、非同期的に `send` と `setContext` 関数を呼び出すことはできます。ただし、コンポーネントがすでにアンマウントされている場合、これらの関数は状態を変更する代わりに、次のようなエラーメッセージを表示します。
 
-```log
+```console
 Cannot dispatch an action to the state machine after the component is unmounted.
 Action { type: "SEND", payload: { type: "TOGGLE" } }
 ```
@@ -845,7 +845,7 @@ const [state, send] = useMachine(
 
 `useSyncedMachine` の中では、コンポーネントのマウント状態に関係なく、非同期的に `send` と `setContext` 関数を呼び出すことはできません。それらの関数はエフェクトの開始直前にアンロックされ、終了後にロックされます。ロックされた状態でこれらの関数を呼び出すと、次のようなエラーメッセージが表示されます。
 
-```log
+```console
 Send function not available. Must be used synchronously within an effect.
 State { value: "inactive", event: { type: "$init" }, nextEvents: ["TOGGLE"], context: undefined }
 Event: { type: "TOGGLE" }
