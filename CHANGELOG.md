@@ -1,3 +1,7 @@
+## <small>v0.2.2 (2024-05-31)</small>
+
+Improved documentation.
+
 ## <small>v0.2.1 (2024-05-13)</small>
 
 Improved log messages.
