@@ -1,6 +1,4 @@
-# use-machine-ts
-
-**The tiny _state machine_ hook for React**
+**React 用の小さな _ステートマシン_ フック**
 
 [![CI](https://github.com/tai-kun/use-machine-ts/actions/workflows/ci.yaml/badge.svg)](https://github.com/tai-kun/use-machine-ts/actions/workflows/ci.yaml)
 [![Release on NPM](https://github.com/tai-kun/use-machine-ts/actions/workflows/release.yaml/badge.svg)](https://github.com/tai-kun/use-machine-ts/actions/workflows/release.yaml)
@@ -14,20 +12,32 @@
 
 <p align="center"><a href="./README.md">English (MT)</a> | 日本語</p>
 
-use-machine-ts は React でステートマシンをデザインするための小さなフックです。すでに慣れ親しんでいる慣用的な React のパターンに従い、状態遷移を簡単に管理できます。
+use-machine-ts は React でステートマシンをデザインするための小さなフックです。
+すでに慣れ親しんでいる慣用的な React のパターンに従い、状態遷移を簡単に管理できます。
 
 <details>
-  <summary>ファイルサイズ</summary>
+<summary>バンドルサイズ</summary>
 
-  | source | min+brotli |
-  | :-- | --: |
-  | `import { useMachine } from "use-machine-ts"` | 973 B |
-  | `import * from "use-machine-ts"`              | 1.37 KB |
-  | `import * from "use-machine-ts/standard"`     | 1 KB |
-  | `import * from "use-machine-ts/shared"`       | 1.04 KB |
-  | `import * from "use-machine-ts/synced"`       | 1.08 KB |
-  |||
-  | `import { createMachine } from "xstate@5.9.1"` & `import { useMachine } from "@xstate/react@4.1.0"`  | 11.12 KB |
+```typescript
+// 973 B
+import { useMachine } from "use-machine-ts"
+
+// 1.37 KB
+import * from "use-machine-ts"
+
+// 1 KB
+import * from "use-machine-ts/standard"
+
+// 1.04 KB
+import * from "use-machine-ts/shared"
+
+// 1.08 KB
+import * from "use-machine-ts/synced"
+
+// 11.12 KB
+import { createMachine } from "xstate@5.9.1"
+import { useMachine } from "@xstate/react@4.1.0"
+```
 </details>
 
 ## Respect
@@ -35,28 +45,48 @@ use-machine-ts は React でステートマシンをデザインするための�
 use-machine-ts は [@cassiozen/usestatemachine](https://github.com/cassiozen/useStateMachine) に触発されています。
 
 <details>
-  <summary>use-machine-ts と @cassiozen/usestatemachine の違い</summary>
+<summary>use-machine-ts と @cassiozen/usestatemachine の違い</summary>
 
-  - ステートマシンの定義は 1 つから 2 つに分割されています。分離された項目はデバッグに関する設定と、ガード関数とエフェクト関数の実体です。状態遷移の定義の中に実装が含まれないため、次の恩恵を得られます。
+- ステートマシンの定義は 1 つから 2 つに分割されています。
+  分離された項目はデバッグに関する設定と、ガード関数とエフェクト関数の実体です。
+  状態遷移の定義の中に実装が含まれないため、次の恩恵を得られます。
     - 状態遷移の熟慮により集中できます。
-    - 状態遷移がガードされたときのログが明確になり、デバッグが容易になります。 (参照: [Using Guards](#using-guards))
-  - コンテキストとイベントの型定義のための特別な関数 `t` が必要ありません。
-  - ステートマシンを事前に作成することができます。
-  - 非同期的なステートマシンの状態更新が比較的安全になりました。具体的には、コンポーネントがすでにアンマウントされている状態での動作が改善されました。 (参照: [Async Orchestration](#async-orchestration))
-  - `useMachine` 以外にも、2 つの便利なフックが提供されています。
-    - `useSharedMachine`: 複数の React コンポーネントの間で状態を共有することができます。また、React コンポーネントの外側から状態遷移を管理することもできます。
-    - `useSyncedMachine`: 状態が遷移するたびに再レンダリングがトリガーされることはありません。このフックは現在の状態ではなく、状態のスナップショットを返す関数提供します。
-  - 😢 必要な React のバージョンは 16.8 から、18 に引き上げられています。
-  - 😢 ファイルサイズが増加しました。`useMachine` を比較すると、約 400 バイト (+60%) の増加です。
+    - 状態遷移がガードされたときのログが明確になり、デバッグが容易になります。
+      (参照: [Using Guards](#using-guards))
+- コンテキストとイベントの型定義のための特別な関数 `t` が不要になりました。
+  代わりに、 `{} as <types...>` を使用して、スキーマの型を定義します。
+- ステートマシンを事前に作成することができます。
+- 非同期的なステートマシンの状態更新が比較的安全になりました。
+  具体的には、コンポーネントがすでにアンマウントされている状態での動作が改善されました。
+  (参照: [Async Orchestration](#async-orchestration))
+- `useMachine` 以外にも、2 つの便利なフックが提供されています。
+    - `useSharedMachine`:
+      複数の React コンポーネントの間で状態を共有することができます。
+      また、React コンポーネントの外側から状態遷移を管理することもできます。
+    - `useSyncedMachine`:
+      状態が遷移時に再レンダリングがトリガーされることはありません。
+      このフックは現在の状態ではなく、状態のスナップショットを返す関数提供します。
+- 😢 必要な React のバージョンは 16.8 から、18 に引き上げられています。
+- 😢 バンドルサイズが増加しました。`useMachine` を比較すると、約 400 バイト (+60%) の増加です。
 </details>
 
 ## Basic Features
 
-- useMachine: 本質的には `useState` と `useEffect` のラッパーです。`useState` と同じように、状態遷移を管理します。
-- useSharedMachine: 本質的には `usuSyncExternalState` と `useEffect` のラッパーです。複数の React コンポーネントの間で状態を共有することができます。また、React コンポーネントの外側から状態遷移を管理することもできます。
-- useSyncedMachine: useMachine と似ていますが、状態が遷移するたびに再レンダリングがトリガーされることはありません。このフックは現在の状態ではなく、状態のスナップショットを返す関数提供します。
-- createMachine: ステートマシンを作成します。State Machine Definitionを異なるコンポーネントで使いまわすのに便利です。useMachine と useSyncedMachine で使用できます。
-- createSharedMachine: createMachine と似ていますが、useSharedMachine でのみ使用できます。
+- `useMachine`:
+  本質的には `useState` と `useEffect` のラッパーです。
+  `useState` と同じように状態遷移を管理します。
+- `useSharedMachine`:
+  本質的には `usuSyncExternalState` と `useEffect` のラッパーです。
+  複数の React コンポーネントの間で状態を共有することができます。
+  また、React コンポーネントの外側から状態遷移を管理することもできます。
+- `useSyncedMachine`:
+  `useMachine` と似ていますが、状態が遷移するたびに再レンダリングがトリガーされることはありません。
+  このフックは現在の状態ではなく、状態のスナップショットを返す関数提供します。
+- `createMachine`:
+  ステートマシンを作成します。ステートマシンの定義を異なるコンポーネントで使いまわすのに便利です。
+  `useMachine` と `useSyncedMachine` で使用できます。
+- `createSharedMachine`:
+  `createMachine` と似ていますが、`useSharedMachine` でのみ使用できます。
 
 ## Installation
 
@@ -74,7 +104,7 @@ npm install use-machine-ts@canary
 
 ## Sample Usage
 
-```ts
+```typescript
 import { useMachine } from "use-machine-ts"
 
 const [state, send] = useMachine(
@@ -152,11 +182,15 @@ console.log(state)
 
 # API
 
+[API リファレンス](https://tai-kun.github.io/use-machine-ts/)
+
 ## useMachine
+
+[API リファレンス](https://tai-kun.github.io/use-machine-ts/functions/useMachine.html)
 
 即席のステートマシンを作成するには:
 
-```ts
+```typescript
 import { useMachine } from "use-machine-ts"
 
 const [state, send] = useMachine(
@@ -167,7 +201,7 @@ const [state, send] = useMachine(
 
 事前に作成したステートマシンを使用するには:
 
-```ts
+```typescript
 import { useMachine, createMachine } from "use-machine-ts"
 
 const machine = /* @__PURE__ */ createMachine(
@@ -178,9 +212,9 @@ const machine = /* @__PURE__ */ createMachine(
 const [state, send] = useMachine(machine)
 ```
 
-または:
+またはコンストラクタを使用して:
 
-```ts
+```typescript
 import { useMachine, createMachine } from "use-machine-ts"
 
 function machine() {
@@ -195,7 +229,7 @@ const [state, send] = useMachine(machine)
 
 ### state
 
-ステートマシンの `state` は、`value`、`event`、`nextEvents`、`context` の 4 つのプロパティで構成されます。
+`state` は `value`、`event`、`nextEvents`、`context` の 4 つのプロパティで構成されます。
 
 | プロパティ | 型 | 説明 |
 | :-- | :-- | :-- |
@@ -206,11 +240,13 @@ const [state, send] = useMachine(machine)
 
 ### send
 
-`send` 関数は、ステートマシンにイベントを送信するために使用します。1 つの引数を取り、イベントの型を表す文字列 (例: `"TOGGLE"`) またはオブジェクト (例: `{ type: "TOGGLE" }`) を渡します。
+`send` 関数は、ステートマシンにイベントを送信するために使用します。
+1 つの引数を取り、イベントの型を表す文字列 (例: `"TOGGLE"`) またはオブジェクト (例: `{ type: "TOGGLE" }`) を渡します。
 
 現在の状態がイベントを受理し、遷移が可能である場合 ([Guards](#using-guards) を参照)、ステートマシンの状態が更新され、関連するエフェクト ([Effects](#using-effects) を参照) が実行されます。
 
-オブジェクト形式のエベントを使用して、追加のデータを送信することができます (例: `{ type: "TOGGLE", value: 10 }`)。イベントの型を定義する方法については [Schema](#schema) を参照してください。
+オブジェクト形式のエベントを使用して、追加のデータを送信することができます (例: `{ type: "TOGGLE", value: 10 }`)。
+イベントの型を定義する方法については [Schema](#schema) を参照してください。
 
 ### State Machine Definition
 
@@ -233,11 +269,12 @@ const [state, send] = useMachine(machine)
 
 ### Defining States
 
-ステートマシンは有限数の状態のうち、1 つの状態にのみなることができます。また、状態はイベントによってのみ変化します。
+ステートマシンは有限数の状態のうち、1 つの状態にのみなることができます。
+また、状態はイベントによってのみ変化します。
 
 状態は `states` オブジェクトのキーとして定義され、イベントタイプは各状態オブジェクトの `on` オブジェクトのキーとして定義されます。
 
-```ts
+```typescript
 {
   states: {
     // 状態名: 状態オブジェクト
@@ -257,7 +294,7 @@ const [state, send] = useMachine(machine)
 
 イベント定義では、`target` プロパティを持つオブジェクトを使用して、状態遷移をより詳細に制御できます (ガードの追加など)。
 
-```ts
+```typescript
 {
   on: {
     TOGGLE: {
@@ -270,9 +307,11 @@ const [state, send] = useMachine(machine)
 
 ### Using Guards
 
-ガードは、実際に状態遷移を行う前に実行される関数です。ガードが `true` を返す場合、状態遷移が許可されます。ガードが `false` を返す場合、状態遷移は拒否されます。
+ガードは、実際に状態遷移を行う前に実行される関数です。
+ガードが `true` を返す場合、状態遷移が許可されます。
+ガードが `false` を返す場合、状態遷移は拒否されます。
 
-```ts
+```typescript
 import { useMachine } from "use-machine-ts"
 
 const [state, send] = useMachine(
@@ -300,9 +339,10 @@ const [state, send] = useMachine(
 )
 ```
 
-use-machine-ts は `and`、`or`、`not` の 3 つのヘルパー関数を提供します。これらの関数を使用して、複雑なガードを作成することができます。
+use-machine-ts は `and`、`or`、`not` の 3 つのヘルパー関数を提供します。
+これらの関数を使用して、複雑なガードを作成することができます。
 
-```ts
+```typescript
 import { useMachine, and, or, not } from "use-machine-ts"
 
 const [state, send] = useMachine(
@@ -334,7 +374,7 @@ const [state, send] = useMachine(
 
 `and` 関数は単純に配列で置き換えることができます。
 
-```ts
+```typescript
 and(or("isReady", "isStopped"), not("isDestroyed"))
 // equals
 [or("isReady", "isStopped"), not("isDestroyed")]
@@ -350,16 +390,20 @@ Event { type: "TOGGLE" }
 Context undefined
 ```
 
-`^` はガードが状態遷移を拒否した原因を示します。上記の例の場合、`isDestroyed` が `true` を返したため、状態遷移が拒否されたことがわかります。
+`^` はガードが状態遷移を拒否した原因を示します。
+上記の例の場合、`isDestroyed` が `true` を返したため、状態遷移が拒否されたことがわかります。
 
 > [!IMPORTANT]  
-> ガードを 1 つも持たない `and` は常に `true` を返します。同様に、ガードを 1 つも持たない `or` は常に `false` を返します。
+> ガードを 1 つも持たない `and` は常に `true` を返します。
+> ガードを 1 つも持たない `or` は常に `false` を返します。
 
 ### Using Effects
 
-エフェクトは、ステートマシンが特定の状態になると実行される関数です。エフェクトから関数を返す場合、その状態を離れるときに、その関数が実行されます。これは React での `useEffect` フックと同じような動作です。
+エフェクトは、ステートマシンが特定の状態になると実行される関数です。
+エフェクトから関数を返す場合、その状態を離れるときに、その関数が実行されます。
+これは React での `useEffect` フックと同じような動作です。
 
-```ts
+```typescript
 import { useMachine } from "use-machine-ts"
 
 const [state, send] = useMachine(
@@ -388,7 +432,7 @@ const [state, send] = useMachine(
 
 `effect` プロパティには文字列ではなく、配列を渡すこともできます。
 
-```ts
+```typescript
 {
   effect: [
     "onActive",
@@ -419,7 +463,7 @@ const [state, send] = useMachine(
 
 次の例では、失敗状態になるたびに `retryCount` を更新して、上限に達した場合はエラー状態に遷移します。
 
-```ts
+```typescript
 import { useMachine } from "use-machine-ts"
 
 const [state, send] = useMachine(
@@ -481,11 +525,14 @@ const [state, send] = useMachine(
 ```
 
 > [!WARNING]
-> ステートマシンの定義と設定は不変です。途中で変更することはできません。`effects` や `guards` などで定義された関数は、最初に定義されたときの値を参照し続けます。そのため、例えば状態の変更を直接監視する際には注意が必要です。
+> ステートマシンの定義と設定を途中で変更することはできません。
+> `effects` や `guards` などで定義された関数は、最初に定義されたときの値を参照し続けます。
+> そのため、例えば状態の変更を直接監視する際には注意が必要です。
 
-次の例は、React の `useEffect` フックを使用して、ステートマシンの状態が変化したときにコンポーネントの状態を更新する方法です。これは正しく動作します。
+次の例は、React の `useEffect` フックを使用して、ステートマシンの状態が変化したときにコンポーネントの状態を更新する方法です。
+これは正しく動作します。
 
-```ts
+```typescript
 function Component(props: { onActive: () => void }) {
   const { onActive } = props
   const [state, send] = useMachine(
@@ -506,9 +553,10 @@ function Component(props: { onActive: () => void }) {
 }
 ```
 
-上記の例を冗長的に感じて、次のようなコードを書いてしまうかもしれません。しかし、これは重大なバグを引き起こす可能性があります。
+上記の例を冗長的に感じて、次のようなコードを書いてしまうかもしれません。
+しかし、これはバグを引き起こす可能性があります。
 
-```ts
+```typescript
 function Component(props: { onToggle: (isActive: boolean) => void }) {
   const { onToggle } = props
   const [state, send] = useMachine(
@@ -528,7 +576,7 @@ function Component(props: { onToggle: (isActive: boolean) => void }) {
 
 次のように `useRef` を使用して常に最新の関数を参照することで、この問題を回避することもできます。
 
-```ts
+```typescript
 function Component(props: { onToggle: (isActive: boolean) => void }) {
   const onToggle = React.useRef(props.onToggle)
   onToggle.current = props.onToggle
@@ -545,9 +593,10 @@ function Component(props: { onToggle: (isActive: boolean) => void }) {
 }
 ```
 
-しかし、まだヒューマンエラーの可能性が残っています。実用的には、事前に定義されたマシーンを使用して、React コンポーネントに依存した値を転送する方法を推奨します。
+しかし、まだヒューマンエラーの可能性が残っています。
+実用的には、コンストラクタを使用して、React コンポーネントに依存した値を転送する方法を推奨します。
 
-```ts
+```typescript
 import { createMachine } from "use-machine-ts"
 
 function machine(
@@ -593,13 +642,16 @@ function ToggleButton(props: { onToggle: (isActive: boolean) => void }) {
 }
 ```
 
-関数形式で事前に定義されたマシーンは、1 つの引数を受け取ることができます。この引数は必ず関数でなければなりません。この関数は `useRef` のラッパーであり、常に最新の値を返します。
+関数形式で事前に定義されたマシーンは、1 つの引数を受け取ることができます。
+この引数は必ず関数でなければなりません。
+この関数は `useRef` の薄いラッパーであり、常に最新の値を返します。
 
 ### Extended State
 
-有限数の状態に加えて、ステートマシンは (コンテキストと呼ばれる) 拡張状態を持つことができます。`context` プロパティを使用して最初の拡張状態を定義し、`setContext` 関数を使用して拡張状態を更新します。
+有限数の状態に加えて、ステートマシンは (コンテキストと知られている) 拡張状態を持つことができます。
+`context` プロパティを使用して最初の拡張状態を定義し、`setContext` 関数を使用して拡張状態を更新します。
 
-```ts
+```typescript
 const [state, send] = useMachine(
   {
     initial: "inactive",
@@ -632,9 +684,10 @@ console.log(state.context) // { toggleCount: 1 }
 
 ### Schema
 
-TypeScript はコンテキストとイベントの型を自動的に推論しますが、`$schema` プロパティを使用して、ステートマシンのスキーマを明示的に定義することもできます。このオブジェクトはランタイムで使用されることはありません。
+TypeScript はコンテキストとイベントの型を自動的に推論しますが、`$schema` プロパティを使用して、ステートマシンのスキーマを明示的に定義することもできます。
+このオブジェクトがランタイムで使用されることはありません。
 
-`$schema` プロパティは、`context`、 `events`、`strict` の 3 つのプロパティを持ちます。
+`$schema` プロパティは `context`、 `events`、`strict` の 3 つのプロパティを持ちます。
 
 | プロパティ | 型 | 必須 | 説明 |
 | :-- | :-- | :-- | :-- |
@@ -642,7 +695,7 @@ TypeScript はコンテキストとイベントの型を自動的に推論しま
 | `events` | `object` | | ステートマシンのイベントの型を定義します。 |
 | `strict` | `boolean` | | スキーマの厳密モードを有効にします。`true` に設定すると、自動推論が無効化され、スキーマに定義されていないコンテキストとイベントが型エラーになります。 |
 
-```ts
+```typescript
 import { useMachine } from "use-machine-ts"
 
 const [state, send] = useMachine(
@@ -688,7 +741,8 @@ send({ type: "TOGGLE", timestamp: new Date() }) // OK (^_^)b
 
 ### Logging
 
-必要に応じて、ステートマシンのログを有効にすることができます。`verbose` プロパティを使用して、ログの詳細度を設定します。。
+必要に応じて、ステートマシンのログを有効にすることができます。
+`verbose` プロパティを使用して、ログの詳細度を設定します。
 
 | 値 | 説明 |
 | :-- | :-- |
@@ -696,7 +750,7 @@ send({ type: "TOGGLE", timestamp: new Date() }) // OK (^_^)b
 | `1` | エラーのみをログに出力します。 (デフォルト) |
 | `2` or `true` | エラーとデバッグ情報をログに出力します。 |
 
-```ts
+```typescript
 import { useMachine } from "use-machine-ts"
 
 const [state, send] = useMachine(
@@ -722,9 +776,11 @@ const [state, send] = useMachine(
 
 ## useSharedMachine
 
+[API リファレンス](https://tai-kun.github.io/use-machine-ts/functions/useSharedMachine.html)
+
 `useSharedMachine` を使うためには `createSharedMachine` で作成されたステートマシンを使用する必要があります。
 
-```ts
+```typescript
 import { useSharedMachine, createSharedMachine } from "use-machine-ts"
 
 const sharedMachine = createSharedMachine(
@@ -735,9 +791,11 @@ const sharedMachine = createSharedMachine(
 const [state, send] = useSharedMachine(sharedMachine)
 ```
 
-`useSharedMachine` は `useMachine` と同じように動作しますが、外部から状態遷移を管理することができます。本質的には `useSyncExternalState` と `useEffect` のラッパーです。あなたの知識を借りられるならば、`atom` と `useAtom` のような関係で例えることができます。
+`useSharedMachine` は `useMachine` と同じように動作しますが、外部から状態遷移を管理することができます。
+本質的には `useSyncExternalState` と `useEffect` のラッパーです。
+`atom` と `useAtom` のような関係で例えることができます。
 
-```ts
+```typescript
 const machineAtom = atom(/* Initial State */)
 const [state, setState] = useAtom(machineAtom)
 
@@ -760,9 +818,12 @@ const send = (event) => {
 
 ## useSyncedMachine
 
-`useMachine` と似ていますが、状態が遷移するたびに再レンダリングがトリガーされることはありません。このフックは現在の状態ではなく、状態のスナップショットを返す関数提供します。
+[API リファレンス](https://tai-kun.github.io/use-machine-ts/functions/useSyncedMachine.html)
 
-```ts
+`useMachine` と似ていますが、状態が遷移するたびに再レンダリングがトリガーされることはありません。
+このフックは現在の状態ではなく、状態のスナップショットを返す関数提供します。
+
+```typescript
 import { useSyncedMachine } from "use-machine-ts"
 
 const [getState, send] = useSyncedMachine({
@@ -791,13 +852,15 @@ console.log(getState())
 # Async Orchestration
 
 > [!WARNING]
-> use-machine-ts において、非同期的にステートマシンの状態を更新することは避けるべきです。
+> use-machine-ts において、可能な限り非同期的にステートマシンの状態を更新することを避けてください。
 
-非同期的にステートマシンの状態を更新するにあたって、いくつかの注意事項があります。use-machine-ts が提供する 3 つのフック (`useMachine`、`useSharedMachine`、`useSyncedMachine`) のそれぞれで注意点が異なります。
+非同期的にステートマシンの状態を更新するにあたって、いくつかの注意事項があります。
+use-machine-ts が提供する 3 つのフック (`useMachine`、`useSharedMachine`、`useSyncedMachine`) のそれぞれで注意点が異なります。
 
 ## useMachine
 
-`useMachine` の中では、コンポーネントがマウントされている限り、非同期的に `send` と `setContext` 関数を呼び出すことはできます。ただし、コンポーネントがすでにアンマウントされている場合、これらの関数は状態を変更する代わりに、次のようなエラーメッセージを表示します。
+`useMachine` の中では、コンポーネントがマウントされている限り、非同期的に `send` と `setContext` 関数を呼び出すことはできます。
+ただし、コンポーネントがすでにアンマウントされている場合、これらの関数は状態を変更する代わりに、次のようなエラーメッセージを表示します。
 
 ```console
 Cannot dispatch an action to the state machine after the component is unmounted.
@@ -806,9 +869,10 @@ Action { type: "SEND", payload: { type: "TOGGLE" } }
 
 `setContext` の場合は `type` プロパティの値が `"SET_CONTEXT"` になります。
 
-事前にコンポーネントがアンマウントされているかどうかを確認するために、`effect` 関数に渡されるパラメーターの `isMounted` プロパティを使用することができます。`isMounted` 関数はコンポーネントがマウントされていれば `true` を返し、それ以外の場合は `false` を返します。
+事前にコンポーネントがアンマウントされているかどうかを確認するために、`effect` 関数に渡されるパラメーターの `isMounted` プロパティを使用することができます。
+`isMounted` 関数はコンポーネントがマウントされていれば `true` を返し、それ以外の場合は `false` を返します。
 
-```ts
+```typescript
 import { useMachine } from "use-machine-ts"
 
 const [state, send] = useMachine(
@@ -839,16 +903,18 @@ const [state, send] = useMachine(
 
 ## useSharedMachine
 
-`useSharedMachine` の中では、コンポーネントのマウント状態に関係なく、非同期的に `send`、`setContext` または共有されたマシーンの `dispatch` を呼び出すことができます。エラーメッセージも警告メッセージも表示されないことに注意してください。事前にコンポーネントがアンマウントされているかどうかを確認するためには、`useMachine` と同様に `isMounted` 関数を使用することができます。
+`useSharedMachine` の中では、コンポーネントのマウント状態に関係なく、非同期的に `send`、`setContext` または共有されたマシーンの `dispatch` を呼び出すことができます。
+エラーメッセージも警告メッセージも表示されないことに注意してください。
+事前にコンポーネントがアンマウントされているかどうかを確認するためには、`useMachine` と同様に `isMounted` 関数を使用することができます。
 
 ## useSyncedMachine
 
-`useSyncedMachine` の中では、コンポーネントのマウント状態に関係なく、非同期的に `send` と `setContext` 関数を呼び出すことはできません。それらの関数はエフェクトの開始直前にアンロックされ、終了後にロックされます。ロックされた状態でこれらの関数を呼び出すと、次のようなエラーメッセージが表示されます。
+`useSyncedMachine` の中では、コンポーネントのマウント状態に関係なく、非同期的に `send` と `setContext` 関数を呼び出すことはできません。
+それらの関数はエフェクトの開始直前にアンロックされ、終了後にロックされます。
+ロックされた状態でこれらの関数を呼び出すと、次のようなエラーメッセージが表示されます。
 
 ```console
 Send function not available. Must be used synchronously within an effect.
 State { value: "inactive", event: { type: "$init" }, nextEvents: ["TOGGLE"], context: undefined }
 Event: { type: "TOGGLE" }
 ```
-
-ただし、`useSyncedMachine` が返す `send` 関数は、コンポーネントがアンマウントされていることをエラーメッセージで警告します。

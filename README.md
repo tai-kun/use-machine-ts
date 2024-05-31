@@ -1,5 +1,3 @@
-# use-machine-ts
-
 **The tiny _state machine_ hook for React**
 
 [![CI](https://github.com/tai-kun/use-machine-ts/actions/workflows/ci.yaml/badge.svg)](https://github.com/tai-kun/use-machine-ts/actions/workflows/ci.yaml)
@@ -14,20 +12,31 @@
 
 <p align="center">English (MT) | <a href="./README.ja.md">日本語</a></p>
 
-use-machine-ts is a tiny hook for designing state machines in React. Easily manage state transitions by following the idiomatic React patterns you're already familiar with.
+use-machine-ts is a tiny hook for designing state machines in React. It follows the familiar idiomatic React patterns, making it easy to manage state transitions.
 
 <details>
-  <summary>File Size</summary>
+<summary>Bundle Size</summary>
 
-  | source | min+brotli |
-  | :-- | --: |
-  | `import { useMachine } from "use-machine-ts"` | 973 B |
-  | `import * from "use-machine-ts"`              | 1.37 KB |
-  | `import * from "use-machine-ts/standard"`     | 1 KB |
-  | `import * from "use-machine-ts/shared"`       | 1.04 KB |
-  | `import * from "use-machine-ts/synced"`       | 1.08 KB |
-  |||
-  | `import { createMachine } from "xstate@5.9.1"` & `import { useMachine } from "@xstate/react@4.1.0"`  | 11.12 KB |
+```typescript
+// 973 B
+import { useMachine } from "use-machine-ts"
+
+// 1.37 KB
+import * from "use-machine-ts"
+
+// 1 KB
+import * from "use-machine-ts/standard"
+
+// 1.04 KB
+import * from "use-machine-ts/shared"
+
+// 1.08 KB
+import * from "use-machine-ts/synced"
+
+// 11.12 KB
+import { createMachine } from "xstate@5.9.1"
+import { useMachine } from "@xstate/react@4.1.0"
+```
 </details>
 
 ## Respect
@@ -35,28 +44,48 @@ use-machine-ts is a tiny hook for designing state machines in React. Easily mana
 use-machine-ts is inspired by [@cassiozen/usestatemachine](https://github.com/cassiozen/useStateMachine).
 
 <details>
-  <summary>Difference between use-machine-ts and @cassiozen/usestatemachine</summary>
+<summary>Difference between use-machine-ts and @cassiozen/usestatemachine</summary>
 
-  - The state machine definition has been split into two parts instead of one. The separated items are debugging settings and the body of guard functions and effect functions. Since the implementation is not included in the state transition definition, you get the following benefits:
-    - You can concentrate more on thinking about state transitions.
-    - Logs when state transitions are guarded are now clearer, making debugging easier. (See: [Using Guards](#using-guards))
-  - No need for special functions `t` for context and event type definitions.
-  - State machines can be created in advance.
-  - Asynchronous state machine state updates are now relatively safe. Specifically, behavior has been improved when the component is already unmounted. (See: [Async Orchestration](#async-orchestration))
-  - In addition to `useMachine`, two other useful hooks are provided.
-    - `useSharedMachine`: Allows you to share state between multiple React components. You can also manage state transitions from outside your React component.
-    - `useSyncedMachine`: Re-rendering is not triggered on every state transition. This hook provides a function that returns a snapshot of the state rather than the current state.
-  - 😢 The required React version has been increased from 16.8 to 18.
-  - 😢 File size has increased. Comparing `useMachine`, it's an increase of about 400 bytes (+60%).
+- The state machine definition is split into one or two parts.
+  The separated items are debug-related settings and the actual implementations of guard and effect functions.
+  Since the implementation is not included within the state transition definitions, you get the following benefits:
+    - You can focus on deliberating state transitions.
+    - The logs when state transitions are guarded become clear, making debugging easier.
+      (See: [Using Guards](#using-guards))
+- The special function `t` for defining context and event types is no longer needed.
+  Instead, you can define schema types using `{} as <types...>`.
+- You can create state machines in advance.
+- Asynchronous state updates for state machines have become relatively safer.
+  Specifically, behavior has improved when the component is already unmounted.
+  (See: [Async Orchestration](#async-orchestration))
+- Besides `useMachine`, two additional convenient hooks are provided:
+    - `useSharedMachine`:
+      Allows sharing state between multiple React components.
+      You can also manage state transitions from outside React components.
+    - `useSyncedMachine`:
+      Re-rendering is not triggered when the state transitions.
+      This hook provides a function that returns a snapshot of the state rather than the current state.
+- 😢 The required version of React has been raised from 16.8 to 18.
+- 😢 The bundle size has increased. Compared to `useMachine`, there's an increase of about 400 bytes (+60%).
 </details>
 
 ## Basic Features
 
-- useMachine: Essentially a wrapper around `useState` and `useEffect`. Manages state transitions, similar to `useState`.
-- useSharedMachine: Essentially a wrapper around `usuSyncExternalState` and `useEffect`. You can share state between multiple React components. You can also manage state transitions from outside your React component.
-- useSyncedMachine: Similar to useMachine, but does not trigger a re-render on every state transition. This hook provides a function that returns a snapshot of the state rather than the current state.
-- createMachine: Create a state machine. This is useful for reusing State Machine Definitions in different components. Can be used with useMachine and useSyncedMachine.
-- createSharedMachine: Similar to createMachine, but only available with useSharedMachine.
+- `useMachine`:
+  Essentially a wrapper around `useState` and `useEffect`.
+  Manages state transitions in the same way as `useState`.
+- `useSharedMachine`:
+  Essentially a wrapper around `useSyncExternalStore` and `useEffect`.
+  Allows sharing state between multiple React components.
+  You can also manage state transitions from outside React components.
+- `useSyncedMachine`:
+  Similar to `useMachine`, but re-rendering is not triggered every time the state transitions.
+  This hook provides a function that returns a snapshot of the state rather than the current state.
+- `createMachine`:
+  Creates a state machine. Useful for reusing state machine definitions across different components.
+  Can be used with `useMachine` and `useSyncedMachine`.
+- `createSharedMachine`:
+  Similar to `createMachine`, but can only be used with `useSharedMachine`.
 
 ## Installation
 
@@ -74,7 +103,7 @@ npm install use-machine-ts@canary
 
 ## Sample Usage
 
-```ts
+```typescript
 import { useMachine } from "use-machine-ts"
 
 const [state, send] = useMachine(
@@ -127,8 +156,8 @@ console.log(state)
 
 - [x] Implement basic functionality.
 - [ ] Fix some incomplete tests.
-- [ ] Also test with `preact/compat`.
-- [ ] Check compatibility with React v19.
+- [ ] Test with `preact/compat`.
+- [ ] Ensure compatibility with React v19.
 
 ## Contents
 
@@ -152,11 +181,15 @@ console.log(state)
 
 # API
 
+[API Reference](https://tai-kun.github.io/use-machine-ts/)
+
 ## useMachine
 
-To create an improvised state machine:
+[API Reference](https://tai-kun.github.io/use-machine-ts/functions/useMachine.html)
 
-```ts
+To create an ad-hoc state machine:
+
+```typescript
 import { useMachine } from "use-machine-ts"
 
 const [state, send] = useMachine(
@@ -167,7 +200,7 @@ const [state, send] = useMachine(
 
 To use a pre-built state machine:
 
-```ts
+```typescript
 import { useMachine, createMachine } from "use-machine-ts"
 
 const machine = /* @__PURE__ */ createMachine(
@@ -178,9 +211,9 @@ const machine = /* @__PURE__ */ createMachine(
 const [state, send] = useMachine(machine)
 ```
 
-or:
+Or use the constructor:
 
-```ts
+```typescript
 import { useMachine, createMachine } from "use-machine-ts"
 
 function machine() {
@@ -195,49 +228,49 @@ const [state, send] = useMachine(machine)
 
 ### state
 
-The state machine's `state` consists of four properties: `value`, `event`, `nextEvents`, and `context`.
+`state` consists of four properties: `value`, `event`, `nextEvents`, and `context`.
 
-| Properties   | Type       | Description                                                                                                                         |
-| :----------- | :--------- | :---------------------------------------------------------------------------------------------------------------------------------- |
-| `value`      | `string`   | Current state. For example, `"inactive"` or `"active"`.                                                                             |
-| `event`      | `object`   | The last sent event that caused the current state. For example, `{ type: "TOGGLE" }`. However, initially it is `{ type: "$init" }`. |
-| `nextEvents` | `string[]` | List of events that can be sent in the current state. For example, `["TOGGLE"]`.                                                    |
-| `context`    | `any`      | The extended state of the state machine. See [Extended State](#extended-state).                                                     |
+| Property     | Type     | Description |
+| :--          | :--      | :-- |
+| `value`      | `string` | The current state, such as `"inactive"` or `"active"`. |
+| `event`      | `object` | The last event that was sent, causing the current state. For example, `{ type: "TOGGLE" }`. Initially, it is `{ type: "$init" }`. |
+| `nextEvents` | `string[]` | A list of events that can be sent in the current state, such as `["TOGGLE"]`. |
+| `context`    | `any`    | The extended state of the state machine. See [Extended State](#extended-state). |
 
 ### send
 
-The `send` function is used to send events to the state machine. It takes one argument and passes a string (e.g. `"TOGGLE"`) or an object (e.g. `{ type: "TOGGLE" }`) representing the type of event.
+The `send` function is used to send events to the state machine. It takes a single argument, which can be a string representing the event type (e.g., `"TOGGLE"`) or an object (e.g., `{ type: "TOGGLE" }`).
 
-If the current state accepts the event and the transition is possible (see [Guards](#using-guards)), the state machine state is updated and the associated effects (see [Effects](#using-effects)) are It will be executed.
+If the current state accepts the event and a transition is possible (see [Guards](#using-guards)), the state machine's state will be updated, and any associated effects will be executed (see [Effects](#using-effects)).
 
-You can send additional data using object-style events (e.g. `{ type: "TOGGLE", value: 10 }`). See [Schema](#schema) for how to define event types.
+You can send additional data using the object format for events (e.g., `{ type: "TOGGLE", value: 10 }`). For information on defining event types, see [Schema](#schema).
 
 ### State Machine Definition
 
-| Property  | Type     | Required | Description                                                                                                                |
-| :-------- | :------- | :------- | :------------------------------------------------------------------------------------------------------------------------- |
-| `initial` | `string` | ✅       | Defines the initial state of the state machine.                                                                            |
-| `states`  | `object` | ✅       | Defines the finite states that the state machine can take. (See: [Defining States](#defining-states))                      |
-| `on`      | `object` |          | Defines the transition for events that cannot be accepted in the current state. (See: [Defining States](#defining-states)) |
-| `context` | `any`    |          | Defines the extended state of the state machine. (See: [Extended State](#extended-state))                                  |
-| `$schema` | `object` |          | Defines the state machine schema as a type. (Reference: [Schema](#schema))                                                 |
+| Property   | Type     | Required | Description |
+| :--        | :--      | :--      | :-- |
+| `initial`  | `string` | ✅       | Defines the initial state of the state machine. |
+| `states`   | `object` | ✅       | Defines the finite states the state machine can be in. (See: [Defining States](#defining-states)) |
+| `on`       | `object` |          | Defines transitions for events not accepted in the current state. (See: [Defining States](#defining-states)) |
+| `context`  | `any`    |          | Defines the extended state of the state machine. (See: [Extended State](#extended-state)) |
+| `$schema`  | `object` |          | Defines the schema of the state machine by type. (See: [Schema](#schema)) |
 
 ### State Machine Configuration
 
-| Properties | Type                  | Description                                                                         |
-| :--------- | :-------------------- | :---------------------------------------------------------------------------------- |
-| `guards`   | `object`              | Defines guard functions for the state machine. (See: [Using Guards](#using-guards)) |
-| `effects`  | `object`              | Defines the state machine effect functions. (See: [Using Effects](#using-effects))  |
-| `verbose`  | `boolean` `0` `1` `2` | Enables debug logging. (Reference: [Logging](#logging))                             |
-| `console`  | `object`              | Defines a custom console for outputting logs. (Reference: [Logging](#logging))      |
+| Property  | Type                  | Description |
+| :--       | :--                   | :-- |
+| `guards`  | `object`              | Defines guard functions for the state machine. (See: [Using Guards](#using-guards)) |
+| `effects` | `object`              | Defines effect functions for the state machine. (See: [Using Effects](#using-effects)) |
+| `verbose` | `boolean` `0` `1` `2` | Enables debug logging. (See: [Logging](#logging)) |
+| `console` | `object`              | Defines a custom console for logging output. (See: [Logging](#logging)) |
 
 ### Defining States
 
-A state machine can only be in one of a finite number of states. Also, state only changes due to events.
+A state machine can only be in one of a finite number of states at any given time. Additionally, states can only change in response to events.
 
-States are defined as keys in the `states` object, and event types are defined as keys in each state object's `on` object.
+States are defined as keys in the `states` object, and event types are defined as keys in the `on` object within each state.
 
-```ts
+```typescript
 {
   states: {
     // state name: state object
@@ -255,9 +288,9 @@ States are defined as keys in the `states` object, and event types are defined a
 }
 ```
 
-In event definitions, you can use objects with a `target` property to have more control over state transitions (such as adding guards).
+In event definitions, you can use objects with a `target` property to control state transitions in more detail (such as adding guards).
 
-```ts
+```typescript
 {
   on: {
     TOGGLE: {
@@ -270,9 +303,9 @@ In event definitions, you can use objects with a `target` property to have more 
 
 ### Using Guards
 
-A guard is a function that is executed before the actual state transition. If the guard returns `true`, the state transition is allowed. If the guard returns `false`, the state transition is rejected.
+Guards are functions that execute before a state transition occurs. If a guard returns `true`, the state transition is allowed. If a guard returns `false`, the state transition is denied.
 
-```ts
+```typescript
 import { useMachine } from "use-machine-ts"
 
 const [state, send] = useMachine(
@@ -302,7 +335,7 @@ const [state, send] = useMachine(
 
 use-machine-ts provides three helper functions: `and`, `or`, and `not`. You can use these functions to create complex guards.
 
-```ts
+```typescript
 import { and, not, or, useMachine } from "use-machine-ts"
 
 const [state, send] = useMachine(
@@ -332,15 +365,15 @@ const [state, send] = useMachine(
 )
 ```
 
-The `and` function can simply be replaced with an array.
+The `and` function can be replaced with a simple array.
 
-```ts
+```typescript
 and(or("isReady", "isStopped"), not("isDestroyed"))
 // equals
 [or("isReady", "isStopped"), not("isDestroyed")]
 ```
 
-If `guard` eventually returns `false`, you will see a log similar to the following:
+If a guard ultimately returns `false`, the following log will be output:
 
 ```console
 Transition from 'inactive' to 'active' denied by guard.
@@ -350,16 +383,17 @@ Event { type: "TOGGLE" }
 Context undefined
 ```
 
-`^` indicates the reason why the guard rejected the state transition. In the example above, we can see that the state transition was rejected because `isDestroyed` returned `true`.
+The `^` indicates the guard that caused the state transition to be denied. In the example above, `isDestroyed` returning `true` caused the state transition to be denied.
 
-> [!IMPORTANT]
-> `and` with no guards always returns `true`. Similarly, `or` with no guards always returns `false`.
+> [!IMPORTANT]  
+> `and` without any guards always returns `true`.
+> `or` without any guards always returns `false`.
 
 ### Using Effects
 
-An effect is a function that is executed when the state machine enters a particular state. If you return a function from an effect, that function will be executed when you leave the state. This works similar to the `useEffect` hook in React.
+Effects are functions that execute when the state machine enters a specific state. If the effect returns a function, that function is executed when leaving that state. This behavior is similar to the `useEffect` hook in React.
 
-```ts
+```typescript
 import { useMachine } from "use-machine-ts"
 
 const [state, send] = useMachine(
@@ -386,9 +420,9 @@ const [state, send] = useMachine(
 )
 ```
 
-You can also pass an array to the `effect` property instead of a string.
+The `effect` property can accept an array instead of a string.
 
-```ts
+```typescript
 {
    effect: [
      "onActive",
@@ -397,29 +431,29 @@ You can also pass an array to the `effect` property instead of a string.
 }
 ```
 
-The effect function takes as a parameter an object (`entryParams`) with four properties:
+Effect functions receive an object (`entryParams`) with the following four properties as a parameter:
 
-| Properties   | Type       | Description                                                                                                                                                                          |
-| :----------- | :--------- | :----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `event`      | `object`   | The event that caused the transition to the current state. Events always use object format (e.g. `{ type: "TOGGLE" }`).                                                              |
-| `context`    | `any`      | The extended state of the state machine.                                                                                                                                             |
-| `send`       | `function` | Function for sending events to the state machine.                                                                                                                                    |
-| `setContext` | `function` | Function for updating the extended state of the state machine. Since it returns an object with a `send` property, you can write `context` updates and state transitions in one line. |
-| `isMounted`  | `function` | Function to check whether the component is mounted.                                                                                                                                  |
+| Property   | Type     | Description |
+| :--        | :--      | :-- |
+| `event`    | `object` | The event that triggered the transition to the current state. The event is always in object format (e.g., `{ type: "TOGGLE" }`). |
+| `context`  | `any`    | The extended state of the state machine. |
+| `send`     | `function` | A function to send events to the state machine. |
+| `setContext` | `function` | A function to update the extended state of the state machine. It returns an object with the `send` property, allowing you to update the `context` and transition states in one line. |
+| `isMounted` | `function` | A function to check if the component is mounted. |
 
-The function returned by the effect function takes as a parameter an object (`exitParams`) with four properties:
+The function returned by the effect function receives an object (`exitParams`) with the following four properties as a parameter:
 
-| Properties   | Type       | Description                                                                                                                                                                          |
-| :----------- | :--------- | :----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `event`      | `object`   | The event that caused the transition from the current state. Events always use object format (e.g. `{ type: "TOGGLE" }`).                                                            |
-| `context`    | `any`      | The extended state of the state machine.                                                                                                                                             |
-| `send`       | `function` | Function for sending events to the state machine.                                                                                                                                    |
-| `setContext` | `function` | Function for updating the extended state of the state machine. Since it returns an object with a `send` property, you can write `context` updates and state transitions in one line. |
-| `isMounted`  | `function` | Function to check whether the component is mounted.                                                                                                                                  |
+| Property   | Type     | Description |
+| :--        | :--      | :-- |
+| `event`    | `object` | The event that triggered the transition from the current state. The event is always in object format (e.g., `{ type: "TOGGLE" }`). |
+| `context`  | `any`    | The extended state of the state machine. |
+| `send`     | `function` | A function to send events to the state machine. |
+| `setContext` | `function` | A function to update the extended state of the state machine. It returns an object with the `send` property, allowing you to update the `context` and transition states in one line. |
+| `isMounted` | `function` | A function to check if the component is mounted. |
 
-The following example updates `retryCount` each time it enters a failure state, and transitions to an error state when the limit is reached.
+In the following example, the `retryCount` is updated every time the state changes to `failure`, and if the limit is reached, it transitions to an error state.
 
-```ts
+```typescript
 import { useMachine } from "use-machine-ts"
 
 const [state, send] = useMachine(
@@ -481,11 +515,11 @@ const [state, send] = useMachine(
 ```
 
 > [!WARNING]
-> State machine definitions and configurations are immutable. It cannot be changed midway. Functions defined with `effects`, `guards`, etc. continue to refer to the values they had when they were first defined. Therefore, care should be taken when directly monitoring state changes, for example.
+> The state machine's definition and configuration cannot be changed midway. Functions defined in `effects` and `guards` will continue to reference the values they had when initially defined. Therefore, caution is needed when directly observing state changes.
 
-The following example shows how to use React's `useEffect` hook to update the state of a component when the state of the state machine changes. This works correctly.
+Here is an example of how to use the React `useEffect` hook to update the component's state when the state machine's state changes. This works correctly.
 
-```ts
+```typescript
 function Component(props: { onActive: () => void }) {
   const { onActive } = props
   const [state, send] = useMachine(
@@ -506,9 +540,9 @@ function Component(props: { onActive: () => void }) {
 }
 ```
 
-You might find the above example redundant and end up writing code like this: However, this can lead to serious bugs.
+You might find the above example redundant and be tempted to write code like this. However, this could lead to bugs.
 
-```ts
+```typescript
 function Component(props: { onToggle: (isActive: boolean) => void }) {
   const { onToggle } = props
   const [state, send] = useMachine(
@@ -526,9 +560,9 @@ function Component(props: { onToggle: (isActive: boolean) => void }) {
 }
 ```
 
-You can also work around this problem by using `useRef` to always refer to the latest function, like this:
+Using `useRef` to always reference the latest function can avoid this issue.
 
-```ts
+```typescript
 function Component(props: { onToggle: (isActive: boolean) => void }) {
   const onToggle = React.useRef(props.onToggle)
   onToggle.current = props.onToggle
@@ -545,9 +579,9 @@ function Component(props: { onToggle: (isActive: boolean) => void }) {
 }
 ```
 
-However, there is still the possibility of human error. In practice, we recommend using predefined machines to transfer values that depend on React components.
+However, the potential for human error still exists. Practically, it is recommended to use the constructor to transfer values dependent on React components.
 
-```ts
+```typescript
 import { createMachine } from "use-machine-ts"
 
 function machine(
@@ -593,13 +627,13 @@ function ToggleButton(props: { onToggle?: (isActive: boolean) => void }) {
 }
 ```
 
-The machine predefined in the form of functions can accept one argument. This argument must be a function. This function is a wrapper around `useRef` and always returns the latest value.
+A pre-defined machine in function form can accept a single argument. This argument must be a function. This function is a thin wrapper around `useRef` and always returns the latest value.
 
 ### Extended State
 
-In addition to a finite number of states, a state machine can have extended states (called contexts). Define the initial extension state using the `context` property and update the extension state using the `setContext` function.
+In addition to a finite number of states, a state machine can have extended states (known as context). The `context` property is used to define the initial extended state, and the `setContext` function is used to update the extended state.
 
-```ts
+```typescript
 const [state, send] = useMachine(
   {
     initial: "inactive",
@@ -632,17 +666,17 @@ console.log(state.context) // { toggleCount: 1 }
 
 ### Schema
 
-TypeScript automatically infers context and event types, but you can also explicitly define a state machine's schema using the `$schema` property. This object is never used at runtime.
+TypeScript automatically infers the types of context and events, but you can also explicitly define the state machine schema using the `$schema` property. This object is not used by the runtime.
 
 The `$schema` property has three properties: `context`, `events`, and `strict`.
 
-| Property  | Type      | Required | Description                                                                                                                                                     |
-| :-------- | :-------- | :------- | :-------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `context` | `any`     |          | Defines the type of extended state of the state machine.                                                                                                        |
-| `events`  | `object`  |          | Defines the type of state machine events.                                                                                                                       |
-| `strict`  | `boolean` |          | Enable strict mode for the schema. When set to `true`, automatic inference is disabled and contexts and events not defined in the schema result in type errors. |
+| Property  | Type | Required | Description |
+| :--       | :--  | :--      | :--         |
+| `context` | `any`     | Defines the type of the state machine's extended state. |
+| `events`  | `object`  | Defines the type of the state machine's events. |
+| `strict`  | `boolean` | Enables strict mode for the schema. When set to `true`, automatic inference is disabled, and any context and events not defined in the schema will cause a type error. |
 
-```ts
+```typescript
 import { useMachine } from "use-machine-ts"
 
 const [state, send] = useMachine(
@@ -688,15 +722,15 @@ send({ type: "TOGGLE", timestamp: new Date() }) // OK (^_^)b
 
 ### Logging
 
-You can enable state machine logging if needed. Use the `verbose` property to set the verbosity of the log. .
+You can enable logging for your state machine if needed. Use the `verbose` property to set the logging level.
 
-| Value          | Description                                         |
-| :------------- | :-------------------------------------------------- |
-| `0` or `false` | Disable logging.                                    |
-| `1`            | Outputs only errors to the log. (default)           |
-| `2` or `true`  | Output errors and debugging information to the log. |
+| Value | Description |
+| :--   | :--         |
+| `0` or `false` | Disables logging. |
+| `1`            | Logs onlyerrors. (Default) |
+| `2` or `true`  | Logs errors and debug information. |
 
-```ts
+```typescript
 import { useMachine } from "use-machine-ts"
 
 const [state, send] = useMachine(
@@ -718,13 +752,15 @@ const [state, send] = useMachine(
 ```
 
 > [!NOTE]
-> Logging is disabled when `process.env.NODE_ENV` is `"production"`.
+> Logging is disabled if `process.env.NODE_ENV` is `"production"`.
 
 ## useSharedMachine
 
-To use `useSharedMachine`, you need to use a state machine created with `createSharedMachine`.
+[API Reference](https://tai-kun.github.io/use-machine-ts/functions/useSharedMachine.html)
 
-```ts
+To use `useSharedMachine`, you must use a state machine created with `createSharedMachine`.
+
+```typescript
 import { useSharedMachine, createSharedMachine } from "use-machine-ts"
 
 const sharedMachine = createSharedMachine(
@@ -735,9 +771,9 @@ const sharedMachine = createSharedMachine(
 const [state, send] = useSharedMachine(sharedMachine)
 ```
 
-`useSharedMachine` works similarly to `useMachine`, but allows you to manage state transitions externally. It's essentially a wrapper around `useSyncExternalState` and `useEffect`. If I may borrow your knowledge, I can give an analogy with the relationship between `atom` and `useAtom`.
+`useSharedMachine` works similarly to `useMachine`, but it allows you to manage state transitions from outside. It is essentially a wrapper around `useSyncExternalState` and `useEffect`. It can be likened to the relationship between `atom` and `useAtom`.
 
-```ts
+```typescript
 const machineAtom = atom() /* Initial State */
 const [state, setState] = useAtom(machineAtom)
 
@@ -749,20 +785,22 @@ const send = event => {
 
 A shared state machine is an object with six properties: `instance`, `dispatch`, `send`, `setContext`, `getState`, and `subscribe`.
 
-| Properties   | Type                           | Description                                                                                          |
-| :----------- | :----------------------------- | :--------------------------------------------------------------------------------------------------- |
-| `instance`   | `[Definition, Configuration?]` | An instance of the state machine.                                                                    |
-| `dispatch`   | `function`                     | A function to send events to the state machine. Primitive functions used by `send` and `setContext`. |
-| `send`       | `function`                     | Function for sending events to the state machine.                                                    |
-| `setContext` | `function`                     | Function for updating the extended state of the state machine.                                       |
-| `getState`   | `function`                     | A function to get the current state of the state machine.                                            |
-| `subscribe`  | `function`                     | A function to monitor state changes in the state machine.                                            |
+| Properties | Type | Description |
+| :--        | :--  | :--         |
+| `instance`   | `[Definition, Configuration?]` | The state machine instance. |
+| `dispatch`   | `function` | A function to send events to the state machine. It is the primitive function used by send and setContext. |
+| `send`       | `function` | A function to send events to the state machine. |
+| `setContext` | `function` | A function to update the state machine's extended state. |
+| `getState`   | `function` | A function to get the current state of the state machine. |
+| `subscribe`  | `function` | A function to watch for state changes in the state machine. |
 
 ## useSyncedMachine
 
-Similar to `useMachine`, but does not trigger a re-render on every state transition. This hook provides a function that returns a snapshot of the state rather than the current state.
+[API Reference](https://tai-kun.github.io/use-machine-ts/functions/useSyncedMachine.html)
 
-```ts
+Unlike `useMachine`, it does not trigger re-rendering every time the state transitions. This hook provides a function that returns a snapshot of the state, not the current state.
+
+```typescript
 import { useSyncedMachine } from "use-machine-ts"
 
 const [getState, send] = useSyncedMachine({
@@ -791,24 +829,24 @@ console.log(getState())
 # Async Orchestration
 
 > [!WARNING]
-> In use-machine-ts, you should avoid updating the state machine state asynchronously.
+> Whenever possible, avoid updating state asynchronously in use-machine-ts.
 
-There are a few things to keep in mind when updating state machine state asynchronously. Each of the three hooks (`useMachine`, `useSharedMachine`, `useSyncedMachine`) provided by use-machine-ts has different points to note.
+When updating state asynchronously, several considerations arise depending on the specific hook used: `useMachine`, `useSharedMachine`, or `useSyncedMachine`.
 
 ## useMachine
 
-Inside `useMachine`, you can call the `send` and `setContext` functions asynchronously as long as the component is mounted. However, if the component is already unmounted, these functions instead of changing the state will display an error message like this:
+Within `useMachine`, you can call the `send` and `setContext` functions asynchronously as long as the component remains mounted. However, if the component has already been unmounted, these functions will instead display an error message indicating that the state cannot be updated:
 
 ```console
 Cannot dispatch an action to the state machine after the component is unmounted.
 Action { type: "SEND", payload: { type: "TOGGLE" } }
 ```
 
-For `setContext`, the value of the `type` property is `"SET_CONTEXT"`.
+For `setContext`, the `type` property value will be `"SET_CONTEXT"`.
 
-To check if a component is unmounted beforehand, you can use the `isMounted` property of the parameter passed to the `effect` function. The `isMounted` function returns `true` if the component is mounted, `false` otherwise.
+To check if the component is unmounted beforehand, you can utilize the `isMounted` property within the parameter passed to the `effect` function. The `isMounted` function returns `true` if the component is mounted, and `false` otherwise.
 
-```ts
+```typescript
 import { useMachine } from "use-machine-ts"
 
 const [state, send] = useMachine(
@@ -839,16 +877,14 @@ const [state, send] = useMachine(
 
 ## useSharedMachine
 
-Inside `useSharedMachine`, you can call `send`, `setContext`, or `dispatch` on the shared machine asynchronously, regardless of the mounted state of the component. Note that no error or warning messages are displayed. To check if a component is unmounted beforehand, you can use the `isMounted` function, similar to `useMachine`.
+In `useSharedMachine`, you can call `send`, `setContext`, or the shared machine's `dispatch` asynchronously regardless of the component's mount state. No error or warning messages will be displayed. To check if the component is unmounted beforehand, you can use the `isMounted` function similarly to `useMachine`.
 
 ## useSyncedMachine
 
-The `send` and `setContext` functions cannot be called asynchronously within `useSyncedMachine`, regardless of the mounted state of the component. These functions are unlocked just before the effect starts and locked after it ends. If you call these functions while locked, you will receive an error message similar to the following:
+Within `useSyncedMachine`, you cannot call the `send` and `setContext` functions asynchronously regardless of the component's mount state. These functions are unlocked at the beginning of an effect and locked after its completion. Calling these functions while locked will result in an error message:
 
 ```console
 Send function not available. Must be used synchronously within an effect.
 State { value: "inactive", event: { type: "$init" }, nextEvents: ["TOGGLE"], context: undefined }
 Event: { type: "TOGGLE" }
 ```
-
-However, the `send` function returned by `useSyncedMachine` warns you with an error message that the component is unmounted.
