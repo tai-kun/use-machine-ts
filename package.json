@@ -5,6 +5,7 @@
   "description": "The tiny state machine hook for React",
   "sideEffects": false,
   "repository": "git+https://github.com/tai-kun/use-machine-ts.git",
+  "homepage": "https://tai-kun.github.io/use-machine-ts/",
   "author": {
     "name": "tai-kun",
     "url": "https://github.com/tai-kun/"
@@ -98,7 +99,8 @@
     "node": "22.1.0"
   },
   "keywords": [
-    "state-machine",
+    "state",
+    "machine",
     "typescript",
     "react",
     "hooks"
