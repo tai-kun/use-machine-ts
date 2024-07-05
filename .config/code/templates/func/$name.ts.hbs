@@ -4,6 +4,6 @@ if (cfgTest && cfgTest.url === import.meta.url) {
   const { describe, test } = cfgTest
 
   describe("{{dirname outpath}}/{{basename outpath}}", () => {
-    test.todo("Should be tested")
+    test.skip("Should be tested", () => {})
   })
 }

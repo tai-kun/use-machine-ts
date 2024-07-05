@@ -101,7 +101,8 @@ export type * from "./types"
 
 if (cfgTest && cfgTest.url === import.meta.url) {
   const { expectType } = await import("tsd")
-  const { assert, describe, mock, test } = cfgTest
+  const { assert, describe, sinon, test } = cfgTest
+  const { stub } = sinon
 
   describe("src/createSharedMachine", () => {
     test("strict: false", () => {
@@ -246,36 +247,32 @@ if (cfgTest && cfgTest.url === import.meta.url) {
         },
       })
 
-      const callback = mock.fn()
+      const callback = stub()
       const unsubscribe = machine.subscribe(callback)
 
       machine.send("NEXT")
 
-      assert.equal(callback.mock.callCount(), 1)
+      assert.equal(callback.callCount, 1)
       assert.deepEqual(
-        callback.mock.calls.map(call => ({
-          args: call.arguments,
-        })),
+        callback.getCalls().map(call => call.args),
         [
-          {
-            args: [
-              {
-                event: { type: "NEXT" },
-                value: "b",
-                context: undefined,
-                nextEvents: ["NEXT"],
-              },
-            ],
-          },
+          [
+            {
+              event: { type: "NEXT" },
+              value: "b",
+              context: undefined,
+              nextEvents: ["NEXT"],
+            },
+          ],
         ],
       )
 
-      callback.mock.resetCalls()
+      callback.reset()
       unsubscribe()
 
       machine.send("NEXT")
 
-      assert.equal(callback.mock.callCount(), 0)
+      assert.equal(callback.callCount, 0)
     })
   })
 }

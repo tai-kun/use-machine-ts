@@ -487,7 +487,8 @@ export function useSyncState(
 if (cfgTest && cfgTest.url === import.meta.url) {
   await import("global-jsdom/register")
   const { renderHook } = await import("@testing-library/react")
-  const { assert, describe, mock, test } = cfgTest
+  const { assert, describe, sinon, test } = cfgTest
+  const { spy } = sinon
 
   describe("src/core/logic", () => {
     describe("createInitialState", () => {
@@ -596,7 +597,7 @@ if (cfgTest && cfgTest.url === import.meta.url) {
         })
 
         test("should log the event type not found", () => {
-          const logMock = mock.fn(() => {})
+          const logSpy = spy()
           const def = {
             initial: "idle",
             context: {},
@@ -607,8 +608,8 @@ if (cfgTest && cfgTest.url === import.meta.url) {
           const conf = {
             verbose: true,
             console: {
-              log: logMock,
-              group: logMock,
+              log: logSpy,
+              group: logSpy,
               groupEnd() {},
             },
           }
@@ -626,27 +627,17 @@ if (cfgTest && cfgTest.url === import.meta.url) {
 
           assert.deepEqual(newState, state)
           assert.deepEqual(
-            logMock.mock.calls.map(call => ({
-              args: call.arguments,
-            })),
+            logSpy.getCalls().map(call => call.args),
             [
-              {
-                args: [
-                  "Current state 'idle' doesn't listen to event type 'FETCH'.",
-                ],
-              },
-              {
-                args: ["State", state],
-              },
-              {
-                args: ["Event", { type: "FETCH" }],
-              },
+              ["Current state 'idle' doesn't listen to event type 'FETCH'."],
+              ["State", state],
+              ["Event", { type: "FETCH" }],
             ],
           )
         })
 
         test("should log the transition denied by guard", () => {
-          const logMock = mock.fn(() => {})
+          const logSpy = spy()
           const def = {
             initial: "idle",
             context: {},
@@ -668,8 +659,8 @@ if (cfgTest && cfgTest.url === import.meta.url) {
               isAllowed: () => false,
             },
             console: {
-              log: logMock,
-              group: logMock,
+              log: logSpy,
+              group: logSpy,
               groupEnd() {},
             },
           }
@@ -687,32 +678,20 @@ if (cfgTest && cfgTest.url === import.meta.url) {
 
           assert.deepEqual(newState, state)
           assert.deepEqual(
-            logMock.mock.calls.map(call => ({
-              args: call.arguments,
-            })),
+            logSpy.getCalls().map(call => call.args),
             [
-              {
-                args: [
-                  "Transition from 'idle' to 'loading' denied by guard.",
-                ],
-              },
-              {
-                args: [
-                  [
-                    // dprint-ignore
-                    "%c" +
-                    "isAllowed",
-                    "^^^^^^^^^",
-                  ].join("\n"),
-                  "font-family: monospace",
-                ],
-              },
-              {
-                args: ["Event", { type: "FETCH" }],
-              },
-              {
-                args: ["Context", {}],
-              },
+              ["Transition from 'idle' to 'loading' denied by guard."],
+              [
+                [
+                  // dprint-ignore
+                  "%c" +
+                  "isAllowed",
+                  "^^^^^^^^^",
+                ].join("\n"),
+                "font-family: monospace",
+              ],
+              ["Event", { type: "FETCH" }],
+              ["Context", {}],
             ],
           )
         })
@@ -720,7 +699,7 @@ if (cfgTest && cfgTest.url === import.meta.url) {
 
       describe("SET_CONTEXT", () => {
         test("should update the context", () => {
-          const logMock = mock.fn(() => {})
+          const logSpy = spy()
           const def = {
             initial: "idle",
             context: {
@@ -733,8 +712,8 @@ if (cfgTest && cfgTest.url === import.meta.url) {
           const conf = {
             verbose: true,
             console: {
-              log: logMock,
-              group: logMock,
+              log: logSpy,
+              group: logSpy,
               groupEnd() {},
             },
           }
@@ -760,19 +739,11 @@ if (cfgTest && cfgTest.url === import.meta.url) {
             nextEvents: [],
           })
           assert.deepEqual(
-            logMock.mock.calls.map(call => ({
-              args: call.arguments,
-            })),
+            logSpy.getCalls().map(call => call.args),
             [
-              {
-                args: ["Context updated."],
-              },
-              {
-                args: ["Prev Context", { foo: 1 }],
-              },
-              {
-                args: ["Next Context", { foo: 1, bar: 2 }],
-              },
+              ["Context updated."],
+              ["Prev Context", { foo: 1 }],
+              ["Next Context", { foo: 1, bar: 2 }],
             ],
           )
         })
@@ -781,8 +752,8 @@ if (cfgTest && cfgTest.url === import.meta.url) {
 
     describe("applyEffect", () => {
       test("should apply the effect", () => {
-        const cleanupMock = mock.fn(() => {})
-        const dispatchMock = mock.fn(() => {})
+        const cleanupSpy = spy<Config.EffectCleanup.Signature>(() => {})
+        const dispatchSpy = spy()
         const def = {
           initial: "idle",
           context: {},
@@ -799,38 +770,35 @@ if (cfgTest && cfgTest.url === import.meta.url) {
                 type: "FETCH",
               })
 
-              return cleanupMock
+              return cleanupSpy
             },
           },
         }
         const state = createInitialState(def)
         const isMounted = { current: true }
-        const cleanup = applyEffect(def, conf, state, dispatchMock, isMounted)
+        const cleanup = applyEffect(def, conf, state, dispatchSpy, isMounted)
         cleanup!({
           event: { type: "FETCH" },
           context: {},
         })
 
         assert.deepEqual(
-          dispatchMock.mock.calls.map(call => ({
-            args: call.arguments,
-          })),
+          dispatchSpy.getCalls().map(call => call.args),
           [
-            {
-              args: [
-                {
-                  type: "SEND",
-                  payload: {
-                    type: "FETCH",
-                  },
+            [
+              {
+                type: "SEND",
+                payload: {
+                  type: "FETCH",
                 },
-              ],
-            },
+              },
+            ],
           ],
         )
-        assert.equal(cleanupMock.mock.callCount(), 1)
-        const params: Config.EffectParams.Signature = cleanupMock.mock
-          .calls!.at(0)!.arguments.at(0)!
+        assert.equal(cleanupSpy.callCount, 1)
+
+        const params = cleanupSpy.getCall(0).args[0]
+
         assert.equal(typeof params.send, "function")
         assert.equal(typeof params.setContext, "function")
         assert.deepEqual(params.event, { type: "FETCH" })
@@ -839,8 +807,8 @@ if (cfgTest && cfgTest.url === import.meta.url) {
 
       test("should error if dispatch is called asynchronously in sync mode", async () => {
         const { promise, resolve } = Promise.withResolvers<void>()
-        const errorMock = mock.fn(() => {})
-        const dispatchMock = mock.fn(() => {})
+        const errorSpy = spy()
+        const dispatchSpy = spy()
         const def = {
           initial: "idle",
           context: {},
@@ -857,7 +825,7 @@ if (cfgTest && cfgTest.url === import.meta.url) {
         const conf = {
           console: {
             log() {},
-            error: errorMock,
+            error: errorSpy,
           },
           effects: {
             onIdle: ({ send }: Config.EffectParams.Signature) => {
@@ -873,42 +841,31 @@ if (cfgTest && cfgTest.url === import.meta.url) {
         }
         const state = createInitialState(def)
         const isMounted = { current: true }
-        applyEffect(def, conf, state, dispatchMock, isMounted, true)
+        applyEffect(def, conf, state, dispatchSpy, isMounted, true)
 
         await promise
 
-        assert.equal(dispatchMock.mock.callCount(), 0)
+        assert.equal(dispatchSpy.callCount, 0)
         assert.deepEqual(
-          errorMock.mock.calls.map(call => ({
-            args: call.arguments,
-          })),
+          errorSpy.getCalls().map(call => call.args),
           [
-            {
-              args: [
-                "`send()` not available. Must be used synchronously within an effect.",
-              ],
-            },
-            {
-              args: [
-                "State",
-                {
-                  context: {},
-                  event: {
-                    type: "$init",
-                  },
-                  nextEvents: [
-                    "FETCH",
-                  ],
-                  value: "idle",
+            [
+              "`send()` not available. Must be used synchronously within an effect.",
+            ],
+            [
+              "State",
+              {
+                context: {},
+                event: {
+                  type: "$init",
                 },
-              ],
-            },
-            {
-              args: [
-                "Event",
-                "FETCH",
-              ],
-            },
+                nextEvents: [
+                  "FETCH",
+                ],
+                value: "idle",
+              },
+            ],
+            ["Event", "FETCH"],
           ],
         )
       })
@@ -964,8 +921,8 @@ if (cfgTest && cfgTest.url === import.meta.url) {
 
     describe("useSyncState", () => {
       test("should apply the effect", () => {
-        const cleanup = mock.fn()
-        const effect = mock.fn(() => cleanup)
+        const cleanup = spy<Config.EffectCleanup.Signature>(() => {})
+        const effect = spy<Config.Effect.Signature>(() => cleanup)
         const def: Definition.Signature = {
           initial: "a",
           states: {
@@ -992,11 +949,10 @@ if (cfgTest && cfgTest.url === import.meta.url) {
           },
         })
 
-        assert.equal(effect.mock.callCount(), 1)
-        assert.equal(cleanup.mock.callCount(), 0)
+        assert.equal(effect.callCount, 1)
+        assert.equal(cleanup.callCount, 0)
 
-        const params: Config.EffectParams.Signature = effect.mock
-          .calls.at(0)!.arguments.at(0)!
+        const params = effect.getCall(0).args[0]
 
         assert.deepEqual(params.event, { type: "$init" })
 
@@ -1009,11 +965,10 @@ if (cfgTest && cfgTest.url === import.meta.url) {
           },
         })
 
-        assert.equal(effect.mock.callCount(), 1)
-        assert.equal(cleanup.mock.callCount(), 1)
+        assert.equal(effect.callCount, 1)
+        assert.equal(cleanup.callCount, 1)
 
-        const cleanupParams: Config.EffectCleanupParams.Signature = cleanup.mock
-          .calls.at(0)!.arguments.at(0)!
+        const cleanupParams = cleanup.getCall(0).args[0]
 
         assert.deepEqual(cleanupParams.event, { type: "NEXT" })
       })

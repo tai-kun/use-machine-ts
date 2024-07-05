@@ -923,7 +923,7 @@ if (cfgTest && cfgTest.url === import.meta.url) {
   const { describe, test } = cfgTest
 
   describe("src/types/config", () => {
-    test.todo("Should be tested")
+    test.skip("Should be tested", () => {})
   })
 }
 

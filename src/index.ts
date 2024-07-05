@@ -27,7 +27,8 @@ if (cfgTest && cfgTest.url === import.meta.url) {
   const { useMachine } = await import("./useMachine")
   const { useSharedMachine } = await import("./useSharedMachine")
   const { useSyncedMachine } = await import("./useSyncedMachine")
-  const { assert, describe, mock, test } = cfgTest
+  const { assert, describe, sinon, test } = cfgTest
+  const { spy } = sinon
 
   function createInvocationCallOrder() {
     const order: string[] = []
@@ -305,8 +306,8 @@ if (cfgTest && cfgTest.url === import.meta.url) {
 
         test("should invoke effect callbacks", () => {
           const invocationCallOrder = createInvocationCallOrder()
-          const entry = mock.fn(invocationCallOrder.register("entry"))
-          const exit = mock.fn(invocationCallOrder.register("exit"))
+          const entry = spy(invocationCallOrder.register("entry"))
+          const exit = spy(invocationCallOrder.register("exit"))
           const { result } = renderHook(() =>
             useHook(
               {
@@ -344,8 +345,8 @@ if (cfgTest && cfgTest.url === import.meta.url) {
             send("TOGGLE")
           })
 
-          assert.equal(entry.mock.callCount(), 2)
-          assert.equal(exit.mock.callCount(), 1)
+          assert.equal(entry.callCount, 2)
+          assert.equal(exit.callCount, 1)
 
           assert.deepEqual(invocationCallOrder.current, [
             "entry",
@@ -353,10 +354,10 @@ if (cfgTest && cfgTest.url === import.meta.url) {
             "entry",
           ])
 
-          assert.equal(entry.mock.calls.at(0)?.arguments[0], "inactive")
-          assert.equal(entry.mock.calls.at(1)?.arguments[0], "active")
+          assert.equal(entry.getCall(0)?.args[0], "inactive")
+          assert.equal(entry.getCall(1)?.args[0], "active")
 
-          assert.equal(exit.mock.calls.at(0)?.arguments[0], "inactive")
+          assert.equal(exit.getCall(0)?.args[0], "inactive")
         })
 
         test("should transition from effect", () => {
@@ -396,7 +397,7 @@ if (cfgTest && cfgTest.url === import.meta.url) {
         })
 
         test("should get payload sent with event object", () => {
-          const effect = mock.fn()
+          const effect = spy()
           const { result } = renderHook(() =>
             useHook(
               {
@@ -433,15 +434,15 @@ if (cfgTest && cfgTest.url === import.meta.url) {
             })
           })
 
-          assert.deepEqual(effect.mock.calls.at(0)?.arguments[0].event, {
+          assert.deepEqual(effect.getCalls().at(0)?.args[0].event, {
             type: "ACTIVATE",
             number: 10,
           })
         })
 
         test("should invoke effect with context as a parameter", () => {
-          const finalEffect = mock.fn()
-          const initialEffect = mock.fn(({ setContext }) => {
+          const finalEffect = spy()
+          const initialEffect = spy(({ setContext }) => {
             setContext((context: boolean) => !context)
               .send("TOGGLE")
           })
@@ -470,20 +471,20 @@ if (cfgTest && cfgTest.url === import.meta.url) {
             )
           )
 
-          assert.equal(initialEffect.mock.callCount(), 1)
+          assert.equal(initialEffect.callCount, 1)
           assert.equal(
-            initialEffect.mock.calls.at(0)?.arguments[0].context,
+            initialEffect.getCalls().at(0)?.args[0].context,
             false, // initial context
           )
 
-          assert.equal(finalEffect.mock.callCount(), 1)
-          assert.equal(finalEffect.mock.calls.at(0)?.arguments[0].context, true)
+          assert.equal(finalEffect.callCount, 1)
+          assert.equal(finalEffect.getCalls().at(0)?.args[0].context, true)
         })
       })
 
       describe("guarded transitions", () => {
         test("should block transitions with guard returning false", () => {
-          const guard = mock.fn(() => false)
+          const guard = spy(() => false)
           const { result } = renderHook(() =>
             useHook(
               {
@@ -517,7 +518,7 @@ if (cfgTest && cfgTest.url === import.meta.url) {
 
           const [state] = result.current
 
-          assert.equal(guard.mock.callCount(), 2) // Called twice in development environment
+          assert.equal(guard.callCount, 2) // Called twice in development environment
           assert.deepEqual(state, {
             context: undefined,
             event: { type: "$init" },
@@ -527,7 +528,7 @@ if (cfgTest && cfgTest.url === import.meta.url) {
         })
 
         test("should allow transitions with guard returning true", () => {
-          const guard = mock.fn(() => true)
+          const guard = spy(() => true)
           const { result } = renderHook(() =>
             useHook(
               {
@@ -561,7 +562,7 @@ if (cfgTest && cfgTest.url === import.meta.url) {
 
           const [state] = result.current
 
-          assert.equal(guard.mock.callCount(), 2) // Called twice in development environment
+          assert.equal(guard.callCount, 2) // Called twice in development environment
           assert.deepEqual(state, {
             context: undefined,
             event: {
@@ -600,7 +601,7 @@ if (cfgTest && cfgTest.url === import.meta.url) {
         })
 
         test("should get the context inside effects", () => {
-          const effect = mock.fn()
+          const effect = spy()
           const { result } = renderHook(() =>
             useHook(
               {
@@ -624,11 +625,11 @@ if (cfgTest && cfgTest.url === import.meta.url) {
             )
           )
 
-          assert.equal(effect.mock.callCount(), 1)
-          assert.deepEqual(effect.mock.calls.at(0)?.arguments[0].context, {
+          assert.equal(effect.callCount, 1)
+          assert.deepEqual(effect.getCalls().at(0)?.args[0].context, {
             foo: "bar",
           })
-          assert.deepEqual(effect.mock.calls.at(0)?.arguments[0].event, {
+          assert.deepEqual(effect.getCalls().at(0)?.args[0].event, {
             type: "$init",
           })
 
@@ -747,9 +748,9 @@ if (cfgTest && cfgTest.url === import.meta.url) {
 
         function createConsole() {
           const console_ = {
-            log: mock.fn(format),
-            error: mock.fn(format),
-            group: mock.fn(format),
+            log: spy(format),
+            error: spy(format),
+            group: spy(format),
             groupEnd() {},
           }
 
@@ -757,9 +758,9 @@ if (cfgTest && cfgTest.url === import.meta.url) {
             ...console_,
             get results() {
               return {
-                group: console_.group.mock.calls.map(c => c.result),
-                error: console_.error.mock.calls.map(c => c.result),
-                log: console_.log.mock.calls.map(c => c.result),
+                group: console_.group.getCalls().map(call => call.returnValue),
+                error: console_.error.getCalls().map(call => call.returnValue),
+                log: console_.log.getCalls().map(call => call.returnValue),
               }
             },
           }
@@ -874,8 +875,8 @@ if (cfgTest && cfgTest.url === import.meta.url) {
 
   describe("useMachine", () => {
     test("definition and config should be immutable", () => {
-      const onToggle1 = mock.fn()
-      const onToggle2 = mock.fn()
+      const onToggle1 = spy()
+      const onToggle2 = spy()
       const { result, rerender } = renderHook(
         ({ onToggle }) =>
           useMachine(
@@ -906,7 +907,7 @@ if (cfgTest && cfgTest.url === import.meta.url) {
           },
         },
       )
-      const callCountOfOnToggle1 = onToggle1.mock.callCount()
+      const callCountOfOnToggle1 = onToggle1.callCount
 
       assert(callCountOfOnToggle1 > 0)
 
@@ -920,8 +921,8 @@ if (cfgTest && cfgTest.url === import.meta.url) {
         send("TOGGLE")
       })
 
-      assert(onToggle1.mock.callCount() > callCountOfOnToggle1)
-      assert(onToggle2.mock.callCount() === 0)
+      assert(onToggle1.callCount > callCountOfOnToggle1)
+      assert(onToggle2.callCount === 0)
     })
 
     test("should transfer props to state machine", () => {
@@ -950,8 +951,8 @@ if (cfgTest && cfgTest.url === import.meta.url) {
           },
         )
       }
-      const onToggle1 = mock.fn()
-      const onToggle2 = mock.fn()
+      const onToggle1 = spy()
+      const onToggle2 = spy()
       const { result, rerender } = renderHook(
         ({ onToggle }) => useMachine(machine, { onToggle }),
         {
@@ -960,7 +961,7 @@ if (cfgTest && cfgTest.url === import.meta.url) {
           },
         },
       )
-      const callCountOfOnToggle1 = onToggle1.mock.callCount()
+      const callCountOfOnToggle1 = onToggle1.callCount
 
       assert(callCountOfOnToggle1 > 0)
 
@@ -974,13 +975,13 @@ if (cfgTest && cfgTest.url === import.meta.url) {
         send("TOGGLE")
       })
 
-      assert(onToggle1.mock.callCount() === callCountOfOnToggle1)
-      assert(onToggle2.mock.callCount() > 0)
+      assert(onToggle1.callCount === callCountOfOnToggle1)
+      assert(onToggle2.callCount > 0)
     })
 
     test("should logs when `send` function is called asynchronously", () => {
-      const groupSpy = mock.fn()
-      const errorSpy = mock.fn()
+      const groupSpy = spy()
+      const errorSpy = spy()
       let sendFn: () => void
       const { unmount } = renderHook(() =>
         useMachine(
@@ -1025,7 +1026,7 @@ if (cfgTest && cfgTest.url === import.meta.url) {
       sendFn!()
 
       assert.deepEqual(
-        groupSpy.mock.calls.map(call => call.arguments),
+        groupSpy.getCalls().map(call => call.args),
         [
           [
             "Cannot dispatch an action to the state machine after the component is unmounted.",
@@ -1033,7 +1034,7 @@ if (cfgTest && cfgTest.url === import.meta.url) {
         ],
       )
       assert.deepEqual(
-        errorSpy.mock.calls.map(call => call.arguments),
+        errorSpy.getCalls().map(call => call.args),
         [
           [
             "Action",
@@ -1161,18 +1162,9 @@ if (cfgTest && cfgTest.url === import.meta.url) {
     })
 
     test("should update the state synchronously", () => {
-      const logs: unknown[] = []
       const stdout = new tty.WriteStream(1)
       const console = new Console(stdout)
-      mock.method(stdout, "write", (data: any) => {
-        logs.push(
-          (data = data.toString().trim()).startsWith("<JSON> ")
-            ? JSON.parse(data.slice("<JSON> ".length))
-            : data,
-        )
-
-        return true // Keep the stream open
-      })
+      const write = spy(stdout, "write")
 
       function Switch(_: {}) {
         const [getState, send] = useSyncedMachine({
@@ -1223,33 +1215,42 @@ if (cfgTest && cfgTest.url === import.meta.url) {
       fireEvent.click(button)
       unmount()
 
-      assert.deepEqual(logs, [
-        "render",
-        // The first effect callback is invoked inside `React.useEffect`.
-        "entryEffect: 1",
-        // Clicking the button triggers the state transition.
-        "beforeSend: 1",
-        {
-          event: { type: "$init" },
-          value: "off",
-          context: 1,
-          nextEvents: ["TOGGLE"],
-        },
-        // The effect callback is invoked synchronously,
-        // regardless of the React lifecycle.
-        "exitEffect: 1",
-        "entryEffect: 2",
-        // The state has been updated at this point.
-        "afterSend: 1",
-        {
-          event: { type: "TOGGLE" },
-          value: "on",
-          context: 2,
-          nextEvents: ["TOGGLE"],
-        },
-        // The exit-effect callback is invoked when it is unmounted.
-        "exitEffect: 2",
-      ])
+      assert.deepEqual(
+        write.getCalls().map(call => {
+          let data = call.args[0]
+
+          return (data = data.toString().trim()).startsWith("<JSON> ")
+            ? JSON.parse(data.slice("<JSON> ".length))
+            : data
+        }),
+        [
+          "render",
+          // The first effect callback is invoked inside `React.useEffect`.
+          "entryEffect: 1",
+          // Clicking the button triggers the state transition.
+          "beforeSend: 1",
+          {
+            event: { type: "$init" },
+            value: "off",
+            context: 1,
+            nextEvents: ["TOGGLE"],
+          },
+          // The effect callback is invoked synchronously,
+          // regardless of the React lifecycle.
+          "exitEffect: 1",
+          "entryEffect: 2",
+          // The state has been updated at this point.
+          "afterSend: 1",
+          {
+            event: { type: "TOGGLE" },
+            value: "on",
+            context: 2,
+            nextEvents: ["TOGGLE"],
+          },
+          // The exit-effect callback is invoked when it is unmounted.
+          "exitEffect: 2",
+        ],
+      )
     })
   })
 }

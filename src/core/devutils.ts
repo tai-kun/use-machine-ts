@@ -141,16 +141,17 @@ export function assertNever(cause: never): never {
 if (cfgTest && cfgTest.url === import.meta.url) {
   await import("global-jsdom/register")
   const { renderHook } = await import("@testing-library/react")
-  const { assert, describe, mock, test } = cfgTest
+  const { assert, describe, sinon, test } = cfgTest
+  const { spy } = sinon
 
   describe("src/core/devutils", () => {
     describe("log", () => {
       test("should log messages", () => {
-        const logMock = mock.fn()
+        const logSpy = spy()
         const options: LogOptions = {
           verbose: true,
           console: {
-            log: logMock,
+            log: logSpy,
           },
         }
 
@@ -161,28 +162,22 @@ if (cfgTest && cfgTest.url === import.meta.url) {
         )
 
         assert.deepEqual(
-          logMock.mock.calls.map(call => ({
-            args: call.arguments,
-          })),
+          logSpy.getCalls().map(call => call.args),
           [
-            {
-              args: ["Group label"],
-            },
-            {
-              args: ["Label", "Value"],
-            },
+            ["Group label"],
+            ["Label", "Value"],
           ],
         )
       })
 
       test("should log messages with group label", () => {
-        const logMock = mock.fn()
+        const logSpy = spy()
         const options: LogOptions = {
           verbose: true,
           console: {
-            log: logMock,
-            group: logMock,
-            groupEnd: logMock,
+            log: logSpy,
+            group: logSpy,
+            groupEnd: logSpy,
           },
         }
 
@@ -193,29 +188,21 @@ if (cfgTest && cfgTest.url === import.meta.url) {
         )
 
         assert.deepEqual(
-          logMock.mock.calls.map(call => ({
-            args: call.arguments,
-          })),
+          logSpy.getCalls().map(call => call.args),
           [
-            {
-              args: ["Group label", "Sub label"],
-            },
-            {
-              args: ["Label", "Value"],
-            },
-            {
-              args: [],
-            },
+            ["Group label", "Sub label"],
+            ["Label", "Value"],
+            [],
           ],
         )
       })
 
       test("should not log messages if verbose is false", () => {
-        const logMock = mock.fn()
+        const logSpy = spy()
         const options: LogOptions = {
           verbose: false,
           console: {
-            log: logMock,
+            log: logSpy,
           },
         }
 
@@ -225,15 +212,15 @@ if (cfgTest && cfgTest.url === import.meta.url) {
           ["Label", "Value"],
         )
 
-        assert.deepEqual(logMock.mock.calls, [])
+        assert.deepEqual(logSpy.getCalls(), [])
       })
 
       test("should not log messages if level is debug and verbose is 1", () => {
-        const logMock = mock.fn()
+        const logSpy = spy()
         const options: LogOptions = {
           verbose: 1,
           console: {
-            log: logMock,
+            log: logSpy,
           },
         }
 
@@ -243,16 +230,16 @@ if (cfgTest && cfgTest.url === import.meta.url) {
           ["Label", "Value"],
         )
 
-        assert.deepEqual(logMock.mock.calls, [])
+        assert.deepEqual(logSpy.getCalls(), [])
       })
 
       test("should log messages if level is error", () => {
-        const logMock = mock.fn()
+        const logSpy = spy()
         const options: LogOptions = {
           verbose: 1,
           console: {
             log: () => {},
-            error: logMock,
+            error: logSpy,
           },
         }
 
@@ -263,26 +250,20 @@ if (cfgTest && cfgTest.url === import.meta.url) {
         )
 
         assert.deepEqual(
-          logMock.mock.calls.map(call => ({
-            args: call.arguments,
-          })),
+          logSpy.getCalls().map(call => call.args),
           [
-            {
-              args: ["Group label"],
-            },
-            {
-              args: ["Label", "Value"],
-            },
+            ["Group label"],
+            ["Label", "Value"],
           ],
         )
       })
 
       test("should fallback to log if error is not available", () => {
-        const logMock = mock.fn()
+        const logSpy = spy()
         const options: LogOptions = {
           verbose: 1,
           console: {
-            log: logMock,
+            log: logSpy,
           },
         }
 
@@ -293,27 +274,21 @@ if (cfgTest && cfgTest.url === import.meta.url) {
         )
 
         assert.deepEqual(
-          logMock.mock.calls.map(call => ({
-            args: call.arguments,
-          })),
+          logSpy.getCalls().map(call => call.args),
           [
-            {
-              args: ["Group label"],
-            },
-            {
-              args: ["Label", "Value"],
-            },
+            ["Group label"],
+            ["Label", "Value"],
           ],
         )
       })
 
       test("should not group messages if groupEnd is not available", () => {
-        const logMock = mock.fn()
+        const logSpy = spy()
         const options: LogOptions = {
           verbose: true,
           console: {
-            log: logMock,
-            group: logMock,
+            log: logSpy,
+            group: logSpy,
           },
         }
 
@@ -324,16 +299,10 @@ if (cfgTest && cfgTest.url === import.meta.url) {
         )
 
         assert.deepEqual(
-          logMock.mock.calls.map(call => ({
-            args: call.arguments,
-          })),
+          logSpy.getCalls().map(call => call.args),
           [
-            {
-              args: ["Group label"],
-            },
-            {
-              args: ["Label", "Value"],
-            },
+            ["Group label"],
+            ["Label", "Value"],
           ],
         )
       })
@@ -342,9 +311,9 @@ if (cfgTest && cfgTest.url === import.meta.url) {
         const options: LogOptions = {
           verbose: 2,
         }
-        const consoleLogMock = mock.method(console, "log", () => {})
-        const consoleGroupMock = mock.method(console, "group", () => {})
-        const consoleGroupEndMock = mock.method(console, "groupEnd", () => {})
+        const consoleLogSpy = spy(console, "log")
+        const consoleGroupSpy = spy(console, "group")
+        const consoleGroupEndSpy = spy(console, "groupEnd")
 
         log(
           { ...options, level: "debug" },
@@ -354,38 +323,26 @@ if (cfgTest && cfgTest.url === import.meta.url) {
 
         assert.deepEqual(
           [
-            ...consoleGroupMock.mock.calls.map(call => ({
-              args: call.arguments,
-            })),
-            ...consoleLogMock.mock.calls.map(call => ({
-              args: call.arguments,
-            })),
-            ...consoleGroupEndMock.mock.calls.map(call => ({
-              args: call.arguments,
-            })),
+            ...consoleGroupSpy.getCalls().map(call => call.args),
+            ...consoleLogSpy.getCalls().map(call => call.args),
+            ...consoleGroupEndSpy.getCalls().map(call => call.args),
           ],
           [
-            {
-              args: ["Group label"],
-            },
-            {
-              args: ["Label", "Value"],
-            },
-            {
-              args: [],
-            },
+            ["Group label"],
+            ["Label", "Value"],
+            [],
           ],
         )
 
-        consoleLogMock.mock.restore()
-        consoleGroupMock.mock.restore()
-        consoleGroupEndMock.mock.restore()
+        consoleLogSpy.restore()
+        consoleGroupSpy.restore()
+        consoleGroupEndSpy.restore()
       })
     })
 
     describe("useDetectChanges", () => {
       test("should call the callback when the value changes", () => {
-        const callback = mock.fn()
+        const callback = spy()
         const { rerender } = renderHook(
           ({ value }) => {
             useDetectChanges(value, callback)
@@ -402,19 +359,15 @@ if (cfgTest && cfgTest.url === import.meta.url) {
         })
 
         assert.deepEqual(
-          callback.mock.calls.map(call => ({
-            args: call.arguments,
-          })),
+          callback.getCalls().map(call => call.args),
           [
-            {
-              args: [1, 2],
-            },
+            [1, 2],
           ],
         )
       })
 
       test("should call the callback with the custom equality function", () => {
-        const callback = mock.fn()
+        const callback = spy()
         const { rerender } = renderHook(
           props => {
             useDetectChanges<{ prop: number }>(props, callback, {
@@ -432,20 +385,16 @@ if (cfgTest && cfgTest.url === import.meta.url) {
           prop: 1,
         })
 
-        assert.deepEqual(callback.mock.calls, [])
+        assert.deepEqual(callback.getCalls(), [])
 
         rerender({
           prop: 2,
         })
 
         assert.deepEqual(
-          callback.mock.calls.map(call => ({
-            args: call.arguments,
-          })),
+          callback.getCalls().map(call => call.args),
           [
-            {
-              args: [{ prop: 1 }, { prop: 2 }],
-            },
+            [{ prop: 1 }, { prop: 2 }],
           ],
         )
       })
