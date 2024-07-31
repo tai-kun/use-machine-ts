@@ -42,9 +42,7 @@ function create(options) {
 
     // Input
 
-    // @ts-expect-error
     entryPoints: fs.globSync(`src/**/*.${jsx ? "tsx" : "ts"}`, {
-      // @ts-expect-error
       exclude: file => file.endsWith(".d.ts"),
     }),
 
