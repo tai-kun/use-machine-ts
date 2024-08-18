@@ -1,3 +1,7 @@
+## <small>v0.2.3 (2024-08-18)</small>
+
+Drop peerDependencies.
+
 ## <small>v0.2.2 (2024-05-31)</small>
 
 Improved documentation.
