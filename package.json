@@ -40,9 +40,6 @@
       "require": "./dist/useSyncedMachine.cjs"
     }
   },
-  "peerDependencies": {
-    "react": "^18.0.0"
-  },
   "devDependencies": {
     "@size-limit/preset-small-lib": "^11.1.4",
     "@testing-library/react": "^16.0.0",
