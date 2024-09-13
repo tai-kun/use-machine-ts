@@ -238,7 +238,7 @@ if (cfgTest && cfgTest.url === import.meta.url) {
       ])
     })
 
-    test("should call the subscribe callback when the state changes", () => {
+    test("it should call the subscribe callback when the state changes", () => {
       const machine = createSharedMachine({
         initial: "a",
         states: {

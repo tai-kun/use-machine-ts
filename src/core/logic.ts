@@ -492,7 +492,7 @@ if (cfgTest && cfgTest.url === import.meta.url) {
 
   describe("src/core/logic", () => {
     describe("createInitialState", () => {
-      test("should return the initial state", () => {
+      test("it should return the initial state", () => {
         const def = {
           initial: "idle",
           context: {},
@@ -523,7 +523,7 @@ if (cfgTest && cfgTest.url === import.meta.url) {
 
     describe("applyDispatch", () => {
       describe("SEND", () => {
-        test("should return the next state", () => {
+        test("it should return the next state", () => {
           const def = {
             initial: "idle",
             context: {},
@@ -562,7 +562,7 @@ if (cfgTest && cfgTest.url === import.meta.url) {
           })
         })
 
-        test("should return the same state", () => {
+        test("it should return the same state", () => {
           const def = {
             initial: "idle",
             context: {},
@@ -596,7 +596,7 @@ if (cfgTest && cfgTest.url === import.meta.url) {
           assert.deepEqual(newState, state)
         })
 
-        test("should log the event type not found", () => {
+        test("it should log the event type not found", () => {
           const logSpy = spy()
           const def = {
             initial: "idle",
@@ -636,7 +636,7 @@ if (cfgTest && cfgTest.url === import.meta.url) {
           )
         })
 
-        test("should log the transition denied by guard", () => {
+        test("it should log the transition denied by guard", () => {
           const logSpy = spy()
           const def = {
             initial: "idle",
@@ -698,7 +698,7 @@ if (cfgTest && cfgTest.url === import.meta.url) {
       })
 
       describe("SET_CONTEXT", () => {
-        test("should update the context", () => {
+        test("it should update the context", () => {
           const logSpy = spy()
           const def = {
             initial: "idle",
@@ -751,7 +751,7 @@ if (cfgTest && cfgTest.url === import.meta.url) {
     })
 
     describe("applyEffect", () => {
-      test("should apply the effect", () => {
+      test("it should apply the effect", () => {
         const cleanupSpy = spy<Config.EffectCleanup.Signature>(() => {})
         const dispatchSpy = spy()
         const def = {
@@ -805,7 +805,7 @@ if (cfgTest && cfgTest.url === import.meta.url) {
         assert.deepEqual(params.context, {})
       })
 
-      test("should error if dispatch is called asynchronously in sync mode", async () => {
+      test("it should error if dispatch is called asynchronously in sync mode", async () => {
         const { promise, resolve } = Promise.withResolvers<void>()
         const errorSpy = spy()
         const dispatchSpy = spy()
@@ -872,7 +872,7 @@ if (cfgTest && cfgTest.url === import.meta.url) {
     })
 
     describe("useIsMounted", () => {
-      test("should return a reference to a boolean that is true if the component is mounted, otherwise false", () => {
+      test("it should return a reference to a boolean that is true if the component is mounted, otherwise false", () => {
         const capture = {
           effect: {
             entry: undefined as boolean | undefined,
@@ -910,7 +910,7 @@ if (cfgTest && cfgTest.url === import.meta.url) {
     })
 
     describe("useInstance", () => {
-      test("should return the state machine definition and configuration", () => {
+      test("it should return the state machine definition and configuration", () => {
         const def: any = {}
         const conf = { verbose: true }
         const { result } = renderHook(() => useInstance([def, conf], []))
@@ -920,7 +920,7 @@ if (cfgTest && cfgTest.url === import.meta.url) {
     })
 
     describe("useSyncState", () => {
-      test("should apply the effect", () => {
+      test("it should apply the effect", () => {
         const cleanup = spy<Config.EffectCleanup.Signature>(() => {})
         const effect = spy<Config.Effect.Signature>(() => cleanup)
         const def: Definition.Signature = {

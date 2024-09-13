@@ -109,7 +109,7 @@ if (cfgTest && cfgTest.url === import.meta.url) {
       // https://github.com/cassiozen/useStateMachine/blob/main/test/index.test.ts
 
       describe("States & Transitions", () => {
-        test("should set initial state", () => {
+        test("it should set initial state", () => {
           const { result } = renderHook(() =>
             useHook({
               initial: "inactive",
@@ -133,7 +133,7 @@ if (cfgTest && cfgTest.url === import.meta.url) {
           })
         })
 
-        test("should transition", () => {
+        test("it should transition", () => {
           const { result } = renderHook(() =>
             useHook({
               initial: "inactive",
@@ -165,7 +165,7 @@ if (cfgTest && cfgTest.url === import.meta.url) {
           })
         })
 
-        test("should transition using a top-level `on`", () => {
+        test("it should transition using a top-level `on`", () => {
           const { result } = renderHook(() =>
             useHook({
               initial: "inactive",
@@ -200,7 +200,7 @@ if (cfgTest && cfgTest.url === import.meta.url) {
           })
         })
 
-        test("should transition using an object event", () => {
+        test("it should transition using an object event", () => {
           const { result } = renderHook(() =>
             useHook({
               initial: "inactive",
@@ -232,7 +232,7 @@ if (cfgTest && cfgTest.url === import.meta.url) {
           })
         })
 
-        test("should ignore unexisting events", () => {
+        test("it should ignore unexisting events", () => {
           const { result } = renderHook(() =>
             useHook({
               initial: "inactive",
@@ -264,7 +264,7 @@ if (cfgTest && cfgTest.url === import.meta.url) {
           })
         })
 
-        test("should transition with object syntax", () => {
+        test("it should transition with object syntax", () => {
           const { result } = renderHook(() =>
             useHook({
               initial: "inactive",
@@ -304,7 +304,7 @@ if (cfgTest && cfgTest.url === import.meta.url) {
           })
         })
 
-        test("should invoke effect callbacks", () => {
+        test("it should invoke effect callbacks", () => {
           const invocationCallOrder = createInvocationCallOrder()
           const entry = spy(invocationCallOrder.register("entry"))
           const exit = spy(invocationCallOrder.register("exit"))
@@ -360,7 +360,7 @@ if (cfgTest && cfgTest.url === import.meta.url) {
           assert.equal(exit.getCall(0)?.args[0], "inactive")
         })
 
-        test("should transition from effect", () => {
+        test("it should transition from effect", () => {
           const { result } = renderHook(() =>
             useHook(
               {
@@ -396,7 +396,7 @@ if (cfgTest && cfgTest.url === import.meta.url) {
           })
         })
 
-        test("should get payload sent with event object", () => {
+        test("it should get payload sent with event object", () => {
           const effect = spy()
           const { result } = renderHook(() =>
             useHook(
@@ -440,7 +440,7 @@ if (cfgTest && cfgTest.url === import.meta.url) {
           })
         })
 
-        test("should invoke effect with context as a parameter", () => {
+        test("it should invoke effect with context as a parameter", () => {
           const finalEffect = spy()
           const initialEffect = spy(({ setContext }) => {
             setContext((context: boolean) => !context)
@@ -483,7 +483,7 @@ if (cfgTest && cfgTest.url === import.meta.url) {
       })
 
       describe("guarded transitions", () => {
-        test("should block transitions with guard returning false", () => {
+        test("it should block transitions with guard returning false", () => {
           const guard = spy(() => false)
           const { result } = renderHook(() =>
             useHook(
@@ -527,7 +527,7 @@ if (cfgTest && cfgTest.url === import.meta.url) {
           })
         })
 
-        test("should allow transitions with guard returning true", () => {
+        test("it should allow transitions with guard returning true", () => {
           const guard = spy(() => true)
           const { result } = renderHook(() =>
             useHook(
@@ -575,7 +575,7 @@ if (cfgTest && cfgTest.url === import.meta.url) {
       })
 
       describe("Extended State", () => {
-        test("should set initial context", () => {
+        test("it should set initial context", () => {
           const { result } = renderHook(() =>
             useHook({
               context: { foo: "bar" },
@@ -600,7 +600,7 @@ if (cfgTest && cfgTest.url === import.meta.url) {
           })
         })
 
-        test("should get the context inside effects", () => {
+        test("it should get the context inside effects", () => {
           const effect = spy()
           const { result } = renderHook(() =>
             useHook(
@@ -643,7 +643,7 @@ if (cfgTest && cfgTest.url === import.meta.url) {
           })
         })
 
-        test("should update context on entry", () => {
+        test("it should update context on entry", () => {
           const { result } = renderHook(() =>
             useHook(
               {
@@ -687,7 +687,7 @@ if (cfgTest && cfgTest.url === import.meta.url) {
           })
         })
 
-        test("should update context on exit", () => {
+        test("it should update context on exit", () => {
           const { result } = renderHook(() =>
             useHook(
               {
@@ -766,7 +766,7 @@ if (cfgTest && cfgTest.url === import.meta.url) {
           }
         }
 
-        test("should log when invalid event is provided as string", () => {
+        test("it should log when invalid event is provided as string", () => {
           const console_ = createConsole()
           renderHook(() =>
             useHook(
@@ -803,7 +803,7 @@ if (cfgTest && cfgTest.url === import.meta.url) {
           })
         })
 
-        test("should log when invalid event is provided as object", () => {
+        test("it should log when invalid event is provided as object", () => {
           const console_ = createConsole()
           renderHook(() =>
             useHook(
@@ -842,7 +842,7 @@ if (cfgTest && cfgTest.url === import.meta.url) {
       })
 
       describe("React performance", () => {
-        test("should provide a stable `send`", () => {
+        test("it should provide a stable `send`", () => {
           const { result, rerender } = renderHook(() =>
             useHook({
               initial: "inactive",
@@ -925,7 +925,7 @@ if (cfgTest && cfgTest.url === import.meta.url) {
       assert(onToggle2.callCount === 0)
     })
 
-    test("should transfer props to state machine", () => {
+    test("it should transfer props to state machine", () => {
       const machine = (props: () => { onToggle: any }) => {
         return createMachine(
           {
@@ -979,7 +979,7 @@ if (cfgTest && cfgTest.url === import.meta.url) {
       assert(onToggle2.callCount > 0)
     })
 
-    test("should logs when `send` function is called asynchronously", () => {
+    test("it should logs when `send` function is called asynchronously", () => {
       const groupSpy = spy()
       const errorSpy = spy()
       let sendFn: () => void
@@ -1052,7 +1052,7 @@ if (cfgTest && cfgTest.url === import.meta.url) {
   })
 
   describe("useSharedMachine", () => {
-    test("should share state machine state between hooks", () => {
+    test("it should share state machine state between hooks", () => {
       const machine = createSharedMachine({
         initial: "inactive",
         states: {
@@ -1115,7 +1115,7 @@ if (cfgTest && cfgTest.url === import.meta.url) {
   })
 
   describe("useSyncedMachine", () => {
-    test("should not be re-rendered even after state transition", () => {
+    test("it should not be re-rendered even after state transition", () => {
       let renderCount = 0
       const { result } = renderHook(() => {
         const machine = useSyncedMachine({
@@ -1161,7 +1161,7 @@ if (cfgTest && cfgTest.url === import.meta.url) {
       assert.equal(state1, state2)
     })
 
-    test("should update the state synchronously", () => {
+    test("it should update the state synchronously", () => {
       const stdout = new tty.WriteStream(1)
       const console = new Console(stdout)
       const write = spy(stdout, "write")

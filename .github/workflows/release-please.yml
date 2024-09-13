@@ -1,0 +1,54 @@
+name: Release Please
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  release-please:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+    steps:
+      - uses: googleapis/release-please-action@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          config-file: .config/rp.json
+          manifest-file: .config/rp-manifest.json
+          target-branch: ${{ github.ref_name }}
+        id: rp
+
+      - uses: actions/checkout@v4
+        if: ${{ steps.rp.outputs.release_created }}
+
+      - name: Node.js v22.x
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22.x"
+          registry-url: "https://registry.npmjs.org"
+        if: ${{ steps.rp.outputs.release_created }}
+
+      - name: Install dependencies
+        run: npm ci
+        if: ${{ steps.rp.outputs.release_created }}
+
+      - name: Build
+        run: npm run build
+        if: ${{ steps.rp.outputs.release_created }}
+
+      - name: Publish
+        run: |
+          ver="$(jq -r .version <package.json)"
+          suf="${ver#*-}"
+
+          if [[ "$suf" == "$ver" ]]; then
+            npm publish --access=public
+          else
+            tag="${suf%%.*}"
+            npm publish --access=public --tag="$tag"
+          fi
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+        if: ${{ steps.rp.outputs.release_created }}

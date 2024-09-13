@@ -146,7 +146,7 @@ if (cfgTest && cfgTest.url === import.meta.url) {
 
   describe("src/core/devutils", () => {
     describe("log", () => {
-      test("should log messages", () => {
+      test("it should log messages", () => {
         const logSpy = spy()
         const options: LogOptions = {
           verbose: true,
@@ -170,7 +170,7 @@ if (cfgTest && cfgTest.url === import.meta.url) {
         )
       })
 
-      test("should log messages with group label", () => {
+      test("it should log messages with group label", () => {
         const logSpy = spy()
         const options: LogOptions = {
           verbose: true,
@@ -197,7 +197,7 @@ if (cfgTest && cfgTest.url === import.meta.url) {
         )
       })
 
-      test("should not log messages if verbose is false", () => {
+      test("it should not log messages if verbose is false", () => {
         const logSpy = spy()
         const options: LogOptions = {
           verbose: false,
@@ -215,7 +215,7 @@ if (cfgTest && cfgTest.url === import.meta.url) {
         assert.deepEqual(logSpy.getCalls(), [])
       })
 
-      test("should not log messages if level is debug and verbose is 1", () => {
+      test("it should not log messages if level is debug and verbose is 1", () => {
         const logSpy = spy()
         const options: LogOptions = {
           verbose: 1,
@@ -233,7 +233,7 @@ if (cfgTest && cfgTest.url === import.meta.url) {
         assert.deepEqual(logSpy.getCalls(), [])
       })
 
-      test("should log messages if level is error", () => {
+      test("it should log messages if level is error", () => {
         const logSpy = spy()
         const options: LogOptions = {
           verbose: 1,
@@ -258,7 +258,7 @@ if (cfgTest && cfgTest.url === import.meta.url) {
         )
       })
 
-      test("should fallback to log if error is not available", () => {
+      test("it should fallback to log if error is not available", () => {
         const logSpy = spy()
         const options: LogOptions = {
           verbose: 1,
@@ -282,7 +282,7 @@ if (cfgTest && cfgTest.url === import.meta.url) {
         )
       })
 
-      test("should not group messages if groupEnd is not available", () => {
+      test("it should not group messages if groupEnd is not available", () => {
         const logSpy = spy()
         const options: LogOptions = {
           verbose: true,
@@ -307,7 +307,7 @@ if (cfgTest && cfgTest.url === import.meta.url) {
         )
       })
 
-      test("should use global.console if console is not defined", () => {
+      test("it should use global.console if console is not defined", () => {
         const options: LogOptions = {
           verbose: 2,
         }
@@ -341,7 +341,7 @@ if (cfgTest && cfgTest.url === import.meta.url) {
     })
 
     describe("useDetectChanges", () => {
-      test("should call the callback when the value changes", () => {
+      test("it should call the callback when the value changes", () => {
         const callback = spy()
         const { rerender } = renderHook(
           ({ value }) => {
@@ -366,7 +366,7 @@ if (cfgTest && cfgTest.url === import.meta.url) {
         )
       })
 
-      test("should call the callback with the custom equality function", () => {
+      test("it should call the callback with the custom equality function", () => {
         const callback = spy()
         const { rerender } = renderHook(
           props => {
@@ -401,12 +401,12 @@ if (cfgTest && cfgTest.url === import.meta.url) {
     })
 
     describe("isPlainObject", () => {
-      test("should return true if the value is a plain object", () => {
+      test("it should return true if the value is a plain object", () => {
         assert(isPlainObject({}))
         assert(isPlainObject(Object.create(null)))
       })
 
-      test("should return false if the value is not a plain object", () => {
+      test("it should return false if the value is not a plain object", () => {
         assert(!isPlainObject([]))
         assert(!isPlainObject(() => {}))
         assert(!isPlainObject(null))
@@ -418,7 +418,7 @@ if (cfgTest && cfgTest.url === import.meta.url) {
     })
 
     describe("assertNever", () => {
-      test("should throw an error", () => {
+      test("it should throw an error", () => {
         assert.throws(
           () => {
             assertNever("value" as never)

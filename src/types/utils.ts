@@ -31,7 +31,7 @@ export type Get<T, P extends ReadonlyArray<any>, F = undefined> = _Get<T, P, F>
  * 
  * @template T - The type of value to check.
  */
-export type IsLiteralString<T> =
+export type IsStringLiteral<T> =
   T extends string
     ? string extends T ? false
     : true
@@ -42,7 +42,7 @@ export type IsLiteralString<T> =
  * 
  * @template T - The type of value to check.
  */
-export type IsLiteralBoolean<T> =
+export type IsBooleanLiteral<T> =
   [(T extends true ? 1 : 0) & (T extends false ? 1 : 0)] extends [never]
     ? true
     : false
@@ -131,7 +131,7 @@ if (cfgTest && cfgTest.url === import.meta.url) {
 
   describe("src/types/utils", () => {
     describe("Get", () => {
-      test("should get the value at the given path", () => {
+      test("it should get the value at the given path", () => {
         expectType<
           Get<
             { a: { b: { c: string } } },
@@ -148,7 +148,7 @@ if (cfgTest && cfgTest.url === import.meta.url) {
         })
       })
 
-      test("should return `undefined` if the path is not found", () => {
+      test("it should return `undefined` if the path is not found", () => {
         expectType<
           Get<
             { a: { b: { c: string } } },
@@ -157,7 +157,7 @@ if (cfgTest && cfgTest.url === import.meta.url) {
         >(undefined)
       })
 
-      test("should return the fallback value if the path is not found", () => {
+      test("it should return the fallback value if the path is not found", () => {
         expectType<
           Get<
             { a: { b: { c: string } } },
@@ -168,36 +168,36 @@ if (cfgTest && cfgTest.url === import.meta.url) {
       })
     })
 
-    describe("IsLiteralString", () => {
-      test("should return `true` if the given type is a literal string", () => {
+    describe("IsStringLiteral", () => {
+      test("it should return `true` if the given type is a literal string", () => {
         expectType<
-          IsLiteralString<"a">
+          IsStringLiteral<"a">
         >(true as const)
       })
 
-      test("should return `false` if the given type is not a literal string", () => {
+      test("it should return `false` if the given type is not a literal string", () => {
         expectType<
-          IsLiteralString<string>
+          IsStringLiteral<string>
         >(false as const)
       })
     })
 
-    describe("IsLiteralBoolean", () => {
-      test("should return `true` if the given type is a literal boolean", () => {
+    describe("IsBooleanLiteral", () => {
+      test("it should return `true` if the given type is a literal boolean", () => {
         expectType<
-          IsLiteralBoolean<true>
+          IsBooleanLiteral<true>
         >(true as const)
       })
 
-      test("should return `false` if the given type is not a literal boolean", () => {
+      test("it should return `false` if the given type is not a literal boolean", () => {
         expectType<
-          IsLiteralBoolean<boolean>
+          IsBooleanLiteral<boolean>
         >(false as const)
       })
     })
 
     describe("IsPlainObject", () => {
-      test("should return `true` if the given type is a plain object", () => {
+      test("it should return `true` if the given type is a plain object", () => {
         expectType<
           IsPlainObject<{}>
         >(true as const)
@@ -208,7 +208,7 @@ if (cfgTest && cfgTest.url === import.meta.url) {
         >(true as const)
       })
 
-      test("should return `false` if the given type is not a plain object", () => {
+      test("it should return `false` if the given type is not a plain object", () => {
         expectType<
           IsPlainObject<string>
         >(false as const)
@@ -222,13 +222,13 @@ if (cfgTest && cfgTest.url === import.meta.url) {
     })
 
     describe("Extends", () => {
-      test("should return `true` if the given type extends the other type", () => {
+      test("it should return `true` if the given type extends the other type", () => {
         expectType<
           Extends<"a", string>
         >(true as const)
       })
 
-      test("should return `false` if the given type does not extend the other type", () => {
+      test("it should return `false` if the given type does not extend the other type", () => {
         expectType<
           Extends<"a", number>
         >(false as const)
@@ -236,7 +236,7 @@ if (cfgTest && cfgTest.url === import.meta.url) {
     })
 
     describe("ValueOf", () => {
-      test("should infer the value of the given object type", () => {
+      test("it should infer the value of the given object type", () => {
         expectType<
           ValueOf<{
             a: string
@@ -247,7 +247,7 @@ if (cfgTest && cfgTest.url === import.meta.url) {
     })
 
     describe("RequiredKeysOf", () => {
-      test("should extract all required keys from the given type", () => {
+      test("it should extract all required keys from the given type", () => {
         expectType<
           RequiredKeysOf<{
             a: string

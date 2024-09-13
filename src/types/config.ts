@@ -10,7 +10,7 @@ import type {
   AnyRoRec,
   Extends,
   Get,
-  IsLiteralString,
+  IsStringLiteral,
   Tagged,
   ValueOf,
 } from "./utils"
@@ -64,7 +64,7 @@ type TransitionEvent<
   | ValueOf<{
       [T in keyof _S]:
         // If the event type is not a literal string, return `never`.
-          IsLiteralString<T> extends false
+          IsStringLiteral<T> extends false
         ? never
         // If the event type is reserved, return `never`.
         : T extends ReservedKeyword
@@ -349,7 +349,7 @@ export type Sendable<
   _T = Get<_E, ["type"]>
 > =
   // If the event does not have a `type` property, return an error.
-    IsLiteralString<_T> extends false
+    IsStringLiteral<_T> extends false
   ? "Error: No event found with `type` property of literal string value."
   // If the event type is reserved, return an error.
   : _T extends ReservedKeyword
@@ -844,7 +844,7 @@ export type Exact<
   readonly guards?: {
     readonly [N in G]: 
       // If the guard name is not a literal string, return an error.
-        IsLiteralString<N> extends false
+        IsStringLiteral<N> extends false
       ? "Error: Guard name must be a literal string."
       // If the guard name is reserved, return an error.
       : N extends ReservedKeyword
@@ -858,7 +858,7 @@ export type Exact<
   readonly effects?: {
     readonly [N in E]: 
       // If the effect name is not a literal string, return an error.
-        IsLiteralString<N> extends false
+        IsStringLiteral<N> extends false
       ? "Error: Effect name must be a literal string."
       // If the effect name is reserved, return an error.
       : N extends ReservedKeyword
