@@ -1,12 +1,9 @@
 **React 用の小さな _ステートマシン_ フック**
 
 [![CI](https://github.com/tai-kun/use-machine-ts/actions/workflows/ci.yaml/badge.svg)](https://github.com/tai-kun/use-machine-ts/actions/workflows/ci.yaml)
-[![Release on NPM](https://github.com/tai-kun/use-machine-ts/actions/workflows/release.yaml/badge.svg)](https://github.com/tai-kun/use-machine-ts/actions/workflows/release.yaml)
-[![Canary Release on NPM](https://github.com/tai-kun/use-machine-ts/actions/workflows/canary-release.yaml/badge.svg)](https://github.com/tai-kun/use-machine-ts/actions/workflows/canary-release.yaml)
 
 [![npm bundle size](https://img.shields.io/bundlephobia/minzip/use-machine-ts/latest)](https://bundlephobia.com/package/use-machine-ts)
 [![npm version](https://img.shields.io/npm/v/use-machine-ts)](https://www.npmjs.com/package/use-machine-ts)
-[![npm canary version](https://img.shields.io/npm/v/use-machine-ts/canary)](https://www.npmjs.com/package/use-machine-ts?activeTab=versions)
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-red.svg)](https://opensource.org/licenses/MIT)
 
@@ -96,12 +93,6 @@ use-machine-ts は [@cassiozen/usestatemachine](https://github.com/cassiozen/use
 npm install use-machine-ts
 ```
 
-Canary バージョンをインストールするには:
-
-```sh
-npm install use-machine-ts@canary
-```
-
 ## Sample Usage
 
 ```typescript
@@ -152,13 +143,6 @@ console.log(state)
 // { value: "active", context: undefined,
 //   event: { type: "TOGGLE" }, nextEvents: ["TOGGLE"] }
 ```
-
-## TODO
-
-- [x] 基本的な機能を実装する。
-- [ ] 一部の不完全なテストを修正する。
-- [ ] `preact/compat` でもテストする。
-- [ ] React v19 との互換性を確認する。
 
 ## Contents
 
