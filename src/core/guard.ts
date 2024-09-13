@@ -318,7 +318,7 @@ if (cfgTest && cfgTest.url === import.meta.url) {
 
   describe("src/core/guard", () => {
     describe("eq", () => {
-      test("should return true if the guard passes", () => {
+      test("it should return true if the guard passes", () => {
         assert.deepEqual(
           doGuardForTest({
             guards: { isOk: () => true },
@@ -338,7 +338,7 @@ if (cfgTest && cfgTest.url === import.meta.url) {
         )
       })
 
-      test("should return false if the guard fails", () => {
+      test("it should return false if the guard fails", () => {
         assert.deepEqual(
           doGuardForTest({
             guards: { isOk: () => false },
@@ -368,7 +368,7 @@ if (cfgTest && cfgTest.url === import.meta.url) {
         )
       })
 
-      test("should return true if all guards pass", () => {
+      test("it should return true if all guards pass", () => {
         assert.deepEqual(
           doGuardForTest({
             guards: { isOk: () => true },
@@ -399,7 +399,7 @@ if (cfgTest && cfgTest.url === import.meta.url) {
         )
       })
 
-      test("should return false if one of the guards fails", () => {
+      test("it should return false if one of the guards fails", () => {
         assert.deepEqual(
           doGuardForTest({
             guards: { isOk: () => false },
@@ -484,7 +484,7 @@ if (cfgTest && cfgTest.url === import.meta.url) {
         )
       })
 
-      test("should return true if there are no guards", () => {
+      test("it should return true if there are no guards", () => {
         assert.deepEqual(
           doGuardForTest({
             guards: {},
@@ -506,7 +506,7 @@ if (cfgTest && cfgTest.url === import.meta.url) {
     })
 
     describe("or", () => {
-      test("should return true if one of the guards passes", () => {
+      test("it should return true if one of the guards passes", () => {
         assert.deepEqual(
           doGuardForTest({
             guards: { isOk: () => true },
@@ -537,7 +537,7 @@ if (cfgTest && cfgTest.url === import.meta.url) {
         )
       })
 
-      test("should return false if all guards fail", () => {
+      test("it should return false if all guards fail", () => {
         assert.deepEqual(
           doGuardForTest({
             guards: { isOk: () => false },
@@ -612,7 +612,7 @@ if (cfgTest && cfgTest.url === import.meta.url) {
         )
       })
 
-      test("should return false if there are no guards", () => {
+      test("it should return false if there are no guards", () => {
         assert.deepEqual(
           doGuardForTest({
             guards: {},
@@ -635,7 +635,7 @@ if (cfgTest && cfgTest.url === import.meta.url) {
     })
 
     describe("not", () => {
-      test("should return true if the guard fails", () => {
+      test("it should return true if the guard fails", () => {
         assert.deepEqual(
           doGuardForTest({
             guards: { isOk: () => false },
@@ -659,7 +659,7 @@ if (cfgTest && cfgTest.url === import.meta.url) {
         )
       })
 
-      test("should return false if the guard passes", () => {
+      test("it should return false if the guard passes", () => {
         assert.deepEqual(
           doGuardForTest({
             guards: { isOk: () => true },

@@ -4,8 +4,8 @@ import type {
   Extends,
   Get,
   InferNarrowestValue,
-  IsLiteralBoolean,
-  IsLiteralString,
+  IsBooleanLiteral,
+  IsStringLiteral,
   IsPlainObject,
   RequiredKeysOf,
   Tagged,
@@ -91,7 +91,7 @@ export type Transition<
     [_T] extends [never]
   ? "Error: State values are not defined."
   // If the state value is not a literal string, return an error.
-  : IsLiteralString<_T> extends false
+  : IsStringLiteral<_T> extends false
   ? "Error: State values must be literal strings."
   // If the state value is reserved, return an error.
   : Extends<_T, ReservedKeyword> extends true
@@ -115,7 +115,7 @@ export type Transition<
               [G] extends [never]
             ? "Error: Guards are not defined."
             // If the guard is not a literal string, return an error.
-            : IsLiteralString<G> extends false
+            : IsStringLiteral<G> extends false
             ? "Error: Guards must be literal strings."
             //  If the guard is reserved, return an error.
             : Extends<G, ReservedKeyword> extends true
@@ -169,7 +169,7 @@ export type On<
     [keyof Get<D, P>] extends [never]
   ? { [NEVER]?: never }
   // If the event is not a literal string, return an error.
-  : IsLiteralString<keyof Get<D, P>> extends false
+  : IsStringLiteral<keyof Get<D, P>> extends false
   ? "Error: Event types must be literal strings."
   // Else, return the transitions.
   : {
@@ -227,7 +227,7 @@ export type State<
       [E] extends [never]
     ? "Error: Effects are not defined."
     // If the effect is not a literal string, return an error.
-    : IsLiteralString<E> extends false
+    : IsStringLiteral<E> extends false
     ? "Error: Effects must be literal strings."
     // Else, return the effect.
     : Effect<E>
@@ -300,7 +300,7 @@ export type Schema<
    */
   readonly strict?:
     // If the `strict` property is not a literal boolean, return an error.
-      IsLiteralBoolean<_T> extends false
+      IsBooleanLiteral<_T> extends false
     ? "Error: `strict` must be a `true` or `false`."
     // Else, return the `strict` property.
     : _T
@@ -312,7 +312,7 @@ export type Schema<
       [keyof _E] extends [never]
     ? { [NEVER]?: never }
     // If the event type is not a literal string, return an error.
-    : IsLiteralString<keyof _E> extends false
+    : IsStringLiteral<keyof _E> extends false
     ? "Error: Event types must be literal strings."
     // Else, return the event type.
     : {
@@ -360,7 +360,7 @@ export type Shape<
     : [keyof _S] extends [never]
     ? "Error: No states defined."
     // If the state value is not a literal string, return an error.
-    : IsLiteralString<keyof _S> extends false
+    : IsStringLiteral<keyof _S> extends false
     ? "Error: States have no literal string value."
     // Else, return the initial state value.
     : keyof _S
@@ -375,7 +375,7 @@ export type Shape<
     : [keyof _S] extends [never]
     ? { [NEVER]?: never }
     // If the state value is not a literal string, return an error.
-    : IsLiteralString<keyof _S> extends false
+    : IsStringLiteral<keyof _S> extends false
     ? "Error: State values must be literal strings."
     // Else, return the state definition.
     : {
@@ -446,21 +446,21 @@ if (cfgTest && cfgTest.url === import.meta.url) {
 
   describe("src/types/definition", () => {
     describe("Transition", () => {
-      test("should be inferred as an error when no states are defined", () => {
+      test("it should be inferred as an error when no states are defined", () => {
         type Expected = "Error: State values are not defined."
         type Actual = Transition<{}, never>
 
         expectType<Expected>({} as Actual)
       })
 
-      test("should be inferred as an error when the state values are not literal strings", () => {
+      test("it should be inferred as an error when the state values are not literal strings", () => {
         type Expected = "Error: State values must be literal strings."
         type Actual = Transition<{ states: { [key: string]: {} } }, never>
 
         expectType<Expected>({} as Actual)
       })
 
-      test("should be inferred as an error when the state value is reserved", () => {
+      test("it should be inferred as an error when the state value is reserved", () => {
         type Def = {
           states: {
             $init: {}
@@ -526,7 +526,7 @@ if (cfgTest && cfgTest.url === import.meta.url) {
         expectType<Expected>({} as Actual)
       })
 
-      test("should be inferred as an Transition object", () => {
+      test("it should be inferred as an Transition object", () => {
         type Expected = "active" | {
           readonly target: "active"
           readonly guard?: Guard<"guard">
@@ -538,21 +538,21 @@ if (cfgTest && cfgTest.url === import.meta.url) {
     })
 
     describe("On", () => {
-      test("should be inferred as an empty object the event types are not defined", () => {
+      test("it should be inferred as an empty object the event types are not defined", () => {
         type Expected = { [NEVER]?: never }
         type Actual = On<{}, ["on"], never>
 
         expectType<Expected>({} as Actual)
       })
 
-      test("should be inferred as an error when the event types are not literal strings", () => {
+      test("it should be inferred as an error when the event types are not literal strings", () => {
         type Expected = "Error: Event types must be literal strings."
         type Actual = On<{ on: { 1: {} } }, ["on"], never>
 
         expectType<Expected>({} as Actual)
       })
 
-      test("should be inferred as an error when the event types are reserved", () => {
+      test("it should be inferred as an error when the event types are reserved", () => {
         type Def = {
           on: {
             $init: {}
@@ -616,7 +616,7 @@ if (cfgTest && cfgTest.url === import.meta.url) {
     })
 
     describe("Context", () => {
-      test("should be inferred as an error when `context` is not defined in `$schema` in strict-mode", () => {
+      test("it should be inferred as an error when `context` is not defined in `$schema` in strict-mode", () => {
         type Def = {
           $schema: {
             strict: true
@@ -628,7 +628,7 @@ if (cfgTest && cfgTest.url === import.meta.url) {
         expectType<Expected>({} as Actual)
       })
 
-      test("should prefer the context schema over the context", () => {
+      test("it should prefer the context schema over the context", () => {
         type Def = {
           $schema: {
             context: { a: 1 }
@@ -682,7 +682,7 @@ if (cfgTest && cfgTest.url === import.meta.url) {
         expectType<Expected>({} as Actual)
       })
 
-      test("should require `context` when it is defined in `$schema`", () => {
+      test("it should require `context` when it is defined in `$schema`", () => {
         type DefHasNoCtx1 = {}
         type DefHasNoCtx2 = {
           $schema: {}
