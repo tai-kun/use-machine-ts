@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-KIND='(chore|docs|feat|fix|perf|refactor|release|revert|style|test)'
+KIND='change|chore|docs|feat|fix|perf|refactor|style'
 EXCLUDES=(
     'cache' '.cache'
     'temp' '.temp' 'tmp' '.tmp'
@@ -8,14 +8,18 @@ EXCLUDES=(
     '.Trash'
     'target' 'debug'
     'node_modules'
+    'build'
     'dist'
     'src'
+    'tests'
+    'packages'
 )
 
 function listup() {
     local dir="$1"
     local pfx=''
-    local max=4
+    local max=3
+    local fil=false
     local EXD
     local OPT
     local OPTARG
@@ -24,15 +28,22 @@ function listup() {
 
     shift
 
-    while getopts p:m: OPT; do
+    while getopts p:m:f OPT; do
         case "$OPT" in
         p) pfx="$OPTARG" ;;
         m) max="$OPTARG" ;;
+        f) fil=true ;;
         *) exit 1 ;;
         esac
     done
 
-    find_opts="-mindepth 1 -maxdepth $max -type d"
+    find_opts="-mindepth 1 -maxdepth $max"
+
+    if [ $fil ]; then
+        : # file
+    else
+        find_opts+=" -type d"
+    fi
 
     for EXD in "${EXCLUDES[@]}"; do
         find_opts+=" ! \\( -name '$EXD' -o -path '*/$EXD/*' \\)"
@@ -50,6 +61,8 @@ function match() {
 }
 
 function check() {
+    local kind="$1"
+    local allow_breaking="${2:-true}"
     local scope=''
     local i
 
@@ -64,14 +77,22 @@ function check() {
     done
 
     if [ "$scope" != '' ]; then
-        match "^$KIND\((${scope//$/\\$})\): ."
+        # https://github.com/googleapis/release-please/blob/v16.12.2/src/commit.ts#L94
+        if [ "$allow_breaking" ]; then
+            match "^($kind)\((${scope//$/\\$})\)!?: ."
+        else
+            match "^($kind)\((${scope//$/\\$})\): ."
+        fi
     fi
 }
 
-match "^$KIND: ."
-match "^chore\((deps|deps-dev|ci)\): ."
-check "$(listup . -m 1)"
-check "$(listup src)"
+match "^($KIND)!?: ."
+check "$KIND" "$(listup . -m 1 -f)"
+check "$KIND|test" "$(listup src)"
+match '^test: .'
+match '^ci: .'
+match '^chore\(deps\): .'
+match '^chore\(deps-dev\): .'
 
 echo 'Invalid commit message format.'
 exit 1
