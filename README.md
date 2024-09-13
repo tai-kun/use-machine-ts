@@ -1,12 +1,9 @@
 **The tiny _state machine_ hook for React**
 
 [![CI](https://github.com/tai-kun/use-machine-ts/actions/workflows/ci.yaml/badge.svg)](https://github.com/tai-kun/use-machine-ts/actions/workflows/ci.yaml)
-[![Release on NPM](https://github.com/tai-kun/use-machine-ts/actions/workflows/release.yaml/badge.svg)](https://github.com/tai-kun/use-machine-ts/actions/workflows/release.yaml)
-[![Canary Release on NPM](https://github.com/tai-kun/use-machine-ts/actions/workflows/canary-release.yaml/badge.svg)](https://github.com/tai-kun/use-machine-ts/actions/workflows/canary-release.yaml)
 
 [![npm bundle size](https://img.shields.io/bundlephobia/minzip/use-machine-ts/latest)](https://bundlephobia.com/package/use-machine-ts)
 [![npm version](https://img.shields.io/npm/v/use-machine-ts)](https://www.npmjs.com/package/use-machine-ts)
-[![npm canary version](https://img.shields.io/npm/v/use-machine-ts/canary)](https://www.npmjs.com/package/use-machine-ts?activeTab=versions)
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-red.svg)](https://opensource.org/licenses/MIT)
 
@@ -95,12 +92,6 @@ To install the latest stable version:
 npm install use-machine-ts
 ```
 
-To install the canary version:
-
-```sh
-npm install use-machine-ts@canary
-```
-
 ## Sample Usage
 
 ```typescript
@@ -151,13 +142,6 @@ console.log(state)
 // { value: "active", context: undefined,
 //   event: { type: "TOGGLE" }, nextEvents: ["TOGGLE"] }
 ```
-
-## TODO
-
-- [x] Implement basic functionality.
-- [ ] Fix some incomplete tests.
-- [ ] Test with `preact/compat`.
-- [ ] Ensure compatibility with React v19.
 
 ## Contents
 
