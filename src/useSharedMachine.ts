@@ -76,6 +76,6 @@ function useSharedMachine<D>(
 }
 
 export { useSharedMachine }
-export { and, not, or } from "./core/guard"
+export { and, guards, not, or } from "./core/guard"
 export { createSharedMachine } from "./createSharedMachine"
 export type * from "./types"

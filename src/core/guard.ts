@@ -47,6 +47,12 @@ export function or<const G extends string>(
   }
 }
 
+export const guards = {
+  or,
+  and,
+  not,
+}
+
 /**
  * Checks if the guard passes.
  *

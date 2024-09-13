@@ -438,6 +438,6 @@ function useSyncedMachine(arg0: any, arg1?: any): [any, any] {
 }
 
 export { useSyncedMachine }
-export { and, not, or } from "./core/guard"
+export { and, guards, not, or } from "./core/guard"
 export { createMachine } from "./createMachine"
 export type * from "./types"
