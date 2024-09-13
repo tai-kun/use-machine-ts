@@ -93,6 +93,7 @@ match '^test: .'
 match '^ci: .'
 match '^chore\(deps\): .'
 match '^chore\(deps-dev\): .'
+match '^revert: .'
 
 echo 'Invalid commit message format.'
 exit 1
