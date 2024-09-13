@@ -1,1 +1,1 @@
-export * from "use-machine-ts/shared"
+export * from "use-machine-ts/shared";

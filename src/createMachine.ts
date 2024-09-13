@@ -1,4 +1,4 @@
-import type { Config, Definition, Machine } from "./types"
+import type { Config, Definition, Machine } from "./types";
 
 /**
  * Create a state machine.
@@ -13,7 +13,7 @@ import type { Config, Definition, Machine } from "./types"
  */
 function createMachine<D extends Definition.Shape<D, never, never>>(
   definition: Definition.Exact<D>,
-): Machine<D>
+): Machine<D>;
 
 /**
  * Create a state machine.
@@ -36,19 +36,19 @@ function createMachine<
 >(
   definition: Definition.Exact<D>,
   config: Config.Exact<D, G, E>,
-): Machine<D>
+): Machine<D>;
 
 function createMachine(...args: any) {
-  return args
+  return args;
 }
 
-export { createMachine }
-export { and, guards, not, or } from "./core/guard"
-export type * from "./types"
+export { createMachine };
+export { and, guards, not, or } from "./core/guard";
+export type * from "./types";
 
 if (cfgTest && cfgTest.url === import.meta.url) {
-  const { expectType } = await import("tsd")
-  const { assert, describe, test } = cfgTest
+  const { expectType } = await import("tsd");
+  const { assert, describe, test } = cfgTest;
 
   describe("src/createMachine", () => {
     test("strict: false", () => {
@@ -77,44 +77,44 @@ if (cfgTest && cfgTest.url === import.meta.url) {
         {
           guards: {
             isOk: params => {
-              expectType<"TOGGLE">(params.event.type)
+              expectType<"TOGGLE">(params.event.type);
 
-              return true
+              return true;
             },
           },
           effects: {
             onInactive: params => {
-              expectType<"TOGGLE" | "$init">(params.event.type)
+              expectType<"TOGGLE" | "$init">(params.event.type);
 
               return params => {
-                expectType<"TOGGLE">(params.event.type)
-              }
+                expectType<"TOGGLE">(params.event.type);
+              };
             },
             onActive: params => {
-              expectType<"TOGGLE" | "PING">(params.event.type)
+              expectType<"TOGGLE" | "PING">(params.event.type);
 
               return params => {
-                expectType<"TOGGLE" | "PING">(params.event.type)
-              }
+                expectType<"TOGGLE" | "PING">(params.event.type);
+              };
             },
           },
         },
-      )
+      );
 
-      assert.equal(machine.length, 2)
-    })
+      assert.equal(machine.length, 2);
+    });
 
     test("strict: true", () => {
       const machine = createMachine(
         {
           $schema: {} as {
-            strict: true
+            strict: true;
             events: {
-              TOGGLE: {}
+              TOGGLE: {};
               PING: {
-                timestamp: number
-              }
-            }
+                timestamp: number;
+              };
+            };
           },
           initial: "inactive",
           states: {
@@ -139,35 +139,35 @@ if (cfgTest && cfgTest.url === import.meta.url) {
         {
           guards: {
             isOk: params => {
-              expectType<"TOGGLE">(params.event.type)
+              expectType<"TOGGLE">(params.event.type);
 
-              return true
+              return true;
             },
           },
           effects: {
             onInactive: params => {
-              expectType<"TOGGLE" | "$init">(params.event.type)
+              expectType<"TOGGLE" | "$init">(params.event.type);
 
               return params => {
-                expectType<"TOGGLE">(params.event.type)
-              }
+                expectType<"TOGGLE">(params.event.type);
+              };
             },
             onActive: params => {
-              expectType<"TOGGLE" | "PING">(params.event.type)
+              expectType<"TOGGLE" | "PING">(params.event.type);
 
               if (params.event.type === "PING") {
-                expectType<number>(params.event.timestamp)
+                expectType<number>(params.event.timestamp);
               }
 
               return params => {
-                expectType<"TOGGLE" | "PING">(params.event.type)
-              }
+                expectType<"TOGGLE" | "PING">(params.event.type);
+              };
             },
           },
         },
-      )
+      );
 
-      assert.equal(machine.length, 2)
-    })
-  })
+      assert.equal(machine.length, 2);
+    });
+  });
 }

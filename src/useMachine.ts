@@ -1,4 +1,4 @@
-import { log } from "./core/devutils"
+import { log } from "./core/devutils";
 import {
   type Action,
   applyDispatch,
@@ -7,9 +7,9 @@ import {
   useIsMounted,
   useSingleton,
   useSyncState,
-} from "./core/logic"
-import { useState } from "./core/react"
-import type { Config, Definition, Machine, Send, State } from "./types"
+} from "./core/logic";
+import { useState } from "./core/react";
+import type { Config, Definition, Machine, Send, State } from "./types";
 
 /**
  * Uses a state machine with the constructor.
@@ -75,7 +75,7 @@ function useMachine<D>(
 ): [
   state: State<D>,
   send: Send<D>,
-]
+];
 
 /**
  * Uses a state machine with the constructor and props.
@@ -150,7 +150,7 @@ function useMachine<D, P>(
 ): [
   state: State<D>,
   send: Send<D>,
-]
+];
 
 /**
  * Uses a state machine with the pre-created instance.
@@ -218,7 +218,7 @@ function useMachine<D>(
 ): [
   state: State<D>,
   send: Send<D>,
-]
+];
 
 /**
  * Define a state machine and uses it.
@@ -268,7 +268,7 @@ function useMachine<D extends Definition.Shape<D, never, never>>(
 ): [
   state: State<D>,
   send: Send<D>,
-]
+];
 
 /**
  * Define a state machine and uses it.
@@ -339,24 +339,24 @@ function useMachine<
 ): [
   state: State<D>,
   send: Send<D>,
-]
+];
 
 function useMachine(arg0: any, arg1?: any): [any, any] {
-  const isMounted = useIsMounted()
+  const isMounted = useIsMounted();
 
-  const [def, conf = {}] = useInstance(arg0, arg1)
-  const [state, setState] = useState(() => createInitialState(def))
+  const [def, conf = {}] = useInstance(arg0, arg1);
+  const [state, setState] = useState(() => createInitialState(def));
   const { send, dispatch } = useSingleton(() => {
     function dispatch(action: Action) {
       if (isMounted.current) {
-        setState(currState => applyDispatch(def, conf, currState, action))
+        setState(currState => applyDispatch(def, conf, currState, action));
       } else if (__DEV__) {
         log(
           { ...conf, level: "error" },
           "Cannot dispatch an action to the state machine "
             + "after the component is unmounted.",
           ["Action", action],
-        )
+        );
       }
     }
 
@@ -365,18 +365,18 @@ function useMachine(arg0: any, arg1?: any): [any, any] {
         dispatch({
           type: "SEND",
           payload,
-        })
+        });
       },
       dispatch,
-    }
-  })
+    };
+  });
 
-  useSyncState(def, conf, state, dispatch, isMounted)
+  useSyncState(def, conf, state, dispatch, isMounted);
 
-  return [state, send]
+  return [state, send];
 }
 
-export { useMachine }
-export { and, guards, not, or } from "./core/guard"
-export { createMachine } from "./createMachine"
-export type * from "./types"
+export { useMachine };
+export { and, guards, not, or } from "./core/guard";
+export { createMachine } from "./createMachine";
+export type * from "./types";

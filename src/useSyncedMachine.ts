@@ -1,4 +1,4 @@
-import { log } from "./core/devutils"
+import { log } from "./core/devutils";
 import {
   type Action,
   applyDispatch,
@@ -7,9 +7,9 @@ import {
   useInstance,
   useIsMounted,
   useSingleton,
-} from "./core/logic"
-import { useEffect, useRef } from "./core/react"
-import type { Config, Definition, Machine, Send, State } from "./types"
+} from "./core/logic";
+import { useEffect, useRef } from "./core/react";
+import type { Config, Definition, Machine, Send, State } from "./types";
 
 /**
  * Uses a synced state machine with the constructor.
@@ -78,7 +78,7 @@ function useSyncedMachine<D>(
 ): [
   getState: () => State<D>,
   send: Send<D>,
-]
+];
 
 /**
  * Uses a synced state machine with the constructor and props.
@@ -155,7 +155,7 @@ function useSyncedMachine<D, P>(
 ): [
   getState: () => State<D>,
   send: Send<D>,
-]
+];
 
 /**
  * Uses a synced state machine with the pre-created instance.
@@ -226,7 +226,7 @@ function useSyncedMachine<D>(
 ): [
   getState: () => State<D>,
   send: Send<D>,
-]
+];
 
 /**
  * Define a synced state machine and uses it.
@@ -279,7 +279,7 @@ function useSyncedMachine<D extends Definition.Shape<D, never, never>>(
 ): [
   getState: () => State<D>,
   send: Send<D>,
-]
+];
 
 /**
  * Define a synced state machine and uses it.
@@ -313,17 +313,17 @@ function useSyncedMachine<
 ): [
   getState: () => State<D>,
   send: Send<D>,
-]
+];
 
 function useSyncedMachine(arg0: any, arg1?: any): [any, any] {
-  const isMounted = useIsMounted()
+  const isMounted = useIsMounted();
 
-  const exitFnRef = useRef<void | (() => void)>()
-  const [def, conf = {}] = useInstance(arg0, arg1)
+  const exitFnRef = useRef<void | (() => void)>();
+  const [def, conf = {}] = useInstance(arg0, arg1);
   const [reqSync, api] = useSingleton(() => {
-    const queue: ((prevState: State.Signature) => State.Signature)[] = []
-    let machineState = createInitialState(def)
-    let previousDeps: readonly unknown[] | undefined
+    const queue: ((prevState: State.Signature) => State.Signature)[] = [];
+    let machineState = createInitialState(def);
+    let previousDeps: readonly unknown[] | undefined;
 
     /**
      * Runs a callback when the dependencies change.
@@ -336,9 +336,9 @@ function useSyncedMachine(arg0: any, arg1?: any): [any, any] {
       deps: readonly unknown[],
     ): void {
       if (previousDeps?.every((dep, i) => Object.is(dep, deps[i])) !== true) {
-        exitFnRef.current?.()
-        exitFnRef.current = callback()
-        previousDeps = deps
+        exitFnRef.current?.();
+        exitFnRef.current = callback();
+        previousDeps = deps;
       }
     }
 
@@ -346,7 +346,7 @@ function useSyncedMachine(arg0: any, arg1?: any): [any, any] {
      * Requests a synchronization of the state machine.
      */
     function flushSync(): void {
-      const state = machineState // bind to the current state
+      const state = machineState; // bind to the current state
 
       sideEffect(
         () => {
@@ -357,15 +357,15 @@ function useSyncedMachine(arg0: any, arg1?: any): [any, any] {
             dispatch,
             isMounted,
             true,
-          )
+          );
 
           return typeof cleanup !== "function" ? undefined : () => {
-            const { event, context } = machineState // stateRef.current!
-            cleanup({ event, context })
-          }
+            const { event, context } = machineState; // stateRef.current!
+            cleanup({ event, context });
+          };
         },
         [state.value, state.event],
-      )
+      );
     }
 
     /**
@@ -374,15 +374,15 @@ function useSyncedMachine(arg0: any, arg1?: any): [any, any] {
      * @param render A function that renders the state machine.
      */
     function act(render: () => void): void {
-      render()
+      render();
 
       while (queue.length) {
         while (queue.length) {
-          const action = queue.shift()!
-          machineState = action(machineState)
+          const action = queue.shift()!;
+          machineState = action(machineState);
         }
 
-        flushSync()
+        flushSync();
       }
     }
 
@@ -396,14 +396,14 @@ function useSyncedMachine(arg0: any, arg1?: any): [any, any] {
     function dispatch(action: Action): void {
       if (isMounted.current) {
         // `queue.push` means `React.useState`
-        queue.push(prevState => applyDispatch(def, conf, prevState, action))
+        queue.push(prevState => applyDispatch(def, conf, prevState, action));
       } else if (__DEV__) {
         log(
           { ...conf, level: "error" },
           "Cannot dispatch an action to the state machine "
             + "after the component is unmounted.",
           ["Action", action],
-        )
+        );
       }
     }
 
@@ -416,28 +416,28 @@ function useSyncedMachine(arg0: any, arg1?: any): [any, any] {
             dispatch({
               type: "SEND",
               payload,
-            })
-          })
+            });
+          });
         },
       ] satisfies [any, any],
-    ]
-  })
+    ];
+  });
 
   useEffect(
     () => {
-      reqSync()
+      reqSync();
 
       return () => {
-        exitFnRef.current?.()
-      }
+        exitFnRef.current?.();
+      };
     },
     [],
-  )
+  );
 
-  return api
+  return api;
 }
 
-export { useSyncedMachine }
-export { and, guards, not, or } from "./core/guard"
-export { createMachine } from "./createMachine"
-export type * from "./types"
+export { useSyncedMachine };
+export { and, guards, not, or } from "./core/guard";
+export { createMachine } from "./createMachine";
+export type * from "./types";

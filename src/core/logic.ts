@@ -1,14 +1,14 @@
-import type { Config, Definition, Machine, State } from "../types"
-import type { Tagged } from "../types/utils"
+import type { Config, Definition, Machine, State } from "../types";
+import type { Tagged } from "../types/utils";
 import {
-  assertNever,
   isPlainObject,
   log,
   type LogOptions,
+  unreachable,
   useDetectChanges,
-} from "./devutils"
-import { doGuard, doGuardForDev, formatGuardResult } from "./guard"
-import { useEffect, useLayoutEffect, useMemo, useRef } from "./react"
+} from "./devutils";
+import { doGuard, doGuardForDev, formatGuardResult } from "./guard";
+import { useEffect, useLayoutEffect, useMemo, useRef } from "./react";
 
 /**
  * Creates a initial state machine state.
@@ -24,7 +24,7 @@ export function createInitialState(
     value: def.initial,
     context: def.context,
     nextEvents: Object.keys({ ...def.states[def.initial]!.on, ...def.on }),
-  }
+  };
 }
 
 /**
@@ -34,16 +34,16 @@ export function createInitialState(
  * @template P - The typeof action payload.
  */
 type ActionType<T extends string, P> = {
-  readonly type: T
-  readonly payload: P
-}
+  readonly type: T;
+  readonly payload: P;
+};
 
 /**
  * Actions to update state machine state.
  */
 export type Action =
   | ActionType<"SEND", Config.Sendable.Signature>
-  | ActionType<"SET_CONTEXT", Config.SetContextAction.Signature>
+  | ActionType<"SET_CONTEXT", Config.SetContextAction.Signature>;
 
 /**
  * Applies the action to the state machine.
@@ -62,9 +62,9 @@ export function applyDispatch(
 ): State.Signature {
   switch (action.type) {
     case "SEND": {
-      const { payload } = action
-      const event = typeof payload === "string" ? { type: payload } : payload
-      const stateDef = def.states[state.value]!
+      const { payload } = action;
+      const event = typeof payload === "string" ? { type: payload } : payload;
+      const stateDef = def.states[state.value]!;
 
       if (__DEV__) {
         if (!stateDef) {
@@ -73,13 +73,13 @@ export function applyDispatch(
             `State '${state.value}' not defined.`,
             ["State", state],
             ["Event", event],
-          )
+          );
 
-          return state
+          return state;
         }
       }
 
-      const transition = stateDef.on?.[event.type] || def.on?.[event.type]
+      const transition = stateDef.on?.[event.type] || def.on?.[event.type];
 
       if (!transition) {
         if (__DEV__) {
@@ -89,13 +89,13 @@ export function applyDispatch(
               + ` doesn't listen to event type '${event.type}'.`,
             ["State", state],
             ["Event", event],
-          )
+          );
         }
 
-        return state
+        return state;
       }
 
-      const { context } = state
+      const { context } = state;
       const [nextStateValue, guardResult] = typeof transition === "string"
         ? [
           transition,
@@ -121,7 +121,7 @@ export function applyDispatch(
               { event, context },
             ),
           },
-        ]
+        ];
 
       if (__DEV__) {
         if (
@@ -134,7 +134,7 @@ export function applyDispatch(
               transition.guard,
               { event, context },
             ),
-          }
+          };
 
           if (guardResult.ok !== prodGuardResult.ok) {
             console.error(
@@ -152,7 +152,7 @@ export function applyDispatch(
               guardResult,
               "Guard Result (Production)",
               prodGuardResult,
-            )
+            );
           }
         }
       }
@@ -169,10 +169,10 @@ export function applyDispatch(
             ],
             ["Event", event],
             ["Context", context],
-          )
+          );
         }
 
-        return state
+        return state;
       }
 
       return {
@@ -183,11 +183,11 @@ export function applyDispatch(
           ...def.states[nextStateValue]?.on,
           ...def.on,
         }),
-      }
+      };
     }
 
     case "SET_CONTEXT": {
-      const nextContext = action.payload(state.context)
+      const nextContext = action.payload(state.context);
 
       if (__DEV__) {
         log(
@@ -195,17 +195,17 @@ export function applyDispatch(
           "Context updated.",
           ["Prev Context", state.context],
           ["Next Context", nextContext],
-        )
+        );
       }
 
       return {
         ...state,
         context: nextContext,
-      }
+      };
     }
 
     default:
-      assertNever(action)
+      unreachable(action);
   }
 }
 
@@ -230,10 +230,10 @@ export function applyEffect(
 ): void | {
   (
     params: Pick<Config.EffectCleanupParams.Signature, "event" | "context">,
-  ): void
+  ): void;
 } {
-  const { effect = [] } = def.states[state.value] || {}
-  const entryFns = typeof effect === "string" ? [effect] : effect
+  const { effect = [] } = def.states[state.value] || {};
+  const entryFns = typeof effect === "string" ? [effect] : effect;
 
   if (entryFns.length) {
     if (__DEV__) {
@@ -243,9 +243,9 @@ export function applyEffect(
           `Effects not defined for state '${state.value}'.`,
           ["Event", state.event],
           ["Context", state.context],
-        )
+        );
 
-        return
+        return;
       }
     }
 
@@ -257,9 +257,9 @@ export function applyEffect(
             "Event must be a plain object.",
             ["State", state],
             ["Event", event],
-          )
+          );
 
-          return
+          return;
         }
       }
 
@@ -267,7 +267,7 @@ export function applyEffect(
         dispatch({
           type: "SEND",
           payload: event,
-        })
+        });
       } else if (__DEV__) {
         log(
           { ...conf, level: "error" },
@@ -275,7 +275,7 @@ export function applyEffect(
             + "Must be used synchronously within an effect.",
           ["State", state],
           ["Event", event],
-        )
+        );
       }
     }
 
@@ -284,7 +284,7 @@ export function applyEffect(
         dispatch({
           type: "SET_CONTEXT",
           payload: action,
-        })
+        });
       } else if (__DEV__) {
         log(
           { ...conf, level: "error" },
@@ -292,15 +292,15 @@ export function applyEffect(
             + "Must be used synchronously within an effect.",
           ["State", state],
           ["Action", action],
-        )
+        );
       }
 
       return {
         send,
-      }
+      };
     }
 
-    let isLocked = false
+    let isLocked = false;
     const exitFns = entryFns.map(effectName => {
       if (__DEV__) {
         if (typeof conf.effects![effectName] !== "function") {
@@ -309,9 +309,9 @@ export function applyEffect(
             `Effect '${effectName}' not defined for state '${state.value}'.`,
             ["Event", state.event],
             ["Context", state.context],
-          )
+          );
 
-          return
+          return;
         }
       }
 
@@ -321,14 +321,14 @@ export function applyEffect(
         context: state.context,
         setContext,
         isMounted() {
-          return isMounted.current
+          return isMounted.current;
         },
-      })
-    })
-    isLocked = syncMode
+      });
+    });
+    isLocked = syncMode;
 
     return params => {
-      isLocked = false
+      isLocked = false;
       exitFns.forEach(exit => {
         if (typeof exit === "function") {
           exit({
@@ -336,19 +336,19 @@ export function applyEffect(
             send,
             setContext,
             isMounted() {
-              return isMounted.current
+              return isMounted.current;
             },
-          })
+          });
         }
-      })
-      isLocked = syncMode
-    }
+      });
+      isLocked = syncMode;
+    };
   }
 }
 
 const useIsomorphicLayoutEffect = typeof document === "undefined"
   ? useEffect
-  : useLayoutEffect
+  : useLayoutEffect;
 
 /**
  * This React hook is used to memoize a value that is expensive to compute.
@@ -359,7 +359,7 @@ const useIsomorphicLayoutEffect = typeof document === "undefined"
  * @returns The memoized value.
  */
 export function useSingleton<T>(compute: () => T): T {
-  return useMemo(compute, [])
+  return useMemo(compute, []);
 }
 
 /**
@@ -368,19 +368,19 @@ export function useSingleton<T>(compute: () => T): T {
  * @returns A reference to a boolean that is `true` if the component is mounted, otherwise `false`.
  */
 export function useIsMounted(): { readonly current: boolean } {
-  const isMounted = useRef(true)
+  const isMounted = useRef(true);
 
   useEffect(() => {
-    isMounted.current = true
-  }, [])
+    isMounted.current = true;
+  }, []);
 
   useIsomorphicLayoutEffect(() => () => {
     // Destructor for useInsertionEffect runs before useEffect.
     // Prevent state machine events to unmounted components.
-    isMounted.current = false
-  }, [])
+    isMounted.current = false;
+  }, []);
 
-  return isMounted
+  return isMounted;
 }
 
 /**
@@ -408,48 +408,48 @@ export function useInstance(
           "Cannot change the definition or machine after the machine is used.",
           ["Current", curr],
           ["Next", next],
-        )
+        );
       },
       {
         equalityFn(curr, next) {
           switch (true) {
             case isPlainObject(curr):
-              return isPlainObject(next)
+              return isPlainObject(next);
 
             case Array.isArray(curr):
-              return Array.isArray(next) && curr.length === next.length
+              return Array.isArray(next) && curr.length === next.length;
 
             case typeof curr === "function":
-              return typeof next === "function"
+              return typeof next === "function";
 
             default:
-              assertNever(curr)
+              unreachable(curr);
           }
         },
       },
-    )
+    );
   }
 
-  let logOptions: LogOptions | undefined
-  const propsRef = useRef<{}>()
+  let logOptions: LogOptions | undefined;
+  const propsRef = useRef<{}>();
 
   if (typeof arg0 === "function") {
-    propsRef.current = arg1
+    propsRef.current = arg1;
   } else if (!Array.isArray(arg0)) {
-    arg0 = arg1 ? [arg0, arg1] : [arg0]
+    arg0 = arg1 ? [arg0, arg1] : [arg0];
   }
 
   const machine = useSingleton(() =>
     typeof arg0 === "function"
       ? arg0(() => propsRef.current)
       : arg0 as Machine.Signature // cast for tsd
-  )
+  );
 
   if (__DEV__) {
-    ;[, logOptions] = machine
+    [, logOptions] = machine;
   }
 
-  return machine
+  return machine;
 }
 
 /**
@@ -468,27 +468,27 @@ export function useSyncState(
   dispatch: (action: Action) => void,
   isMounted: { readonly current: boolean },
 ): void {
-  const stateRef = useRef(state)
-  stateRef.current = state
+  const stateRef = useRef(state);
+  stateRef.current = state;
 
   useEffect(
     () => {
-      const cleanup = applyEffect(def, conf, state, dispatch, isMounted)
+      const cleanup = applyEffect(def, conf, state, dispatch, isMounted);
 
       return typeof cleanup !== "function" ? undefined : () => {
-        const { event, context } = stateRef.current
-        cleanup({ event, context })
-      }
+        const { event, context } = stateRef.current;
+        cleanup({ event, context });
+      };
     },
     [state.value, state.event],
-  )
+  );
 }
 
 if (cfgTest && cfgTest.url === import.meta.url) {
-  await import("global-jsdom/register")
-  const { renderHook } = await import("@testing-library/react")
-  const { assert, describe, sinon, test } = cfgTest
-  const { spy } = sinon
+  await import("global-jsdom/register");
+  const { renderHook } = await import("@testing-library/react");
+  const { assert, describe, sinon, test } = cfgTest;
+  const { spy } = sinon;
 
   describe("src/core/logic", () => {
     describe("createInitialState", () => {
@@ -509,17 +509,17 @@ if (cfgTest && cfgTest.url === import.meta.url) {
               },
             },
           },
-        }
-        const res = createInitialState(def)
+        };
+        const res = createInitialState(def);
 
         assert.deepEqual(res, {
           event: { type: "$init" },
           value: "idle",
           context: {},
           nextEvents: ["FETCH"],
-        })
-      })
-    })
+        });
+      });
+    });
 
     describe("applyDispatch", () => {
       describe("SEND", () => {
@@ -540,27 +540,27 @@ if (cfgTest && cfgTest.url === import.meta.url) {
                 },
               },
             },
-          }
-          const conf = {}
-          const state = createInitialState(def)
+          };
+          const conf = {};
+          const state = createInitialState(def);
           const action: Action = {
             type: "SEND",
             payload: "FETCH",
-          }
+          };
           const newState = applyDispatch(
             def,
             conf,
             state,
             action,
-          )
+          );
 
           assert.deepEqual(newState, {
             event: { type: "FETCH" },
             value: "loading",
             context: {},
             nextEvents: ["RESOLVE", "REJECT"],
-          })
-        })
+          });
+        });
 
         test("it should return the same state", () => {
           const def = {
@@ -573,38 +573,38 @@ if (cfgTest && cfgTest.url === import.meta.url) {
                 },
               },
             },
-          }
-          const conf = {}
+          };
+          const conf = {};
           const state = {
             event: { type: "IDLE" },
             value: "idle",
             context: {},
             nextEvents: ["IDLE"],
-          }
+          };
           const action: Action = {
             type: "SEND",
             payload: "IDLE",
-          }
+          };
           const newState = applyDispatch(
             def,
             conf,
             state,
             action,
-          )
+          );
 
-          assert.notEqual(newState, state)
-          assert.deepEqual(newState, state)
-        })
+          assert.notEqual(newState, state);
+          assert.deepEqual(newState, state);
+        });
 
         test("it should log the event type not found", () => {
-          const logSpy = spy()
+          const logSpy = spy();
           const def = {
             initial: "idle",
             context: {},
             states: {
               idle: {},
             },
-          }
+          };
           const conf = {
             verbose: true,
             console: {
@@ -612,20 +612,20 @@ if (cfgTest && cfgTest.url === import.meta.url) {
               group: logSpy,
               groupEnd() {},
             },
-          }
-          const state = createInitialState(def)
+          };
+          const state = createInitialState(def);
           const action: Action = {
             type: "SEND",
             payload: "FETCH",
-          }
+          };
           const newState = applyDispatch(
             def,
             conf,
             state,
             action,
-          )
+          );
 
-          assert.deepEqual(newState, state)
+          assert.deepEqual(newState, state);
           assert.deepEqual(
             logSpy.getCalls().map(call => call.args),
             [
@@ -633,11 +633,11 @@ if (cfgTest && cfgTest.url === import.meta.url) {
               ["State", state],
               ["Event", { type: "FETCH" }],
             ],
-          )
-        })
+          );
+        });
 
         test("it should log the transition denied by guard", () => {
-          const logSpy = spy()
+          const logSpy = spy();
           const def = {
             initial: "idle",
             context: {},
@@ -652,7 +652,7 @@ if (cfgTest && cfgTest.url === import.meta.url) {
               },
               loading: {},
             },
-          }
+          };
           const conf = {
             verbose: true,
             guards: {
@@ -663,20 +663,20 @@ if (cfgTest && cfgTest.url === import.meta.url) {
               group: logSpy,
               groupEnd() {},
             },
-          }
-          const state = createInitialState(def)
+          };
+          const state = createInitialState(def);
           const action: Action = {
             type: "SEND",
             payload: "FETCH",
-          }
+          };
           const newState = applyDispatch(
             def,
             conf,
             state,
             action,
-          )
+          );
 
-          assert.deepEqual(newState, state)
+          assert.deepEqual(newState, state);
           assert.deepEqual(
             logSpy.getCalls().map(call => call.args),
             [
@@ -693,13 +693,13 @@ if (cfgTest && cfgTest.url === import.meta.url) {
               ["Event", { type: "FETCH" }],
               ["Context", {}],
             ],
-          )
-        })
-      })
+          );
+        });
+      });
 
       describe("SET_CONTEXT", () => {
         test("it should update the context", () => {
-          const logSpy = spy()
+          const logSpy = spy();
           const def = {
             initial: "idle",
             context: {
@@ -708,7 +708,7 @@ if (cfgTest && cfgTest.url === import.meta.url) {
             states: {
               idle: {},
             },
-          }
+          };
           const conf = {
             verbose: true,
             console: {
@@ -716,18 +716,18 @@ if (cfgTest && cfgTest.url === import.meta.url) {
               group: logSpy,
               groupEnd() {},
             },
-          }
-          const state = createInitialState(def)
+          };
+          const state = createInitialState(def);
           const action: Action = {
             type: "SET_CONTEXT",
             payload: (ctx: any) => ({ ...ctx, bar: 2 }),
-          }
+          };
           const newState = applyDispatch(
             def,
             conf,
             state,
             action,
-          )
+          );
 
           assert.deepEqual(newState, {
             event: { type: "$init" },
@@ -737,7 +737,7 @@ if (cfgTest && cfgTest.url === import.meta.url) {
               bar: 2,
             },
             nextEvents: [],
-          })
+          });
           assert.deepEqual(
             logSpy.getCalls().map(call => call.args),
             [
@@ -745,15 +745,15 @@ if (cfgTest && cfgTest.url === import.meta.url) {
               ["Prev Context", { foo: 1 }],
               ["Next Context", { foo: 1, bar: 2 }],
             ],
-          )
-        })
-      })
-    })
+          );
+        });
+      });
+    });
 
     describe("applyEffect", () => {
       test("it should apply the effect", () => {
-        const cleanupSpy = spy<Config.EffectCleanup.Signature>(() => {})
-        const dispatchSpy = spy()
+        const cleanupSpy = spy<Config.EffectCleanup.Signature>(() => {});
+        const dispatchSpy = spy();
         const def = {
           initial: "idle",
           context: {},
@@ -762,25 +762,25 @@ if (cfgTest && cfgTest.url === import.meta.url) {
               effect: "onIdle",
             },
           },
-        }
+        };
         const conf = {
           effects: {
             onIdle: ({ send }: Config.EffectParams.Signature) => {
               send({
                 type: "FETCH",
-              })
+              });
 
-              return cleanupSpy
+              return cleanupSpy;
             },
           },
-        }
-        const state = createInitialState(def)
-        const isMounted = { current: true }
-        const cleanup = applyEffect(def, conf, state, dispatchSpy, isMounted)
+        };
+        const state = createInitialState(def);
+        const isMounted = { current: true };
+        const cleanup = applyEffect(def, conf, state, dispatchSpy, isMounted);
         cleanup!({
           event: { type: "FETCH" },
           context: {},
-        })
+        });
 
         assert.deepEqual(
           dispatchSpy.getCalls().map(call => call.args),
@@ -794,21 +794,21 @@ if (cfgTest && cfgTest.url === import.meta.url) {
               },
             ],
           ],
-        )
-        assert.equal(cleanupSpy.callCount, 1)
+        );
+        assert.equal(cleanupSpy.callCount, 1);
 
-        const params = cleanupSpy.getCall(0).args[0]
+        const params = cleanupSpy.getCall(0).args[0];
 
-        assert.equal(typeof params.send, "function")
-        assert.equal(typeof params.setContext, "function")
-        assert.deepEqual(params.event, { type: "FETCH" })
-        assert.deepEqual(params.context, {})
-      })
+        assert.equal(typeof params.send, "function");
+        assert.equal(typeof params.setContext, "function");
+        assert.deepEqual(params.event, { type: "FETCH" });
+        assert.deepEqual(params.context, {});
+      });
 
       test("it should error if dispatch is called asynchronously in sync mode", async () => {
-        const { promise, resolve } = Promise.withResolvers<void>()
-        const errorSpy = spy()
-        const dispatchSpy = spy()
+        const { promise, resolve } = Promise.withResolvers<void>();
+        const errorSpy = spy();
+        const dispatchSpy = spy();
         const def = {
           initial: "idle",
           context: {},
@@ -821,7 +821,7 @@ if (cfgTest && cfgTest.url === import.meta.url) {
             },
             loading: {},
           },
-        }
+        };
         const conf = {
           console: {
             log() {},
@@ -831,21 +831,21 @@ if (cfgTest && cfgTest.url === import.meta.url) {
             onIdle: ({ send }: Config.EffectParams.Signature) => {
               setTimeout(
                 () => {
-                  send("FETCH")
-                  resolve()
+                  send("FETCH");
+                  resolve();
                 },
                 0,
-              )
+              );
             },
           },
-        }
-        const state = createInitialState(def)
-        const isMounted = { current: true }
-        applyEffect(def, conf, state, dispatchSpy, isMounted, true)
+        };
+        const state = createInitialState(def);
+        const isMounted = { current: true };
+        applyEffect(def, conf, state, dispatchSpy, isMounted, true);
 
-        await promise
+        await promise;
 
-        assert.equal(dispatchSpy.callCount, 0)
+        assert.equal(dispatchSpy.callCount, 0);
         assert.deepEqual(
           errorSpy.getCalls().map(call => call.args),
           [
@@ -867,9 +867,9 @@ if (cfgTest && cfgTest.url === import.meta.url) {
             ],
             ["Event", "FETCH"],
           ],
-        )
-      })
-    })
+        );
+      });
+    });
 
     describe("useIsMounted", () => {
       test("it should return a reference to a boolean that is true if the component is mounted, otherwise false", () => {
@@ -878,51 +878,51 @@ if (cfgTest && cfgTest.url === import.meta.url) {
             entry: undefined as boolean | undefined,
             exit: undefined as boolean | undefined,
           },
-        }
+        };
         const { unmount } = renderHook(() => {
-          const isMounted = useIsMounted()
+          const isMounted = useIsMounted();
 
           useEffect(() => {
-            capture.effect.entry = isMounted.current
+            capture.effect.entry = isMounted.current;
 
             return () => {
-              capture.effect.exit = isMounted.current
-            }
-          })
-        })
+              capture.effect.exit = isMounted.current;
+            };
+          });
+        });
 
         assert.deepEqual(capture, {
           effect: {
             entry: true,
             exit: undefined,
           },
-        })
+        });
 
-        unmount()
+        unmount();
 
         assert.deepEqual(capture, {
           effect: {
             entry: true,
             exit: false,
           },
-        })
-      })
-    })
+        });
+      });
+    });
 
     describe("useInstance", () => {
       test("it should return the state machine definition and configuration", () => {
-        const def: any = {}
-        const conf = { verbose: true }
-        const { result } = renderHook(() => useInstance([def, conf], []))
+        const def: any = {};
+        const conf = { verbose: true };
+        const { result } = renderHook(() => useInstance([def, conf], []));
 
-        assert.deepEqual(result.current, [def, conf])
-      })
-    })
+        assert.deepEqual(result.current, [def, conf]);
+      });
+    });
 
     describe("useSyncState", () => {
       test("it should apply the effect", () => {
-        const cleanup = spy<Config.EffectCleanup.Signature>(() => {})
-        const effect = spy<Config.Effect.Signature>(() => cleanup)
+        const cleanup = spy<Config.EffectCleanup.Signature>(() => {});
+        const effect = spy<Config.Effect.Signature>(() => cleanup);
         const def: Definition.Signature = {
           initial: "a",
           states: {
@@ -934,27 +934,27 @@ if (cfgTest && cfgTest.url === import.meta.url) {
             },
             b: {},
           },
-        }
+        };
         const conf: Config.Signature = {
           effects: {
             effect,
           },
-        }
+        };
         const { rerender } = renderHook(({ state }) => {
-          const isMounted = useIsMounted()
-          useSyncState(def, conf, state, () => {}, isMounted)
+          const isMounted = useIsMounted();
+          useSyncState(def, conf, state, () => {}, isMounted);
         }, {
           initialProps: {
             state: createInitialState(def),
           },
-        })
+        });
 
-        assert.equal(effect.callCount, 1)
-        assert.equal(cleanup.callCount, 0)
+        assert.equal(effect.callCount, 1);
+        assert.equal(cleanup.callCount, 0);
 
-        const params = effect.getCall(0).args[0]
+        const params = effect.getCall(0).args[0];
 
-        assert.deepEqual(params.event, { type: "$init" })
+        assert.deepEqual(params.event, { type: "$init" });
 
         rerender({
           state: {
@@ -963,15 +963,15 @@ if (cfgTest && cfgTest.url === import.meta.url) {
             event: { type: "NEXT" },
             nextEvents: ["NEXT"],
           },
-        })
+        });
 
-        assert.equal(effect.callCount, 1)
-        assert.equal(cleanup.callCount, 1)
+        assert.equal(effect.callCount, 1);
+        assert.equal(cleanup.callCount, 1);
 
-        const cleanupParams = cleanup.getCall(0).args[0]
+        const cleanupParams = cleanup.getCall(0).args[0];
 
-        assert.deepEqual(cleanupParams.event, { type: "NEXT" })
-      })
-    })
-  })
+        assert.deepEqual(cleanupParams.event, { type: "NEXT" });
+      });
+    });
+  });
 }

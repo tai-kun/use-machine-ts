@@ -1,8 +1,8 @@
 // @ts-check
 
-import { buildDefine } from "cfg-test/define"
-import fs from "node:fs"
-import path from "node:path"
+import { buildDefine } from "cfg-test/define";
+import fs from "node:fs";
+import path from "node:path";
 
 /** @type {import("esbuild").BuildOptions[]} */
 export default [
@@ -23,7 +23,7 @@ export default [
       format: "cjs",
     })
   )),
-]
+];
 
 /**
  * @param {object} options
@@ -32,7 +32,7 @@ export default [
  * @returns {import("esbuild").BuildOptions}
  */
 function create(options) {
-  const { jsx, format } = options
+  const { jsx, format } = options;
 
   return {
     // General
@@ -97,7 +97,7 @@ function create(options) {
         format,
       }),
     ],
-  }
+  };
 }
 
 /**
@@ -106,24 +106,24 @@ function create(options) {
  */
 function replace(values) {
   const replacers = Object.entries(values).map(item => {
-    const [key, value] = item
-    const regex = new RegExp(`\\b${key}\\b`, "g")
+    const [key, value] = item;
+    const regex = new RegExp(`\\b${key}\\b`, "g");
 
     /**
      * @param {string} text
      * @returns {string}
      */
     return text => {
-      return text.replace(regex, value)
-    }
-  })
+      return text.replace(regex, value);
+    };
+  });
 
   return {
     name: "replace",
     setup(build) {
       build.onLoad({ filter: /.*/ }, async args => {
         if (args.path.indexOf("node_modules") !== -1) {
-          return null
+          return null;
         }
 
         return {
@@ -132,10 +132,10 @@ function replace(values) {
             (text, replacer) => replacer(text),
             await fs.promises.readFile(args.path, "utf-8"),
           ),
-        }
-      })
+        };
+      });
     },
-  }
+  };
 }
 
 /**
@@ -144,25 +144,25 @@ function replace(values) {
  * @returns {import("esbuild").Plugin}
  */
 function resolve(options) {
-  const { format } = options
+  const { format } = options;
   /** @type {Record<string, boolean>} */
-  const accessCache = {}
+  const accessCache = {};
 
   /** @param {string} file */
   function readOk(file) {
     if (file in accessCache) {
-      return accessCache[file]
+      return accessCache[file];
     }
 
     try {
-      fs.accessSync(file, fs.constants.R_OK)
-      accessCache[file] = true
+      fs.accessSync(file, fs.constants.R_OK);
+      accessCache[file] = true;
 
-      return true
+      return true;
     } catch {
-      accessCache[file] = false
+      accessCache[file] = false;
 
-      return false
+      return false;
     }
   }
 
@@ -171,21 +171,21 @@ function resolve(options) {
    * @param {string} file
    */
   function getBuiltPath(dir, file) {
-    const name = path.join(dir, file)
+    const name = path.join(dir, file);
     const pairs = Object.entries({
       ".ts": format === "cjs" ? ".cjs" : ".mjs",
       ".tsx": format === "cjs" ? ".cjs" : ".jsx",
       "/index.ts": `/index${format === "cjs" ? ".cjs" : ".mjs"}`,
       "/index.tsx": `/index${format === "cjs" ? ".cjs" : ".jsx"}`,
-    })
+    });
 
     for (const [src, dst] of pairs) {
       if (readOk(name + src)) {
-        return file + dst
+        return file + dst;
       }
     }
 
-    return null
+    return null;
   }
 
   return {
@@ -193,22 +193,22 @@ function resolve(options) {
     setup(build) {
       build.onResolve({ filter: /.*/ }, args => {
         if (args.namespace !== "file" || args.kind !== "import-statement") {
-          return null
+          return null;
         }
 
         if (!args.path.startsWith(".")) {
           return {
             external: true,
-          }
+          };
         }
 
-        const builtPath = getBuiltPath(args.resolveDir, args.path)
+        const builtPath = getBuiltPath(args.resolveDir, args.path);
 
         if (builtPath) {
           return {
             path: builtPath,
             external: true,
-          }
+          };
         }
 
         return {
@@ -217,8 +217,8 @@ function resolve(options) {
               text: `File not found: ${args.path}`,
             },
           ],
-        }
-      })
+        };
+      });
     },
-  }
+  };
 }

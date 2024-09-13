@@ -1,6 +1,6 @@
-import { useIsMounted, useSyncState } from "./core/logic"
-import { useSyncExternalStore } from "./core/react"
-import type { Send, SharedMachine, State } from "./types"
+import { useIsMounted, useSyncState } from "./core/logic";
+import { useSyncExternalStore } from "./core/react";
+import type { Send, SharedMachine, State } from "./types";
 
 /**
  * Uses a shared state machine.
@@ -56,26 +56,26 @@ function useSharedMachine<D>(
   state: State<D>,
   send: Send<D>,
 ] {
-  const isMounted = useIsMounted()
+  const isMounted = useIsMounted();
 
   const {
     instance: [def, conf = {}],
     dispatch,
     getState,
     subscribe,
-  } = machine as unknown as SharedMachine.Signature
+  } = machine as unknown as SharedMachine.Signature;
   const state = useSyncExternalStore(
     subscribe,
     getState,
     (getServerState as () => State.Signature) || getState,
-  ) as State.Signature
+  ) as State.Signature;
 
-  useSyncState(def, conf, state, dispatch, isMounted)
+  useSyncState(def, conf, state, dispatch, isMounted);
 
-  return [state as any, machine.send]
+  return [state as any, machine.send];
 }
 
-export { useSharedMachine }
-export { and, guards, not, or } from "./core/guard"
-export { createSharedMachine } from "./createSharedMachine"
-export type * from "./types"
+export { useSharedMachine };
+export { and, guards, not, or } from "./core/guard";
+export { createSharedMachine } from "./createSharedMachine";
+export type * from "./types";

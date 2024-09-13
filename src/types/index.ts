@@ -1,11 +1,11 @@
-export type * as Config from "./config"
-export type * as Definition from "./definition"
-export type * from "./machine"
+export type * as Config from "./config";
+export type * as Definition from "./definition";
+export type * from "./machine";
 
 if (cfgTest && cfgTest.url === import.meta.url) {
-  const { describe, test } = cfgTest
+  const { describe, test } = cfgTest;
 
   describe("src/types/index", () => {
-    test.skip("Should be tested", () => {})
-  })
+    test.skip("Should be tested", () => {});
+  });
 }

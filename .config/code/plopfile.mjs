@@ -1,6 +1,6 @@
 // @ts-check
 
-import path from "node:path"
+import path from "node:path";
 
 /**
  * @param {import("plop").NodePlopAPI} plop
@@ -8,11 +8,11 @@ import path from "node:path"
 export default plop => {
   // Helpers
 
-  plop.setHelper("basename", arg => path.basename(arg))
+  plop.setHelper("basename", arg => path.basename(arg));
   plop.setHelper("dirname", arg =>
     path.normalize(path.dirname(arg))
       .replace(new RegExp(`${path.sep}{2,}`, "g"), "/")
-      .replace(new RegExp(`${path.sep}*$`, "g"), ""))
+      .replace(new RegExp(`${path.sep}*$`, "g"), ""));
 
   // Generators
 
@@ -32,5 +32,5 @@ export default plop => {
         templateFile: "./templates/func/$name.ts.hbs",
       },
     ],
-  })
-}
+  });
+};

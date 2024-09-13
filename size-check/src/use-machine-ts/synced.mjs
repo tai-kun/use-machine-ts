@@ -1,1 +1,1 @@
-export * from "use-machine-ts/synced"
+export * from "use-machine-ts/synced";

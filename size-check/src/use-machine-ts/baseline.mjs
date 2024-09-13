@@ -1,1 +1,1 @@
-export { useMachine } from "use-machine-ts"
+export { useMachine } from "use-machine-ts";

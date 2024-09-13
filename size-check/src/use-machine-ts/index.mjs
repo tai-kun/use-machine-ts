@@ -1,1 +1,1 @@
-export * from "use-machine-ts"
+export * from "use-machine-ts";

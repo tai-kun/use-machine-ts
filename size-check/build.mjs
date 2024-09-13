@@ -1,4 +1,4 @@
-import { build } from "esbuild"
+import { build } from "esbuild";
 
 await build({
   entryPoints: ["src/**/*"],
@@ -16,4 +16,4 @@ await build({
   format: "esm",
   platform: "browser",
   mainFields: ["module", "main"],
-})
+});

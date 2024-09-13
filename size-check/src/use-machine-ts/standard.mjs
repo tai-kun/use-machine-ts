@@ -1,1 +1,1 @@
-export * from "use-machine-ts/standard"
+export * from "use-machine-ts/standard";

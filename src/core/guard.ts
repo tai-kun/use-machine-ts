@@ -1,6 +1,6 @@
-import type { Config, Definition } from "../types"
-import type { Tagged } from "../types/utils"
-import { assertNever, log } from "./devutils"
+import type { Config, Definition } from "../types";
+import type { Tagged } from "../types/utils";
+import { log, unreachable } from "./devutils";
 
 /**
  * Inverts the boolean value returned by the guard function.
@@ -15,7 +15,7 @@ export function not<const G extends string>(
   return {
     op: "not",
     value: guard,
-  }
+  };
 }
 
 /**
@@ -28,7 +28,7 @@ export function not<const G extends string>(
 export function and<const G extends string>(
   ...guards: Definition.Guard<G>[]
 ): Definition.Guard.And<G> {
-  return guards
+  return guards;
 }
 
 /**
@@ -44,14 +44,14 @@ export function or<const G extends string>(
   return {
     op: "or",
     value: guards,
-  }
+  };
 }
 
 export const guards = {
   or,
   and,
   not,
-}
+};
 
 /**
  * Checks if the guard passes.
@@ -72,7 +72,7 @@ export function doGuard(
     ? guard.every(g => doGuard(conf, g, params))
     : guard.op === "not"
     ? !doGuard(conf, guard.value, params)
-    : guard.value.some(g => doGuard(conf, g, params))
+    : guard.value.some(g => doGuard(conf, g, params));
 }
 
 type GuardResult =
@@ -82,14 +82,14 @@ type GuardResult =
     | { op: "and"; by: GuardResult[] }
     | { op: "not"; by: GuardResult }
   )
-  & { ok: boolean | undefined }
+  & { ok: boolean | undefined };
 
 type GuardContext = {
-  done: boolean
-  end(): void
-  revert(): void
-  doGuard(name: Tagged<string, "GuardName">): boolean
-}
+  done: boolean;
+  end(): void;
+  revert(): void;
+  doGuard(name: Tagged<string, "GuardName">): boolean;
+};
 
 /**
  * Checks if the guard passes for development.
@@ -103,66 +103,66 @@ function innerDoGuardForDev(
   guard: Definition.Guard.Signature,
 ): GuardResult {
   if (typeof guard === "string") {
-    const { done } = ctx
+    const { done } = ctx;
 
     return {
       op: "eq",
       ok: done ? undefined : ctx.doGuard(guard),
       by: guard,
-    }
+    };
   } else if (Array.isArray(guard)) {
-    const { done } = ctx
+    const { done } = ctx;
     const by = guard.map(g => {
-      const res = innerDoGuardForDev(ctx, g)
+      const res = innerDoGuardForDev(ctx, g);
 
       if (res.ok === false) {
-        ctx.end()
+        ctx.end();
       }
 
-      return res
-    })
+      return res;
+    });
 
     if (!done) {
-      ctx.revert()
+      ctx.revert();
     }
 
     return {
       op: "and",
       ok: done ? undefined : by.every(b => b.ok !== false),
       by,
-    }
+    };
   } else if (guard.op === "not") {
-    const { done } = ctx
-    const by = innerDoGuardForDev(ctx, guard.value)
+    const { done } = ctx;
+    const by = innerDoGuardForDev(ctx, guard.value);
 
     return {
       op: "not",
       ok: done ? undefined : !by.ok,
       by,
-    }
+    };
   } else if (guard.op === "or") {
-    const { done } = ctx
+    const { done } = ctx;
     const by = guard.value.map(g => {
-      const res = innerDoGuardForDev(ctx, g)
+      const res = innerDoGuardForDev(ctx, g);
 
       if (res.ok === true) {
-        ctx.end()
+        ctx.end();
       }
 
-      return res
-    })
+      return res;
+    });
 
     if (!done) {
-      ctx.revert()
+      ctx.revert();
     }
 
     return {
       op: "or",
       ok: done ? undefined : by.some(b => b.ok !== false),
       by,
-    }
+    };
   } else {
-    assertNever(guard)
+    unreachable(guard);
   }
 }
 
@@ -179,16 +179,16 @@ export function doGuardForDev(
   guard: Definition.Guard.Signature,
   params: Config.GuardParams.Signature,
 ): GuardResult {
-  let done = false
+  let done = false;
   const ctx: GuardContext = {
     get done() {
-      return done
+      return done;
     },
     end() {
-      done = true
+      done = true;
     },
     revert() {
-      done = false
+      done = false;
     },
     doGuard(name) {
       if (__DEV__) {
@@ -198,91 +198,87 @@ export function doGuardForDev(
             "The guard function is not defined in the configuration.",
             ["Guard name", name],
             ["Configuration", conf],
-          )
+          );
         }
       }
 
-      return !!conf.guards?.[name]?.(params)
+      return !!conf.guards?.[name]?.(params);
     },
-  }
+  };
 
-  return innerDoGuardForDev(ctx, guard)
+  return innerDoGuardForDev(ctx, guard);
 }
 
 type FormatContext = {
-  code: string
-  cause: string
-}
+  code: string;
+  cause: string;
+};
 
 function innerFormatGuardResult(ctx: FormatContext, res: GuardResult): void {
   switch (res.op) {
     case "eq":
-      ctx.code += res.by
+      ctx.code += res.by;
       ctx.cause += res.ok === false
         ? "^".repeat(res.by.length)
-        : " ".repeat(res.by.length)
-
-      break
+        : " ".repeat(res.by.length);
+      break;
 
     case "and":
-      ctx.code += "("
-      ctx.cause += " ".repeat("(".length)
+      ctx.code += "(";
+      ctx.cause += " ".repeat("(".length);
 
       res.by.forEach((r, i) => {
-        innerFormatGuardResult(ctx, r)
+        innerFormatGuardResult(ctx, r);
 
         if (i < res.by.length - 1) {
-          ctx.code += " && "
-          ctx.cause += " ".repeat(" && ".length)
+          ctx.code += " && ";
+          ctx.cause += " ".repeat(" && ".length);
         }
-      })
+      });
 
-      ctx.code += ")"
-      ctx.cause += " ".repeat(")".length)
-
-      break
+      ctx.code += ")";
+      ctx.cause += " ".repeat(")".length);
+      break;
 
     case "or": {
-      let { code, cause } = ctx
-      ctx.code += "("
-      ctx.cause = ""
+      let { code, cause } = ctx;
+      ctx.code += "(";
+      ctx.cause = "";
 
       res.by.forEach((r, i) => {
-        innerFormatGuardResult(ctx, r)
+        innerFormatGuardResult(ctx, r);
 
         if (i < res.by.length - 1) {
-          ctx.code += " || "
+          ctx.code += " || ";
         }
-      })
+      });
 
-      ctx.code += ")"
+      ctx.code += ")";
       ctx.cause = cause + (
         res.ok === false
           ? "^".repeat(ctx.code.length - code.length)
           : " ".repeat(ctx.code.length - code.length)
-      )
-
-      break
+      );
+      break;
     }
 
     case "not": {
-      let { cause } = ctx
-      ctx.code += "!"
-      ctx.cause = " ".repeat("!".length)
+      let { cause } = ctx;
+      ctx.code += "!";
+      ctx.cause = " ".repeat("!".length);
 
-      innerFormatGuardResult(ctx, res.by)
+      innerFormatGuardResult(ctx, res.by);
 
       ctx.cause = cause + (
         res.ok === false && (ctx.cause.trim() === "" || /^\^+$/.test(ctx.cause))
           ? "^".repeat(ctx.cause.length)
           : " ".repeat(ctx.cause.length)
-      )
-
-      break
+      );
+      break;
     }
 
     default:
-      assertNever(res)
+      unreachable(res);
   }
 }
 
@@ -293,33 +289,34 @@ function innerFormatGuardResult(ctx: FormatContext, res: GuardResult): void {
  * @returns The formatted result of the guard.
  */
 export function formatGuardResult(result: GuardResult): string {
-  const ctx: FormatContext = { code: "", cause: "" }
+  const ctx: FormatContext = { code: "", cause: "" };
 
-  innerFormatGuardResult(ctx, result)
+  innerFormatGuardResult(ctx, result);
 
   return ctx.cause.includes("^")
     ? [ctx.code, ctx.cause].join("\n")
-    : ctx.code
+    : ctx.code;
 }
 
 if (cfgTest && cfgTest.url === import.meta.url) {
-  const { assert, describe, test } = cfgTest
+  const { assert, describe, test } = cfgTest;
 
   function doGuardForTest(
     setup: {
-      guards: NonNullable<Config.Signature["guards"]>
-      guard: Definition.Guard.Signature
-      params?: Config.GuardParams.Signature
+      guards: NonNullable<Config.Signature["guards"]>;
+      guard: Definition.Guard.Signature;
+      params?: Config.GuardParams.Signature;
     },
   ) {
-    const { guards, guard, params = {} as Config.GuardParams.Signature } = setup
-    const dev = doGuardForDev({ guards }, guard, params)
+    const { guards, guard, params = {} as Config.GuardParams.Signature } =
+      setup;
+    const dev = doGuardForDev({ guards }, guard, params);
 
     return {
       prd: doGuard({ guards }, guard, params),
       dev,
       fmt: formatGuardResult(dev).split("\n"),
-    }
+    };
   }
 
   describe("src/core/guard", () => {
@@ -341,8 +338,8 @@ if (cfgTest && cfgTest.url === import.meta.url) {
               "isOk",
             ],
           },
-        )
-      })
+        );
+      });
 
       test("it should return false if the guard fails", () => {
         assert.deepEqual(
@@ -362,17 +359,17 @@ if (cfgTest && cfgTest.url === import.meta.url) {
               "^^^^",
             ],
           },
-        )
-      })
-    })
+        );
+      });
+    });
 
     describe("and", () => {
       test("array means and", () => {
         assert.deepEqual(
           ["isOk", "isOk"],
           and("isOk", "isOk"),
-        )
-      })
+        );
+      });
 
       test("it should return true if all guards pass", () => {
         assert.deepEqual(
@@ -402,8 +399,8 @@ if (cfgTest && cfgTest.url === import.meta.url) {
               "(isOk && isOk)",
             ],
           },
-        )
-      })
+        );
+      });
 
       test("it should return false if one of the guards fails", () => {
         assert.deepEqual(
@@ -434,8 +431,8 @@ if (cfgTest && cfgTest.url === import.meta.url) {
               " ^^^^         ",
             ],
           },
-        )
-      })
+        );
+      });
 
       test("nesting", () => {
         assert.deepEqual(
@@ -487,8 +484,8 @@ if (cfgTest && cfgTest.url === import.meta.url) {
               "(isOk && (isOk && (isOk && isOk)))",
             ],
           },
-        )
-      })
+        );
+      });
 
       test("it should return true if there are no guards", () => {
         assert.deepEqual(
@@ -507,9 +504,9 @@ if (cfgTest && cfgTest.url === import.meta.url) {
               "()",
             ],
           },
-        )
-      })
-    })
+        );
+      });
+    });
 
     describe("or", () => {
       test("it should return true if one of the guards passes", () => {
@@ -540,8 +537,8 @@ if (cfgTest && cfgTest.url === import.meta.url) {
               "(isOk || isOk)",
             ],
           },
-        )
-      })
+        );
+      });
 
       test("it should return false if all guards fail", () => {
         assert.deepEqual(
@@ -572,8 +569,8 @@ if (cfgTest && cfgTest.url === import.meta.url) {
               "^^^^^^^^^^^^^^",
             ],
           },
-        )
-      })
+        );
+      });
 
       test("nesting", () => {
         assert.deepEqual(
@@ -615,8 +612,8 @@ if (cfgTest && cfgTest.url === import.meta.url) {
               "(((isOk || isOk)))",
             ],
           },
-        )
-      })
+        );
+      });
 
       test("it should return false if there are no guards", () => {
         assert.deepEqual(
@@ -636,9 +633,9 @@ if (cfgTest && cfgTest.url === import.meta.url) {
               "^^",
             ],
           },
-        )
-      })
-    })
+        );
+      });
+    });
 
     describe("not", () => {
       test("it should return true if the guard fails", () => {
@@ -662,8 +659,8 @@ if (cfgTest && cfgTest.url === import.meta.url) {
               "!isOk",
             ],
           },
-        )
-      })
+        );
+      });
 
       test("it should return false if the guard passes", () => {
         assert.deepEqual(
@@ -687,8 +684,8 @@ if (cfgTest && cfgTest.url === import.meta.url) {
               "^^^^^",
             ],
           },
-        )
-      })
+        );
+      });
 
       test("nesting", () => {
         assert.deepEqual(
@@ -720,9 +717,9 @@ if (cfgTest && cfgTest.url === import.meta.url) {
               "^^^^^^^",
             ],
           },
-        )
-      })
-    })
+        );
+      });
+    });
 
     describe("complex", () => {
       test("or(and(not('isOk')), 'isOk')", () => {
@@ -763,8 +760,8 @@ if (cfgTest && cfgTest.url === import.meta.url) {
               "((!isOk) || isOk)",
             ],
           },
-        )
-      })
+        );
+      });
 
       test("and('isOk', or(not('isOk'), not('isOk')), 'isOk')", () => {
         assert.deepEqual(
@@ -819,8 +816,8 @@ if (cfgTest && cfgTest.url === import.meta.url) {
               "         ^^^^^^^^^^^^^^^^         ",
             ],
           },
-        )
-      })
+        );
+      });
 
       test("and(or('isReady', 'isStopped'), not('isDestroyed'))", () => {
         assert.deepEqual(
@@ -870,8 +867,8 @@ if (cfgTest && cfgTest.url === import.meta.url) {
               "                           ^^^^^^^^^^^^ ",
             ],
           },
-        )
-      })
+        );
+      });
 
       test("and(not('isDestroyed'), or('isReady', 'isStopped'))", () => {
         assert.deepEqual(
@@ -921,8 +918,8 @@ if (cfgTest && cfgTest.url === import.meta.url) {
               " ^^^^^^^^^^^^                           ",
             ],
           },
-        )
-      })
-    })
-  })
+        );
+      });
+    });
+  });
 }

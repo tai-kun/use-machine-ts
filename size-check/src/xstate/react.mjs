@@ -1,2 +1,2 @@
-export { useMachine } from "@xstate/react"
-export { createMachine } from "xstate"
+export { useMachine } from "@xstate/react";
+export { createMachine } from "xstate";

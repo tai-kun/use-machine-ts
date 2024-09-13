@@ -1,5 +1,5 @@
-import { applyDispatch, createInitialState } from "./core/logic"
-import { createMachine } from "./createMachine"
+import { applyDispatch, createInitialState } from "./core/logic";
+import { createMachine } from "./createMachine";
 import type {
   Action,
   Config,
@@ -7,7 +7,7 @@ import type {
   Machine,
   SharedMachine,
   State,
-} from "./types"
+} from "./types";
 
 /**
  * Create a shared state machine.
@@ -18,7 +18,7 @@ import type {
  */
 function createSharedMachine<D extends Definition.Shape<D, never, never>>(
   definition: Definition.Exact<D>,
-): SharedMachine<D>
+): SharedMachine<D>;
 
 /**
  * Create a shared state machine.
@@ -41,22 +41,22 @@ function createSharedMachine<
 >(
   definition: Definition.Exact<D>,
   config: Config.Exact<D, G, E>,
-): SharedMachine<D>
+): SharedMachine<D>;
 
 function createSharedMachine(...args: [any, any?]) {
-  const instance = createMachine(...args) as unknown as Machine.Signature
-  const [def, conf = {}] = instance
-  let state = createInitialState(def)
-  const callbacks = new Set<(state: State.Signature) => void>()
+  const instance = createMachine(...args) as unknown as Machine.Signature;
+  const [def, conf = {}] = instance;
+  let state = createInitialState(def);
+  const callbacks = new Set<(state: State.Signature) => void>();
 
   function dispatch(action: Action.Signature) {
-    const nextState = applyDispatch(def, conf, state, action)
+    const nextState = applyDispatch(def, conf, state, action);
 
     if (!Object.is(state, nextState)) {
-      state = nextState
+      state = nextState;
 
       for (const callback of callbacks) {
-        callback(state)
+        callback(state);
       }
     }
   }
@@ -65,7 +65,7 @@ function createSharedMachine(...args: [any, any?]) {
     dispatch({
       type: "SEND",
       payload: event,
-    })
+    });
   }
 
   const machine: SharedMachine.Signature = {
@@ -73,36 +73,36 @@ function createSharedMachine(...args: [any, any?]) {
     instance,
     dispatch,
     getState() {
-      return state
+      return state;
     },
     subscribe(callback: (state: State.Signature) => void) {
-      callbacks.add(callback)
+      callbacks.add(callback);
 
       return () => {
-        callbacks.delete(callback)
-      }
+        callbacks.delete(callback);
+      };
     },
     setContext(action: Config.SetContextAction.Signature) {
       dispatch({
         type: "SET_CONTEXT",
         payload: action,
-      })
+      });
 
-      return { send }
+      return { send };
     },
-  }
+  };
 
-  return machine as any
+  return machine as any;
 }
 
-export { createSharedMachine }
-export { and, guards, not, or } from "./core/guard"
-export type * from "./types"
+export { createSharedMachine };
+export { and, guards, not, or } from "./core/guard";
+export type * from "./types";
 
 if (cfgTest && cfgTest.url === import.meta.url) {
-  const { expectType } = await import("tsd")
-  const { assert, describe, sinon, test } = cfgTest
-  const { stub } = sinon
+  const { expectType } = await import("tsd");
+  const { assert, describe, sinon, test } = cfgTest;
+  const { stub } = sinon;
 
   describe("src/createSharedMachine", () => {
     test("strict: false", () => {
@@ -131,29 +131,29 @@ if (cfgTest && cfgTest.url === import.meta.url) {
         {
           guards: {
             isOk: params => {
-              expectType<"TOGGLE">(params.event.type)
+              expectType<"TOGGLE">(params.event.type);
 
-              return true
+              return true;
             },
           },
           effects: {
             onInactive: params => {
-              expectType<"TOGGLE" | "$init">(params.event.type)
+              expectType<"TOGGLE" | "$init">(params.event.type);
 
               return params => {
-                expectType<"TOGGLE">(params.event.type)
-              }
+                expectType<"TOGGLE">(params.event.type);
+              };
             },
             onActive: params => {
-              expectType<"TOGGLE" | "PING">(params.event.type)
+              expectType<"TOGGLE" | "PING">(params.event.type);
 
               return params => {
-                expectType<"TOGGLE" | "PING">(params.event.type)
-              }
+                expectType<"TOGGLE" | "PING">(params.event.type);
+              };
             },
           },
         },
-      )
+      );
 
       assert.deepEqual(Object.keys(machine), [
         "send",
@@ -162,20 +162,20 @@ if (cfgTest && cfgTest.url === import.meta.url) {
         "getState",
         "subscribe",
         "setContext",
-      ])
-    })
+      ]);
+    });
 
     test("strict: true", () => {
       const machine = createSharedMachine(
         {
           $schema: {} as {
-            strict: true
+            strict: true;
             events: {
-              TOGGLE: {}
+              TOGGLE: {};
               PING: {
-                timestamp: number
-              }
-            }
+                timestamp: number;
+              };
+            };
           },
           initial: "inactive",
           states: {
@@ -200,33 +200,33 @@ if (cfgTest && cfgTest.url === import.meta.url) {
         {
           guards: {
             isOk: params => {
-              expectType<"TOGGLE">(params.event.type)
+              expectType<"TOGGLE">(params.event.type);
 
-              return true
+              return true;
             },
           },
           effects: {
             onInactive: params => {
-              expectType<"TOGGLE" | "$init">(params.event.type)
+              expectType<"TOGGLE" | "$init">(params.event.type);
 
               return params => {
-                expectType<"TOGGLE">(params.event.type)
-              }
+                expectType<"TOGGLE">(params.event.type);
+              };
             },
             onActive: params => {
-              expectType<"TOGGLE" | "PING">(params.event.type)
+              expectType<"TOGGLE" | "PING">(params.event.type);
 
               if (params.event.type === "PING") {
-                expectType<number>(params.event.timestamp)
+                expectType<number>(params.event.timestamp);
               }
 
               return params => {
-                expectType<"TOGGLE" | "PING">(params.event.type)
-              }
+                expectType<"TOGGLE" | "PING">(params.event.type);
+              };
             },
           },
         },
-      )
+      );
 
       assert.deepEqual(Object.keys(machine), [
         "send",
@@ -235,8 +235,8 @@ if (cfgTest && cfgTest.url === import.meta.url) {
         "getState",
         "subscribe",
         "setContext",
-      ])
-    })
+      ]);
+    });
 
     test("it should call the subscribe callback when the state changes", () => {
       const machine = createSharedMachine({
@@ -245,14 +245,14 @@ if (cfgTest && cfgTest.url === import.meta.url) {
           a: { on: { NEXT: "b" } },
           b: { on: { NEXT: "a" } },
         },
-      })
+      });
 
-      const callback = stub()
-      const unsubscribe = machine.subscribe(callback)
+      const callback = stub();
+      const unsubscribe = machine.subscribe(callback);
 
-      machine.send("NEXT")
+      machine.send("NEXT");
 
-      assert.equal(callback.callCount, 1)
+      assert.equal(callback.callCount, 1);
       assert.deepEqual(
         callback.getCalls().map(call => call.args),
         [
@@ -265,14 +265,14 @@ if (cfgTest && cfgTest.url === import.meta.url) {
             },
           ],
         ],
-      )
+      );
 
-      callback.reset()
-      unsubscribe()
+      callback.reset();
+      unsubscribe();
 
-      machine.send("NEXT")
+      machine.send("NEXT");
 
-      assert.equal(callback.callCount, 0)
-    })
-  })
+      assert.equal(callback.callCount, 0);
+    });
+  });
 }

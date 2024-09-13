@@ -5,12 +5,12 @@ export {
   useRef,
   useState,
   useSyncExternalStore,
-} from "react"
+} from "react";
 
 if (cfgTest && cfgTest.url === import.meta.url) {
-  const { describe, test } = cfgTest
+  const { describe, test } = cfgTest;
 
   describe("src/core/react", () => {
-    test.skip("Should be tested", () => {})
-  })
+    test.skip("Should be tested", () => {});
+  });
 }
