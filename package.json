@@ -49,7 +49,7 @@
     "@types/react": "^18.3.3",
     "cfg-test": "^0.8.0-beta.1",
     "dprint": "^0.47.2",
-    "esbuild": "^0.23.0",
+    "esbuild": "^0.24.0",
     "global-jsdom": "^25.0.0",
     "jsdom": "^25.0.0",
     "plop": "^4.0.1",
