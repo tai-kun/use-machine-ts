@@ -1,5 +1,24 @@
 # Changelog
 
+## [0.3.1](https://github.com/tai-kun/use-machine-ts/compare/v0.3.0...v0.3.1) (2024-11-07)
+
+
+### Documentation
+
+* fix README.ja ([d81635f](https://github.com/tai-kun/use-machine-ts/commit/d81635fcd1e02e8550be13e7a4eb4a619c611cb3))
+* update README ([e3ff784](https://github.com/tai-kun/use-machine-ts/commit/e3ff7844e04ca446b6494eb6a74c440a42c3b231))
+
+
+### Miscellaneous Chores
+
+* **deps-dev:** bump @types/node from 22.4.0 to 22.7.6 ([#97](https://github.com/tai-kun/use-machine-ts/issues/97)) ([34aa806](https://github.com/tai-kun/use-machine-ts/commit/34aa806a0bd2a60cd2b143cfbbebc1f78b8e8688))
+* **deps-dev:** bump esbuild from 0.23.1 to 0.24.0 ([#89](https://github.com/tai-kun/use-machine-ts/issues/89)) ([2d4a977](https://github.com/tai-kun/use-machine-ts/commit/2d4a977e2fffd70f52d45217fd1d2c339a2093d9))
+* **deps-dev:** bump jsdom in the dev-dependencies group ([#88](https://github.com/tai-kun/use-machine-ts/issues/88)) ([1b71b2a](https://github.com/tai-kun/use-machine-ts/commit/1b71b2a50d5b767b1fa3b1004999eeea8498ddf6))
+* **deps-dev:** bump the dev-dependencies group across 1 directory with 7 updates ([#102](https://github.com/tai-kun/use-machine-ts/issues/102)) ([fd4d27e](https://github.com/tai-kun/use-machine-ts/commit/fd4d27eb59033cb9cf276844b70adf6bc20a64cb))
+* **deps-dev:** bump the dev-dependencies group across 1 directory with 8 updates ([#87](https://github.com/tai-kun/use-machine-ts/issues/87)) ([fc84297](https://github.com/tai-kun/use-machine-ts/commit/fc8429726c6048bf564a76dd36833c157c3e858f))
+* **deps-dev:** bump tsx from 4.17.0 to 4.19.1 ([#91](https://github.com/tai-kun/use-machine-ts/issues/91)) ([460b113](https://github.com/tai-kun/use-machine-ts/commit/460b113654ce23975061d7464041c38b9e61ea90))
+* **deps-dev:** bump typescript from 5.5.4 to 5.6.2 ([#90](https://github.com/tai-kun/use-machine-ts/issues/90)) ([91ffb70](https://github.com/tai-kun/use-machine-ts/commit/91ffb7034ba311e5fc40b98b1fee834bad823e44))
+
 ## [0.3.0](https://github.com/tai-kun/use-machine-ts/compare/v0.2.3...v0.3.0) (2024-09-13)
 
 
