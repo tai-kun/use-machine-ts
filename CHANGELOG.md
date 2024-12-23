@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.4.1](https://github.com/tai-kun/use-machine-ts/compare/v0.4.0...v0.4.1) (2024-12-23)
+
+
+### Miscellaneous Chores
+
+* update dprint plugins ([95fb1c8](https://github.com/tai-kun/use-machine-ts/commit/95fb1c81873bbc09b1ee5fd323d57421e1ac9b04))
+
 ## [0.4.0](https://github.com/tai-kun/use-machine-ts/compare/v0.3.0...v0.4.0) (2024-12-23)
 
 
