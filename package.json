@@ -40,25 +40,30 @@
       "require": "./dist/useSyncedMachine.cjs"
     }
   },
+  "peerDependencies": {
+    "react": "^18.0.0",
+    "react-dom": "^18.0.0"
+  },
   "devDependencies": {
-    "@size-limit/preset-small-lib": "^11.1.4",
-    "@testing-library/react": "^16.0.0",
+    "@size-limit/preset-small-lib": "^11.1.6",
+    "@testing-library/react": "^16.1.0",
     "@tsconfig/node21": "^21.0.3",
     "@tsconfig/strictest": "^2.0.5",
-    "@types/node": "^22.0.2",
-    "@types/react": "^18.3.3",
+    "@types/node": "^22.10.2",
+    "@types/react": "^19.0.2",
     "cfg-test": "^0.8.0-beta.1",
     "dprint": "^0.48.0",
-    "esbuild": "^0.24.0",
+    "esbuild": "^0.24.2",
     "global-jsdom": "^25.0.0",
-    "jsdom": "^25.0.0",
+    "jsdom": "^25.0.1",
     "plop": "^4.0.1",
-    "react": "^18.3.1",
-    "size-limit": "^11.1.4",
-    "tsd": "^0.31.1",
-    "tsx": "^4.16.3",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0",
+    "size-limit": "^11.1.6",
+    "tsd": "^0.31.2",
+    "tsx": "^4.19.2",
     "typedoc": "^0.27.5",
-    "typescript": "^5.5.4"
+    "typescript": "^5.7.2"
   },
   "scripts": {
     "add": "plop --plopfile config/code/plopfile.mjs",
@@ -94,7 +99,7 @@
     }
   ],
   "volta": {
-    "node": "22.5.1"
+    "node": "22.12.0"
   },
   "keywords": [
     "state",

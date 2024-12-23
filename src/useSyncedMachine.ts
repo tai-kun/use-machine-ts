@@ -318,7 +318,7 @@ function useSyncedMachine<
 function useSyncedMachine(arg0: any, arg1?: any): [any, any] {
   const isMounted = useIsMounted();
 
-  const exitFnRef = useRef<void | (() => void)>();
+  const exitFnRef = useRef<void | (() => void)>(undefined);
   const [def, conf = {}] = useInstance(arg0, arg1);
   const [reqSync, api] = useSingleton(() => {
     const queue: ((prevState: State.Signature) => State.Signature)[] = [];

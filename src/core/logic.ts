@@ -431,7 +431,7 @@ export function useInstance(
   }
 
   let logOptions: LogOptions | undefined;
-  const propsRef = useRef<{}>();
+  const propsRef = useRef<{}>(undefined);
 
   if (typeof arg0 === "function") {
     propsRef.current = arg1;
