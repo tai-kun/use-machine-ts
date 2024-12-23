@@ -1,5 +1,34 @@
 # Changelog
 
+## [0.4.0](https://github.com/tai-kun/use-machine-ts/compare/v0.3.0...v0.4.0) (2024-12-23)
+
+
+### Features
+
+* Supports React19 ([#120](https://github.com/tai-kun/use-machine-ts/issues/120)) ([e9c5d02](https://github.com/tai-kun/use-machine-ts/commit/e9c5d0286b11618288af2a48dfb9c0e479af87bc))
+
+
+### Documentation
+
+* fix README.ja ([d81635f](https://github.com/tai-kun/use-machine-ts/commit/d81635fcd1e02e8550be13e7a4eb4a619c611cb3))
+* update README ([e3ff784](https://github.com/tai-kun/use-machine-ts/commit/e3ff7844e04ca446b6494eb6a74c440a42c3b231))
+
+
+### Miscellaneous Chores
+
+* **deps-dev:** bump @testing-library/react from 16.0.1 to 16.1.0 ([#119](https://github.com/tai-kun/use-machine-ts/issues/119)) ([ce86d65](https://github.com/tai-kun/use-machine-ts/commit/ce86d6557b6062e9904ce2953386cc41ca47c984))
+* **deps-dev:** bump @types/node from 22.4.0 to 22.7.6 ([#97](https://github.com/tai-kun/use-machine-ts/issues/97)) ([34aa806](https://github.com/tai-kun/use-machine-ts/commit/34aa806a0bd2a60cd2b143cfbbebc1f78b8e8688))
+* **deps-dev:** bump @types/node from 22.7.6 to 22.10.2 ([#115](https://github.com/tai-kun/use-machine-ts/issues/115)) ([79e6728](https://github.com/tai-kun/use-machine-ts/commit/79e672828b87c0c749c6531097a9485138caa748))
+* **deps-dev:** bump dprint from 0.47.5 to 0.48.0 ([#118](https://github.com/tai-kun/use-machine-ts/issues/118)) ([889aa1f](https://github.com/tai-kun/use-machine-ts/commit/889aa1fe2a714346b330ff59d454a7a3f5adcfb3))
+* **deps-dev:** bump esbuild from 0.23.1 to 0.24.0 ([#89](https://github.com/tai-kun/use-machine-ts/issues/89)) ([2d4a977](https://github.com/tai-kun/use-machine-ts/commit/2d4a977e2fffd70f52d45217fd1d2c339a2093d9))
+* **deps-dev:** bump jsdom in the dev-dependencies group ([#88](https://github.com/tai-kun/use-machine-ts/issues/88)) ([1b71b2a](https://github.com/tai-kun/use-machine-ts/commit/1b71b2a50d5b767b1fa3b1004999eeea8498ddf6))
+* **deps-dev:** bump the dev-dependencies group across 1 directory with 7 updates ([#102](https://github.com/tai-kun/use-machine-ts/issues/102)) ([fd4d27e](https://github.com/tai-kun/use-machine-ts/commit/fd4d27eb59033cb9cf276844b70adf6bc20a64cb))
+* **deps-dev:** bump the dev-dependencies group across 1 directory with 8 updates ([#87](https://github.com/tai-kun/use-machine-ts/issues/87)) ([fc84297](https://github.com/tai-kun/use-machine-ts/commit/fc8429726c6048bf564a76dd36833c157c3e858f))
+* **deps-dev:** bump tsx from 4.17.0 to 4.19.1 ([#91](https://github.com/tai-kun/use-machine-ts/issues/91)) ([460b113](https://github.com/tai-kun/use-machine-ts/commit/460b113654ce23975061d7464041c38b9e61ea90))
+* **deps-dev:** bump typedoc from 0.26.11 to 0.27.5 ([#116](https://github.com/tai-kun/use-machine-ts/issues/116)) ([a88ec78](https://github.com/tai-kun/use-machine-ts/commit/a88ec7858a2fbef678a106ddfcc73a78c5cdf458))
+* **deps-dev:** bump typescript from 5.5.4 to 5.6.2 ([#90](https://github.com/tai-kun/use-machine-ts/issues/90)) ([91ffb70](https://github.com/tai-kun/use-machine-ts/commit/91ffb7034ba311e5fc40b98b1fee834bad823e44))
+* **deps-dev:** bump typescript from 5.6.3 to 5.7.2 ([#105](https://github.com/tai-kun/use-machine-ts/issues/105)) ([22ea95b](https://github.com/tai-kun/use-machine-ts/commit/22ea95be49d4a61328073dd5ede17f014b86b565))
+
 ## [0.3.0](https://github.com/tai-kun/use-machine-ts/compare/v0.2.3...v0.3.0) (2024-09-13)
 
 
