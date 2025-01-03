@@ -1,5 +1,14 @@
 # Changelog
 
+## [0.4.1](https://github.com/tai-kun/use-machine-ts/compare/v0.4.0...v0.4.1) (2025-01-03)
+
+
+### Miscellaneous Chores
+
+* **deps-dev:** bump @types/node ([#124](https://github.com/tai-kun/use-machine-ts/issues/124)) ([5058555](https://github.com/tai-kun/use-machine-ts/commit/5058555d2981b30245e62d1cd452f6c94faba9ff))
+* **deps-dev:** bump typedoc in the dev-dependencies group ([#122](https://github.com/tai-kun/use-machine-ts/issues/122)) ([897ce5f](https://github.com/tai-kun/use-machine-ts/commit/897ce5fcd327f44bd8a8f629a1e34dea71d474ea))
+* update dprint plugins ([95fb1c8](https://github.com/tai-kun/use-machine-ts/commit/95fb1c81873bbc09b1ee5fd323d57421e1ac9b04))
+
 ## [0.4.0](https://github.com/tai-kun/use-machine-ts/compare/v0.3.0...v0.4.0) (2024-12-23)
 
 
