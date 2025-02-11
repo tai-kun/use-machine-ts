@@ -52,7 +52,7 @@
     "@types/node": "^22.10.2",
     "@types/react": "^19.0.2",
     "cfg-test": "^0.8.0-beta.1",
-    "dprint": "^0.48.0",
+    "dprint": "^0.49.0",
     "esbuild": "^0.24.2",
     "global-jsdom": "^26.0.0",
     "jsdom": "^26.0.0",
