@@ -121,6 +121,7 @@ jobs:
       - lint
       - unit
       - size-check
+      - build
       # - e2e
     permissions:
       actions: read
