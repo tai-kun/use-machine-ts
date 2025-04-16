@@ -15,3 +15,10 @@ updates:
     ignore:
       - dependency-name: "@swc-node/register"
         versions: ["1.9.1"]
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "daily"
+      time: "07:30"
+      timezone: "Asia/Tokyo"
+    open-pull-requests-limit: 3
