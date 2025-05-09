@@ -7,6 +7,28 @@
 
 * enable erasableSyntaxOnly=true ([#168](https://github.com/tai-kun/use-machine-ts/issues/168))
 
+We no longer use TypeScript-specific namespaces. All types that used to end with .Signature now simply end with Signature, without the dot. However, since Config.Signature and Definition.Signature do not use namespaces, they can still be used as before.
+
+Before:
+
+```ts
+import type { Config } from "use-machine-ts";
+
+type _1 = Config.Signature;
+type _2 = Config.TransitionEvent.Signature;
+```
+
+After:
+
+```ts
+import type { Config } from "use-machine-ts";
+
+type _1 = Config.Signature;
+type _2 = Config.TransitionEventSignature;
+                            // ~~
+                            // The dot here is unnecessary.
+```
+
 ### Features
 
 * enable erasableSyntaxOnly=true ([#168](https://github.com/tai-kun/use-machine-ts/issues/168)) ([8328468](https://github.com/tai-kun/use-machine-ts/commit/83284689db9908aa2242d71ed2bbdc640d49a1b9))
