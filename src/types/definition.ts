@@ -26,54 +26,55 @@ export type ReservedKeyword =
  * 
  * @template G - The type of guard names for state machine functions.
  */
-export type Guard<G extends string> = G | Guard.Op<G>
+export type Guard<G extends string> = G | GuardOp<G>
 
-export namespace Guard {
-  export type Signature =
-    | Tagged<string, "GuardName">
-    | Op<Tagged<string, "GuardName">>
+/**
+ * The type of guard for state machine.
+ */
+export type GuardSignature =
+  | Tagged<string, "GuardName">
+  | GuardOp<Tagged<string, "GuardName">>
 
-  /**
-   * The type of guard for state machine.
-   * Inverts the boolean value returned by the guard function.
-   * 
-   * @template G - The type of guard names for state machine functions.
-   */
-  export type Not<G extends string> = {
-    readonly op: "not"
-    readonly value: G | Op<G>
-  }
-
-  /**
-   * The type of guard for state machine.
-   * Combines the results of multiple guard functions using the logical `&&` operator.
-   * 
-   * **Note: An empty guards will be `true`.**
-   * 
-   * @template G - The type of guard names for state machine functions.
-   */
-  export type And<G extends string> = readonly (G | Op<G>)[]
-
-  /**
-   * The type of guard for state machine.
-   * Combines the results of multiple guard functions using the logical `||` operator.
-   * 
-   * **Note: An empty guards will be `false`.**
-   * 
-   * @template G - The type of guard names for state machine functions.
-   */
-  export type Or<G extends string> = {
-    readonly op: "or"
-    readonly value: readonly (G | Op<G>)[]
-  }
-
-  /**
-   * The type of guard for state machine.
-   * 
-   * @template G - The type of guard names for state machine functions.
-   */
-  export type Op<G extends string> = Not<G> | And<G> | Or<G>
+/**
+ * The type of guard for state machine.
+ * Inverts the boolean value returned by the guard function.
+ * 
+ * @template G - The type of guard names for state machine functions.
+ */
+export type GuardNot<G extends string> = {
+  readonly op: "not"
+  readonly value: G | GuardOp<G>
 }
+
+/**
+ * The type of guard for state machine.
+ * Combines the results of multiple guard functions using the logical `&&` operator.
+ * 
+ * **Note: An empty guards will be `true`.**
+ * 
+ * @template G - The type of guard names for state machine functions.
+ */
+export type GuardAnd<G extends string> = readonly (G | GuardOp<G>)[]
+
+/**
+ * The type of guard for state machine.
+ * Combines the results of multiple guard functions using the logical `||` operator.
+ * 
+ * **Note: An empty guards will be `false`.**
+ * 
+ * @template G - The type of guard names for state machine functions.
+ */
+export type GuardOr<G extends string> = {
+  readonly op: "or"
+  readonly value: readonly (G | GuardOp<G>)[]
+}
+
+/**
+ * The type of guard for state machine.
+ * 
+ * @template G - The type of guard names for state machine functions.
+ */
+export type GuardOp<G extends string> = GuardNot<G> | GuardAnd<G> | GuardOr<G>
 
 /**
  * The type of transition for state machine.
@@ -125,20 +126,21 @@ export type Transition<
         }
     )
 
-export namespace Transition {
-  export type Signature = Tagged<string, "StateValue"> | {
-    /**
-     * The state value to transition to.
-     */
-    readonly target: Tagged<string, "StateValue">
-    /**
-     * The guards to check before the transition.
-     * Combines the results of multiple guard functions using the logical AND operator.
-     * 
-     * **Note: An empty guards will be `true`.**
-     */
-    readonly guard?: Guard.Signature
-  }
+/**
+ * The type of transition for state machine.
+ */
+export type TransitionSignature = Tagged<string, "StateValue"> | {
+  /**
+   * The state value to transition to.
+   */
+  readonly target: Tagged<string, "StateValue">
+  /**
+   * The guards to check before the transition.
+   * Combines the results of multiple guard functions using the logical AND operator.
+   * 
+   * **Note: An empty guards will be `true`.**
+   */
+  readonly guard?: GuardSignature
 }
 
 /**
@@ -184,10 +186,11 @@ export type On<
         : Transition<D, G>
     }
 
-export namespace On {
-  export type Signature = {
-    readonly [eventType: Tagged<string, "EventType">]: Transition.Signature
-  }
+/**
+ * The type of definition how a state machine will transition when it receives a specific event.
+ */
+export type OnSignature = {
+  readonly [eventType: Tagged<string, "EventType">]: TransitionSignature
 }
 
 /**
@@ -197,9 +200,10 @@ export namespace On {
  */
 export type Effect<E extends string> = E | readonly E[]
 
-export namespace Effect {
-  export type Signature = Effect<Tagged<string, "EffectName">>
-}
+/**
+ * The type of effect for state machine.
+ */
+export type EffectSignature = Effect<Tagged<string, "EffectName">>
 
 /**
  * The state definition.
@@ -233,17 +237,18 @@ export type State<
     : Effect<E>
 }
 
-export namespace State {
-  export type Signature = {
-    /**
-     * The type of definition how a state machine will transition when it receives a specific event.
-     */
-    readonly on?: On.Signature
-    /**
-     * The actions to perform when the state is entered.
-     */
-    readonly effect?: Effect.Signature
-  }
+/**
+ * The state definition.
+ */
+export type StateSignature = {
+  /**
+   * The type of definition how a state machine will transition when it receives a specific event.
+   */
+  readonly on?: OnSignature
+  /**
+   * The actions to perform when the state is entered.
+   */
+  readonly effect?: EffectSignature
 }
 
 declare const ERROR: unique symbol
@@ -272,9 +277,10 @@ export type Context<D> =
       >
     >
 
-export namespace Context {
-  export type Signature = unknown
-}
+/**
+ * The type of context for state machine.
+ */
+export type ContextSignature = unknown
 
 /**
  * The type of schema for state machine.
@@ -428,16 +434,16 @@ export type Signature = {
    * The state definitions.
    */
   readonly states: {
-    readonly [stateValue: Tagged<string, "StateValue">]: State.Signature
+    readonly [stateValue: Tagged<string, "StateValue">]: StateSignature
   }
   /**
    * The definition how a state machine will transition when it receives a specific event.
    */
-  readonly on?: On.Signature
+  readonly on?: OnSignature
   /**
    * The context of the state machine.
    */
-  readonly context?: Context.Signature
+  readonly context?: ContextSignature
 }
 
 if (cfgTest && cfgTest.url === import.meta.url) {

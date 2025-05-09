@@ -2,6 +2,7 @@
 
 import type {
   Context,
+  ContextSignature,
   Effect as EffectDefinition,
   Guard as GuardDefinition,
   ReservedKeyword,
@@ -97,15 +98,16 @@ type TransitionEvent<
         >
     )
 
-export namespace TransitionEvent {
-  export type Signature = {
-    /**
-     * The event type. Initially, it is `$init`.
-     */
-    readonly type: Tagged<string, "EventType">
-  } & {
-    readonly [key: string]: unknown
-  }
+/**
+ * The type of event that triggered the transition.
+ */
+export type TransitionEventSignature = {
+  /**
+   * The event type. Initially, it is `$init`.
+   */
+  readonly type: Tagged<string, "EventType">
+} & {
+  readonly [key: string]: unknown
 }
 
 /*******************************************************************************
@@ -210,9 +212,7 @@ export type TransitionEventForStateValue<D, V> =
       _InferAllTransitionEventTypesForStateValue<D, V>
     >
 
-export namespace TransitionEventForStateValue {
-  export type Signature = TransitionEvent.Signature
-}
+export type TransitionEventForStateValueSignature = TransitionEventSignature
 
 /*******************************************************************************
  * 
@@ -264,9 +264,10 @@ export type GuardEvent<
   | _InferGuardEventType<D, ["on"], N>
 >
 
-export namespace GuardEvent {
-  export type Signature = TransitionEvent.Signature
-}
+/**
+ * The type of event that triggered the transition for the given guard name.
+ */
+export type GuardEventSignature = TransitionEventSignature
 
 /**
  * The type of parameters for the guard function.
@@ -288,17 +289,18 @@ export type GuardParams<
   context: Context<D>
 }
 
-export namespace GuardParams {
-  export type Signature = {
-    /**
-     * The event that triggered the transition.
-     */
-    readonly event: GuardEvent.Signature
-    /**
-     * The current context of the state machine.
-     */
-    readonly context: Context.Signature
-  }
+/**
+ * The type of parameters for the guard function.
+ */
+export type GuardParamsSignature = {
+  /**
+   * The event that triggered the transition.
+   */
+  readonly event: GuardEventSignature
+  /**
+   * The current context of the state machine.
+   */
+  readonly context: ContextSignature
 }
 
 /**
@@ -320,15 +322,13 @@ export type Guard<
   (params: GuardParams<D, N>): boolean
 }
 
-export namespace Guard {
-  /**
-   * Checks if the transition is allowed.
-   * 
-   * @param params - The parameters for the guard function.
-   * @returns `true` if the transition is allowed, `false` otherwise.
-   */
-  export type Signature = (params: GuardParams.Signature) => boolean
-}
+/**
+ * Checks if the transition is allowed.
+ * 
+ * @param params - The parameters for the guard function.
+ * @returns `true` if the transition is allowed, `false` otherwise.
+ */
+export type GuardSignature = (params: GuardParamsSignature) => boolean
 
 /*******************************************************************************
  * 
@@ -360,14 +360,12 @@ export type Sendable<
   // Else, return the event and its type.
   : _E
 
-export namespace Sendable {
-  /**
-   * The type of sendable event to send to the state machine.
-   */
-  export type Signature =
-    | Tagged<string, "EventType">
-    | TransitionEvent.Signature
-}
+/**
+ * The type of sendable event to send to the state machine.
+ */
+export type SendableSignature =
+  | Tagged<string, "EventType">
+  | TransitionEventSignature
 
 /**
  * The type of the send function to send an event to the state machine.
@@ -383,14 +381,12 @@ export type Send<D> = {
   (event: Sendable<D>): void
 }
 
-export namespace Send {
-  /**
-   * Sends an event to the state machine.
-   * 
-   * @param event - The event to send to the state machine.
-   */
-  export type Signature = (event: Sendable.Signature) => void
-}
+/**
+ * Sends an event to the state machine.
+ * 
+ * @param event - The event to send to the state machine.
+ */
+export type SendSignature = (event: SendableSignature) => void
 
 /*******************************************************************************
  * 
@@ -406,12 +402,10 @@ export namespace Send {
  */
 export type EntryEvent<D, V> = TransitionEventForStateValue<D, V>
 
-export namespace EntryEvent {
-  /**
-   * The type of event that triggered the transition.
-   */
-  export type Signature = TransitionEvent.Signature
-}
+/**
+ * The type of event that triggered the transition.
+ */
+export type EntryEventSignature = TransitionEventSignature
 
 /*******************************************************************************
  * 
@@ -432,12 +426,10 @@ export type NextEventTypesForStateValue<
   | keyof Get<D, ["states", V, "on"]>
   | keyof Get<D, ["on"]>
 
-export namespace NextEventTypesForStateValue {
-  /**
-   * The next event types for the given state value.
-   */
-  export type Signature = Tagged<string, "EventType">
-}
+/**
+ * The next event types for the given state value.
+ */
+export type NextEventTypesForStateValueSignature = Tagged<string, "EventType">
 
 /**
  * The type of event that before the transition.
@@ -450,12 +442,10 @@ export type ExitEvent<D, V> = TransitionEventForType<
   NextEventTypesForStateValue<D, V>
 >
 
-export namespace ExitEvent {
-  /**
-   * The type of event that before the transition.
-   */
-  export type Signature = TransitionEvent.Signature
-}
+/**
+ * The type of event that before the transition.
+ */
+export type ExitEventSignature = TransitionEventSignature
 
 /*******************************************************************************
  * 
@@ -478,15 +468,13 @@ export type SetContextAction<D> = {
   (prevContext: Context<D>): Context<D>
 }
 
-export namespace SetContextAction {
-  /**
-   * The action to update the context of the state machine.
-   * 
-   * @param prevContext - The type of the previous context of the state machine.
-   * @returns The type of the new context of the state machine.
-   */
-  export type Signature = (prevContext: Context.Signature) => Context.Signature
-}
+/**
+ * The action to update the context of the state machine.
+ * 
+ * @param prevContext - The type of the previous context of the state machine.
+ * @returns The type of the new context of the state machine.
+ */
+export type SetContextActionSignature = (prevContext: ContextSignature) => ContextSignature
 
 /**
  * The type of return value of the function to update the context of the state machine.
@@ -500,13 +488,14 @@ export type SetContextReturn<D> = {
   readonly send: Send<D>
 }
 
-export namespace SetContextReturn {
-  export type Signature = {
-    /**
-     * The send function to send an event to the state machine.
-     */
-    readonly send: Send.Signature
-  }
+/**
+ * The type of return value of the function to update the context of the state machine.
+ */
+export type SetContextReturnSignature = {
+  /**
+   * The send function to send an event to the state machine.
+   */
+  readonly send: SendSignature
 }
 
 /**
@@ -524,17 +513,13 @@ export type SetContext<D> = {
   (action: SetContextAction<D>): SetContextReturn<D>
 }
 
-export namespace SetContext {
-  /**
-   * The function to update the context of the state machine.
-   * 
-   * @param action - The action to update the context of the state machine.
-   * @returns The object with the `send` function to send an event to the state machine.
-   */
-  export type Signature = (
-    action: SetContextAction.Signature
-  ) => SetContextReturn.Signature
-}
+/**
+ * The function to update the context of the state machine.
+ * 
+ * @param action - The action to update the context of the state machine.
+ * @returns The object with the `send` function to send an event to the state machine.
+ */
+export type SetContextSignature = (action: SetContextActionSignature) => SetContextReturnSignature
 
 /*******************************************************************************
  * 
@@ -578,35 +563,36 @@ export type EffectParams<D, V> = {
   }
 }
 
-export namespace EffectParams {
-  export type Signature = {
+/**
+ * The type of the effect parameters.
+ */
+export type EffectParamsSignature = {
+  /**
+   * The send function to send an event to the state machine.
+   */
+  readonly send: SendSignature
+  /**
+   * The event that triggered the effect.
+   */
+  readonly event: EntryEventSignature
+  /**
+   * The current context of the state machine.
+   */
+  readonly context: ContextSignature
+  /**
+   * The function to update the context of the state machine.
+   */
+  readonly setContext: SetContextSignature
+  /**
+   * The function to check if the component is mounted.
+   */
+  readonly isMounted: {
     /**
-     * The send function to send an event to the state machine.
+     * Check if the component is mounted.
+     * 
+     * @returns `true` if the component is mounted, `false` otherwise.
      */
-    readonly send: Send.Signature
-    /**
-     * The event that triggered the effect.
-     */
-    readonly event: EntryEvent.Signature
-    /**
-     * The current context of the state machine.
-     */
-    readonly context: Context.Signature
-    /**
-     * The function to update the context of the state machine.
-     */
-    readonly setContext: SetContext.Signature
-    /**
-     * The function to check if the component is mounted.
-     */
-    readonly isMounted: {
-      /**
-       * Check if the component is mounted.
-       * 
-       * @returns `true` if the component is mounted, `false` otherwise.
-       */
-      (): boolean
-    }
+    (): boolean
   }
 }
 
@@ -646,35 +632,36 @@ export type EffectCleanupParams<D, V> = {
   }
 }
 
-export namespace EffectCleanupParams {
-  export type Signature = {
+/**
+ * The type of cleanup parameters for the effect.
+ */
+export type EffectCleanupParamsSignature = {
+  /**
+   * The send function to send an event to the state machine.
+   */
+  readonly send: SendSignature
+  /**
+   * The event that triggered the effect.
+   */
+  readonly event: ExitEventSignature
+  /**
+   * The current context of the state machine.
+   */
+  readonly context: ContextSignature
+  /**
+   * The function to update the context of the state machine.
+   */
+  readonly setContext: SetContextSignature
+  /**
+   * The function to check if the component is mounted.
+   */
+  readonly isMounted: {
     /**
-     * The send function to send an event to the state machine.
+     * Check if the component is mounted.
+     * 
+     * @returns `true` if the component is mounted, `false` otherwise.
      */
-    readonly send: Send.Signature
-    /**
-     * The event that triggered the effect.
-     */
-    readonly event: ExitEvent.Signature
-    /**
-     * The current context of the state machine.
-     */
-    readonly context: Context.Signature
-    /**
-     * The function to update the context of the state machine.
-     */
-    readonly setContext: SetContext.Signature
-    /**
-     * The function to check if the component is mounted.
-     */
-    readonly isMounted: {
-      /**
-       * Check if the component is mounted.
-       * 
-       * @returns `true` if the component is mounted, `false` otherwise.
-       */
-      (): boolean
-    }
+    (): boolean
   }
 }
 
@@ -696,17 +683,13 @@ export type EffectCleanup<D, V> = {
   (params: EffectCleanupParams<D, V>): void | { [UNDEFINED_VOID_ONLY]: never }
 }
 
-export namespace EffectCleanup {
-  /**
-   * The cleanup function for the effect.
-   * 
-   * @param params - The effect cleanup parameters.
-   * @returns `void` or a cleanup function.
-   */
-  export type Signature = (
-    params: EffectCleanupParams.Signature
-  ) => void | { [UNDEFINED_VOID_ONLY]: never }
-}
+/**
+ * The cleanup function for the effect.
+ * 
+ * @param params - The effect cleanup parameters.
+ * @returns `void` or a cleanup function.
+ */
+export type EffectCleanupSignature = (params: EffectCleanupParamsSignature) => void | { [UNDEFINED_VOID_ONLY]: never }
 
 /**
  * The type of return value of the effect function.
@@ -716,12 +699,10 @@ export namespace EffectCleanup {
  */
 export type EffectReturn<D, V> = void | EffectCleanup<D, V>
 
-export namespace EffectReturn {
-  /**
-   * The type of return value of the effect function.
-   */
-  export type Signature = void | EffectCleanup.Signature
-}
+/**
+ * The type of return value of the effect function.
+ */
+export type EffectReturnSignature = void | EffectCleanupSignature
 
 /**
  * The type of the effect function.
@@ -759,17 +740,13 @@ export type Effect<D, N> = _Effect<
   }>
 >
 
-export namespace Effect {
-  /**
-   * The effect function to perform when the state is entered.
-   * 
-   * @param params - The effect parameters.
-   * @returns `void` or a cleanup function.
-   */
-  export type Signature = (
-    params: EffectParams.Signature
-  ) => EffectReturn.Signature
-}
+/**
+ * The effect function to perform when the state is entered.
+ * 
+ * @param params - The effect parameters.
+ * @returns `void` or a cleanup function.
+*/
+export type EffectSignature = (params: EffectParamsSignature) => EffectReturnSignature
 
 /*******************************************************************************
  * 
@@ -892,13 +869,13 @@ export type Signature = {
    * The guards to check before the transition.
    */
   readonly guards?: {
-    readonly [guardName: Tagged<string, "GuardName">]: Guard.Signature
+    readonly [guardName: Tagged<string, "GuardName">]: GuardSignature
   }
   /**
    * The actions to perform when the state is entered.
    */
   readonly effects?: {
-    readonly [effectName: Tagged<string, "EffectName">]: Effect.Signature
+    readonly [effectName: Tagged<string, "EffectName">]: EffectSignature
   }
   /**
    * The verbose level to log messages.
