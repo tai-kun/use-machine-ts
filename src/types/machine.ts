@@ -17,20 +17,20 @@ export type State<
   /**
    * The current state value.
    */
-  readonly value: V
+  readonly value: V;
   /**
    * The current context.
    */
-  readonly context: Definition.Context<D>
+  readonly context: Definition.Context<D>;
   /**
    * The event that caused the state transition.
    */
-  readonly event: Config.TransitionEventForStateValue<D, V>
+  readonly event: Config.TransitionEventForStateValue<D, V>;
   /**
    * The next events that can be sent to the state machine.
    */
-  readonly nextEvents: readonly Config.NextEventTypesForStateValue<D, V>[]
-}
+  readonly nextEvents: readonly Config.NextEventTypesForStateValue<D, V>[];
+};
 
 /**
  * The current state of the state machine.
@@ -39,32 +39,32 @@ export type StateSignature = {
   /**
    * The current state value.
    */
-  readonly value: Tagged<string, "StateValue">
+  readonly value: Tagged<string, "StateValue">;
   /**
    * The current context.
    */
-  readonly context: Definition.ContextSignature
+  readonly context: Definition.ContextSignature;
   /**
    * The event that caused the state transition.
    */
-  readonly event: Config.TransitionEventForStateValueSignature
+  readonly event: Config.TransitionEventForStateValueSignature;
   /**
    * The next events that can be sent to the state machine.
    */
-  readonly nextEvents: readonly Config.NextEventTypesForStateValueSignature[]
-}
+  readonly nextEvents: readonly Config.NextEventTypesForStateValueSignature[];
+};
 
 /**
  * The send function to send an event to the state machine.
  * 
  * @template D - The type of the state machine definition.
  */
-export type Send<D> = Config.Send<D>
+export type Send<D> = Config.Send<D>;
 
 /**
  * The send function to send an event to the state machine.
  */
-export type SendSignature = Config.SendSignature
+export type SendSignature = Config.SendSignature;
 
 /**
  * The state machine.
@@ -74,7 +74,7 @@ export type SendSignature = Config.SendSignature
 export type Machine<D = Definition.Signature> = readonly [
   definition: D,
   config?: Config.Signature,
-]
+];
 
 /**
  * The state machine.
@@ -82,7 +82,7 @@ export type Machine<D = Definition.Signature> = readonly [
 export type MachineSignature = readonly [
   definition: Definition.Signature,
   config?: Config.Signature,
-]
+];
 
 /**
  * The action to send an event to the shared state machine.
@@ -90,23 +90,23 @@ export type MachineSignature = readonly [
  * @template D - The type of the shared state machine definition.
  */
 export type Action<D> = {
-  readonly type: "SEND"
-  readonly payload: Config.Sendable<D>
+  readonly type: "SEND";
+  readonly payload: Config.Sendable<D>;
 } | {
-  readonly type: "SET_CONTEXT"
-  readonly payload: Definition.Context<D>
-}
+  readonly type: "SET_CONTEXT";
+  readonly payload: Definition.Context<D>;
+};
 
 /**
  * The action to send an event to the shared state machine.
  */
 export type ActionSignature = {
-  readonly type: "SEND"
-  readonly payload: Config.SendableSignature
+  readonly type: "SEND";
+  readonly payload: Config.SendableSignature;
 } | {
-  readonly type: "SET_CONTEXT"
-  readonly payload: Config.SetContextActionSignature
-}
+  readonly type: "SET_CONTEXT";
+  readonly payload: Config.SetContextActionSignature;
+};
 
 /**
  * The shared state machine.
@@ -117,7 +117,7 @@ export type SharedMachine<D = Definition.Signature> = {
   /**
    * Instance of the state machine.
    */
-  readonly instance: Machine<D>
+  readonly instance: Machine<D>;
   /**
    * The dispatch function to send an event to the shared state machine.
    */
@@ -127,30 +127,30 @@ export type SharedMachine<D = Definition.Signature> = {
      * 
      * @param action - The action to send to the shared state machine.
      */
-    (action: Action<D>): void
-  }
+    (action: Action<D>): void;
+  };
   /**
    * The send function to send an event to the shared state machine.
    */
-  readonly send: Send<D>
+  readonly send: Send<D>;
   /**
    * The current state of the shared state machine.
    * 
    * @returns The current state of the shared state machine.
    */
-  readonly getState: () => State<D>
+  readonly getState: () => State<D>;
   /**
    * Subscribes to state changes in the shared state machine.
    * 
    * @param callback A function that is called whenever the state machine changes state.
    * @returns A function to unsubscribe from state changes.
    */
-  readonly subscribe: (callback: (state: State<D>) => void) => () => void
+  readonly subscribe: (callback: (state: State<D>) => void) => () => void;
   /**
    * The function to set the context of the shared state machine.
    */
-  readonly setContext: Config.SetContext<D>
-}
+  readonly setContext: Config.SetContext<D>;
+};
 
 /**
  * The shared state machine.
@@ -159,7 +159,7 @@ export type SharedMachineSignature = {
   /**
    * Instance of the state machine.
    */
-  readonly instance: MachineSignature
+  readonly instance: MachineSignature;
   /**
    * The dispatch function to send an event to the shared state machine.
    */
@@ -169,30 +169,30 @@ export type SharedMachineSignature = {
      * 
      * @param action - The action to send to the shared state machine.
      */
-    (action: ActionSignature): void
-  }
+    (action: ActionSignature): void;
+  };
   /**
    * The send function to send an event to the shared state machine.
    */
-  readonly send: SendSignature
+  readonly send: SendSignature;
   /**
    * The current state of the shared state machine.
    * 
    * @returns The current state of the shared state machine.
    */
-  readonly getState: () => StateSignature
+  readonly getState: () => StateSignature;
   /**
    * Subscribes to state changes in the shared state machine.
    * 
    * @param callback A function that is called whenever the state machine changes state.
    * @returns A function to unsubscribe from state changes.
    */
-  readonly subscribe: (callback: (state: StateSignature) => void) => () => void
+  readonly subscribe: (callback: (state: StateSignature) => void) => () => void;
   /**
    * The function to set the context of the shared state machine.
    */
-  readonly setContext: Config.SetContextSignature
-}
+  readonly setContext: Config.SetContextSignature;
+};
 
 if (cfgTest && cfgTest.url === import.meta.url) {
   // const { expectType } = await import("tsd")

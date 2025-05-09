@@ -6,7 +6,7 @@ import type {
   Effect as EffectDefinition,
   Guard as GuardDefinition,
   ReservedKeyword,
-} from "./definition"
+} from "./definition";
 import type {
   AnyRoRec,
   Extends,
@@ -14,7 +14,7 @@ import type {
   IsStringLiteral,
   Tagged,
   ValueOf,
-} from "./utils"
+} from "./utils";
 
 /*******************************************************************************
  * 
@@ -33,8 +33,8 @@ type _InferAllTransitionEventTypes<D> =
   | keyof Get<D, ["on"]>
   // The event types defined in each state.
   | ValueOf<{
-      [V in keyof Get<D, ["states"]>]: keyof Get<D, ["states", V, "on"]>
-    }>
+      [V in keyof Get<D, ["states"]>]: keyof Get<D, ["states", V, "on"]>;
+    }>;
 
 /**
  * The type of event that triggered the transition.
@@ -46,8 +46,8 @@ type _TransitionEvent<T> = [T] extends [never] ? never : {
   /**
    * The event type. Initially, it is `$init`.
    */
-  type: T
-}
+  type: T;
+};
 
 /**
  * The type of event that triggered the transition.
@@ -96,19 +96,19 @@ type TransitionEvent<
             | keyof _S
           >
         >
-    )
+    );
 
 /**
- * The type of event that triggered the transition.
+ * The type of signature for event that triggered the transition.
  */
 export type TransitionEventSignature = {
   /**
    * The event type. Initially, it is `$init`.
    */
-  readonly type: Tagged<string, "EventType">
+  readonly type: Tagged<string, "EventType">;
 } & {
-  readonly [key: string]: unknown
-}
+  readonly [key: string]: unknown;
+};
 
 /*******************************************************************************
  * 
@@ -128,7 +128,7 @@ type _TransitionEventForType<E, T> =
     ? ET extends T
       ? E
       : never
-    : never
+    : never;
 
 /**
  * The type of event that triggered the transition for the given event type.
@@ -137,7 +137,7 @@ type _TransitionEventForType<E, T> =
  * @template T - The type of event type to extract.
  */
 type TransitionEventForType<D, T> =
-  _TransitionEventForType<TransitionEvent<D>, T>
+  _TransitionEventForType<TransitionEvent<D>, T>;
 
 /*******************************************************************************
  * 
@@ -159,7 +159,7 @@ type _InferTransitionTarget<E> =
   : Get<E, ["target"]> extends infer T extends string
   ? T
   // Else, return `never`.
-  : never
+  : never;
 
 /**
  * Infer all event types from the state machine definition for the given state value.
@@ -175,7 +175,7 @@ type _InferAllTransitionEventTypesForStateValue<D, V> =
         [E in keyof Get<D, ["states", SV, "on"]>]:
           _InferTransitionTarget<Get<D, ["states", SV, "on", E]>> extends V
             ? E
-            : never
+            : never;
       }>
     }>
   // The event types defined in the root.
@@ -183,8 +183,8 @@ type _InferAllTransitionEventTypesForStateValue<D, V> =
       [E in keyof Get<D, ["on"]>]:
         _InferTransitionTarget<Get<D, ["on", E]>> extends V
           ? E
-          : never
-    }>
+          : never;
+    }>;
 
 /**
  * The type of event that triggered the transition for the given state value.
@@ -201,7 +201,7 @@ export type TransitionEventForStateValue<D, V> =
           /**
            * The event type. Initially, it is `$init`.
            */
-          type: "$init"
+          type: "$init";
         }
       // Else, return `never`.
       : never
@@ -210,9 +210,12 @@ export type TransitionEventForStateValue<D, V> =
   | TransitionEventForType<
       D,
       _InferAllTransitionEventTypesForStateValue<D, V>
-    >
+    >;
 
-export type TransitionEventForStateValueSignature = TransitionEventSignature
+/**
+ * The type of signature for event that triggered the transition for the given state value.
+ */
+export type TransitionEventForStateValueSignature = TransitionEventSignature;
 
 /*******************************************************************************
  * 
@@ -241,7 +244,7 @@ type _InferGuardEventType<
     ? E
     // Else, return `never`.
     : never
-    : never
+    : never;
 }>
 
 /**
@@ -258,16 +261,16 @@ export type GuardEvent<
   // Infer the state value from the guard name in each state.
   | ValueOf<{
       [V in keyof Get<D, ["states"]>]:
-      _InferGuardEventType<D, ["states", V, "on"], N>
+        _InferGuardEventType<D, ["states", V, "on"], N>;
     }>
   // Infer the state value from the guard name in the root.
   | _InferGuardEventType<D, ["on"], N>
->
+>;
 
 /**
- * The type of event that triggered the transition for the given guard name.
+ * The type of signature for event that triggered the transition for the given guard name.
  */
-export type GuardEventSignature = TransitionEventSignature
+export type GuardEventSignature = TransitionEventSignature;
 
 /**
  * The type of parameters for the guard function.
@@ -282,26 +285,26 @@ export type GuardParams<
   /**
    * The event that triggered the transition.
    */
-  event: GuardEvent<D, N>
+  event: GuardEvent<D, N>;
   /**
    * The current context of the state machine.
    */
-  context: Context<D>
-}
+  context: Context<D>;
+};
 
 /**
- * The type of parameters for the guard function.
+ * The type of signature for parameters for the guard function.
  */
 export type GuardParamsSignature = {
   /**
    * The event that triggered the transition.
    */
-  readonly event: GuardEventSignature
+  readonly event: GuardEventSignature;
   /**
    * The current context of the state machine.
    */
-  readonly context: ContextSignature
-}
+  readonly context: ContextSignature;
+};
 
 /**
  * The type of guard function to check before the transition.
@@ -319,8 +322,8 @@ export type Guard<
    * @param params - The parameters for the guard function.
    * @returns `true` if the transition is allowed, `false` otherwise.
    */
-  (params: GuardParams<D, N>): boolean
-}
+  (params: GuardParams<D, N>): boolean;
+};
 
 /**
  * Checks if the transition is allowed.
@@ -328,7 +331,7 @@ export type Guard<
  * @param params - The parameters for the guard function.
  * @returns `true` if the transition is allowed, `false` otherwise.
  */
-export type GuardSignature = (params: GuardParamsSignature) => boolean
+export type GuardSignature = (params: GuardParamsSignature) => boolean;
 
 /*******************************************************************************
  * 
@@ -358,14 +361,14 @@ export type Sendable<
   : keyof _E extends "type"
   ? (_E | _T)
   // Else, return the event and its type.
-  : _E
+  : _E;
 
 /**
- * The type of sendable event to send to the state machine.
+ * The type of signature for sendable event to send to the state machine.
  */
 export type SendableSignature =
   | Tagged<string, "EventType">
-  | TransitionEventSignature
+  | TransitionEventSignature;
 
 /**
  * The type of the send function to send an event to the state machine.
@@ -378,15 +381,15 @@ export type Send<D> = {
    * 
    * @param event - The event to send to the state machine.
    */
-  (event: Sendable<D>): void
-}
+  (event: Sendable<D>): void;
+};
 
 /**
  * Sends an event to the state machine.
  * 
  * @param event - The event to send to the state machine.
  */
-export type SendSignature = (event: SendableSignature) => void
+export type SendSignature = (event: SendableSignature) => void;
 
 /*******************************************************************************
  * 
@@ -400,12 +403,12 @@ export type SendSignature = (event: SendableSignature) => void
  * @template D - The type of the state machine definition.
  * @template V - The type of state value.
  */
-export type EntryEvent<D, V> = TransitionEventForStateValue<D, V>
+export type EntryEvent<D, V> = TransitionEventForStateValue<D, V>;
 
 /**
- * The type of event that triggered the transition.
+ * The type of signature for event that triggered the transition.
  */
-export type EntryEventSignature = TransitionEventSignature
+export type EntryEventSignature = TransitionEventSignature;
 
 /*******************************************************************************
  * 
@@ -424,12 +427,12 @@ export type NextEventTypesForStateValue<
   V,
 > =
   | keyof Get<D, ["states", V, "on"]>
-  | keyof Get<D, ["on"]>
+  | keyof Get<D, ["on"]>;
 
 /**
- * The next event types for the given state value.
+ * The signature for next event types for the given state value.
  */
-export type NextEventTypesForStateValueSignature = Tagged<string, "EventType">
+export type NextEventTypesForStateValueSignature = Tagged<string, "EventType">;
 
 /**
  * The type of event that before the transition.
@@ -440,12 +443,12 @@ export type NextEventTypesForStateValueSignature = Tagged<string, "EventType">
 export type ExitEvent<D, V> = TransitionEventForType<
   D,
   NextEventTypesForStateValue<D, V>
->
+>;
 
 /**
- * The type of event that before the transition.
+ * The type of signature for event that before the transition.
  */
-export type ExitEventSignature = TransitionEventSignature
+export type ExitEventSignature = TransitionEventSignature;
 
 /*******************************************************************************
  * 
@@ -465,8 +468,8 @@ export type SetContextAction<D> = {
    * @param prevContext - The type of the previous context of the state machine.
    * @returns The type of the new context of the state machine.
    */
-  (prevContext: Context<D>): Context<D>
-}
+  (prevContext: Context<D>): Context<D>;
+};
 
 /**
  * The action to update the context of the state machine.
@@ -474,7 +477,7 @@ export type SetContextAction<D> = {
  * @param prevContext - The type of the previous context of the state machine.
  * @returns The type of the new context of the state machine.
  */
-export type SetContextActionSignature = (prevContext: ContextSignature) => ContextSignature
+export type SetContextActionSignature = (prevContext: ContextSignature) => ContextSignature;
 
 /**
  * The type of return value of the function to update the context of the state machine.
@@ -485,8 +488,8 @@ export type SetContextReturn<D> = {
   /**
    * The send function to send an event to the state machine.
    */
-  readonly send: Send<D>
-}
+  readonly send: Send<D>;
+};
 
 /**
  * The type of return value of the function to update the context of the state machine.
@@ -495,8 +498,8 @@ export type SetContextReturnSignature = {
   /**
    * The send function to send an event to the state machine.
    */
-  readonly send: SendSignature
-}
+  readonly send: SendSignature;
+};
 
 /**
  * The type of the function to update the context of the state machine.
@@ -510,8 +513,8 @@ export type SetContext<D> = {
    * @param action - The action to update the context of the state machine.
    * @returns The object with the `send` function to send an event to the state machine.
    */
-  (action: SetContextAction<D>): SetContextReturn<D>
-}
+  (action: SetContextAction<D>): SetContextReturn<D>;
+};
 
 /**
  * The function to update the context of the state machine.
@@ -519,7 +522,7 @@ export type SetContext<D> = {
  * @param action - The action to update the context of the state machine.
  * @returns The object with the `send` function to send an event to the state machine.
  */
-export type SetContextSignature = (action: SetContextActionSignature) => SetContextReturnSignature
+export type SetContextSignature = (action: SetContextActionSignature) => SetContextReturnSignature;
 
 /*******************************************************************************
  * 
@@ -537,19 +540,19 @@ export type EffectParams<D, V> = {
   /**
    * The send function to send an event to the state machine.
    */
-  readonly send: Send<D>
+  readonly send: Send<D>;
   /**
    * The event that triggered the effect.
    */
-  readonly event: EntryEvent<D, V>
+  readonly event: EntryEvent<D, V>;
   /**
    * The current context of the state machine.
    */
-  readonly context: Context<D>
+  readonly context: Context<D>;
   /**
    * The function to update the context of the state machine.
    */
-  readonly setContext: SetContext<D>
+  readonly setContext: SetContext<D>;
   /**
    * The function to check if the component is mounted.
    */
@@ -559,9 +562,9 @@ export type EffectParams<D, V> = {
      * 
      * @returns `true` if the component is mounted, `false` otherwise.
      */
-    (): boolean
-  }
-}
+    (): boolean;
+  };
+};
 
 /**
  * The type of the effect parameters.
@@ -570,19 +573,19 @@ export type EffectParamsSignature = {
   /**
    * The send function to send an event to the state machine.
    */
-  readonly send: SendSignature
+  readonly send: SendSignature;
   /**
    * The event that triggered the effect.
    */
-  readonly event: EntryEventSignature
+  readonly event: EntryEventSignature;
   /**
    * The current context of the state machine.
    */
-  readonly context: ContextSignature
+  readonly context: ContextSignature;
   /**
    * The function to update the context of the state machine.
    */
-  readonly setContext: SetContextSignature
+  readonly setContext: SetContextSignature;
   /**
    * The function to check if the component is mounted.
    */
@@ -592,8 +595,8 @@ export type EffectParamsSignature = {
      * 
      * @returns `true` if the component is mounted, `false` otherwise.
      */
-    (): boolean
-  }
+    (): boolean;
+  };
 }
 
 /**
@@ -606,19 +609,19 @@ export type EffectCleanupParams<D, V> = {
   /**
    * The send function to send an event to the state machine.
    */
-  readonly send: Send<D>
+  readonly send: Send<D>;
   /**
    * The event that triggered the effect.
    */
-  readonly event: ExitEvent<D, V>
+  readonly event: ExitEvent<D, V>;
   /**
    * The current context of the state machine.
    */
-  readonly context: Context<D>
+  readonly context: Context<D>;
   /**
    * The function to update the context of the state machine.
    */
-  readonly setContext: SetContext<D>
+  readonly setContext: SetContext<D>;
   /**
    * The function to check if the component is mounted.
    */
@@ -628,8 +631,8 @@ export type EffectCleanupParams<D, V> = {
      * 
      * @returns `true` if the component is mounted, `false` otherwise.
      */
-    (): boolean
-  }
+    (): boolean;
+  };
 }
 
 /**
@@ -639,19 +642,19 @@ export type EffectCleanupParamsSignature = {
   /**
    * The send function to send an event to the state machine.
    */
-  readonly send: SendSignature
+  readonly send: SendSignature;
   /**
    * The event that triggered the effect.
    */
-  readonly event: ExitEventSignature
+  readonly event: ExitEventSignature;
   /**
    * The current context of the state machine.
    */
-  readonly context: ContextSignature
+  readonly context: ContextSignature;
   /**
    * The function to update the context of the state machine.
    */
-  readonly setContext: SetContextSignature
+  readonly setContext: SetContextSignature;
   /**
    * The function to check if the component is mounted.
    */
@@ -661,8 +664,8 @@ export type EffectCleanupParamsSignature = {
      * 
      * @returns `true` if the component is mounted, `false` otherwise.
      */
-    (): boolean
-  }
+    (): boolean;
+  };
 }
 
 declare const UNDEFINED_VOID_ONLY: unique symbol
@@ -680,8 +683,8 @@ export type EffectCleanup<D, V> = {
    * @param params - The effect cleanup parameters.
    * @returns `void` or a cleanup function.
    */
-  (params: EffectCleanupParams<D, V>): void | { [UNDEFINED_VOID_ONLY]: never }
-}
+  (params: EffectCleanupParams<D, V>): void | { [UNDEFINED_VOID_ONLY]: never };
+};
 
 /**
  * The cleanup function for the effect.
@@ -689,7 +692,7 @@ export type EffectCleanup<D, V> = {
  * @param params - The effect cleanup parameters.
  * @returns `void` or a cleanup function.
  */
-export type EffectCleanupSignature = (params: EffectCleanupParamsSignature) => void | { [UNDEFINED_VOID_ONLY]: never }
+export type EffectCleanupSignature = (params: EffectCleanupParamsSignature) => void | { [UNDEFINED_VOID_ONLY]: never };
 
 /**
  * The type of return value of the effect function.
@@ -697,12 +700,12 @@ export type EffectCleanupSignature = (params: EffectCleanupParamsSignature) => v
  * @template D - The type of the state machine definition.
  * @template V - The type of state value.
  */
-export type EffectReturn<D, V> = void | EffectCleanup<D, V>
+export type EffectReturn<D, V> = void | EffectCleanup<D, V>;
 
 /**
  * The type of return value of the effect function.
  */
-export type EffectReturnSignature = void | EffectCleanupSignature
+export type EffectReturnSignature = void | EffectCleanupSignature;
 
 /**
  * The type of the effect function.
@@ -718,8 +721,8 @@ type _Effect<D, V> = {
    * @param params - The effect parameters.
    * @returns `void` or a cleanup function.
    */
-  (params: EffectParams<D, V>): EffectReturn<D, V>
-}
+  (params: EffectParams<D, V>): EffectReturn<D, V>;
+};
 
 /**
  * The type of the effect function.
@@ -736,9 +739,9 @@ export type Effect<D, N> = _Effect<
         ? N extends E
           ? V
           : never
-        : never
+        : never;
   }>
->
+>;
 
 /**
  * The effect function to perform when the state is entered.
@@ -746,7 +749,7 @@ export type Effect<D, N> = _Effect<
  * @param params - The effect parameters.
  * @returns `void` or a cleanup function.
 */
-export type EffectSignature = (params: EffectParamsSignature) => EffectReturnSignature
+export type EffectSignature = (params: EffectParamsSignature) => EffectReturnSignature;
 
 /*******************************************************************************
  * 
@@ -761,7 +764,7 @@ export type EffectSignature = (params: EffectParamsSignature) => EffectReturnSig
  * - `1`: Logs some messages.
  * - `2` or `true`: Logs all messages.
  */
-export type Verbose = boolean | 0 | 1 | 2
+export type Verbose = boolean | 0 | 1 | 2;
 
 /**
  * Interface for a console object.
@@ -773,29 +776,29 @@ export type ConsoleInterface = {
    * @param format - A `printf`-like format string.
    * @param param - The parameter to log.
    */
-  readonly log: (format: string, ...param: unknown[]) => void
+  readonly log: (format: string, ...param: unknown[]) => void;
   /**
    * Logs a message to the console.
    * 
    * @param format - A `printf`-like format string.
    * @param param - The parameter to log.
    */
-  readonly error?: ((format: string, ...param: unknown[]) => void) | undefined
+  readonly error?: ((format: string, ...param: unknown[]) => void) | undefined;
   /**
    * Increases indentation of subsequent lines by spaces for `groupIndentation`length.
    * 
    * @param label - If one or more `label`s are provided, those are printed first without the additional indentation.
    */
-  readonly group?: ((...label: string[]) => void) | undefined
+  readonly group?: ((...label: string[]) => void) | undefined;
   /**
    * Decreases indentation of subsequent lines by spaces for `groupIndentation`length.
    */
-  readonly groupEnd?: (() => void) | undefined
+  readonly groupEnd?: (() => void) | undefined;
   /**
    * An alias for {@link group} in Node.js.
    */
-  readonly groupCollapsed?: ((...label: string[]) => void) | undefined
-}
+  readonly groupCollapsed?: ((...label: string[]) => void) | undefined;
+};
 
 /*******************************************************************************
  * 
@@ -827,7 +830,7 @@ export type Exact<
       : N extends ReservedKeyword
       ? `Error: Guard name '${N}' is reserved.`
       // Else, return the guard function.
-      : Guard<D, N>
+      : Guard<D, N>;
   }
   /**
    * The actions to perform when the state is entered.
@@ -841,7 +844,7 @@ export type Exact<
       : N extends ReservedKeyword
       ? `Error: Effect name '${N}' is reserved.`
       // Else, return the effect function.
-      : Effect<D, N>
+      : Effect<D, N>;
   }
   /**
    * The verbose level to log messages.
@@ -852,14 +855,14 @@ export type Exact<
    * 
    * @default 1
    */
-  readonly verbose?: Verbose
+  readonly verbose?: Verbose;
   /**
    * Interface for a console object.
    * 
    * @default console
    */
-  readonly console?: ConsoleInterface
-}
+  readonly console?: ConsoleInterface;
+};
 
 /**
  * The typeof signature for state machine configuration.
@@ -869,14 +872,14 @@ export type Signature = {
    * The guards to check before the transition.
    */
   readonly guards?: {
-    readonly [guardName: Tagged<string, "GuardName">]: GuardSignature
-  }
+    readonly [guardName: Tagged<string, "GuardName">]: GuardSignature;
+  };
   /**
    * The actions to perform when the state is entered.
    */
   readonly effects?: {
-    readonly [effectName: Tagged<string, "EffectName">]: EffectSignature
-  }
+    readonly [effectName: Tagged<string, "EffectName">]: EffectSignature;
+  };
   /**
    * The verbose level to log messages.
    * 
@@ -886,14 +889,14 @@ export type Signature = {
    * 
    * @default 1
    */
-  readonly verbose?: Verbose
+  readonly verbose?: Verbose;
   /**
    * Interface for a console object.
    * 
    * @default console
    */
-  readonly console?: ConsoleInterface
-}
+  readonly console?: ConsoleInterface;
+};
 
 if (cfgTest && cfgTest.url === import.meta.url) {
   // const { expectType } = await import("tsd")
