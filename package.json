@@ -25,19 +25,19 @@
       "require": "./dist/index.cjs"
     },
     "./standard": {
-      "types": "./dist/useMachine.d.ts",
-      "import": "./dist/useMachine.mjs",
-      "require": "./dist/useMachine.cjs"
+      "types": "./dist/use-machine.d.ts",
+      "import": "./dist/use-machine.mjs",
+      "require": "./dist/use-machine.cjs"
     },
     "./shared": {
-      "types": "./dist/useSharedMachine.d.ts",
-      "import": "./dist/useSharedMachine.mjs",
-      "require": "./dist/useSharedMachine.cjs"
+      "types": "./dist/use-shared-machine.d.ts",
+      "import": "./dist/use-shared-machine.mjs",
+      "require": "./dist/use-shared-machine.cjs"
     },
     "./synced": {
-      "types": "./dist/useSyncedMachine.d.ts",
-      "import": "./dist/useSyncedMachine.mjs",
-      "require": "./dist/useSyncedMachine.cjs"
+      "types": "./dist/use-synced-machine.d.ts",
+      "import": "./dist/use-synced-machine.mjs",
+      "require": "./dist/use-synced-machine.cjs"
     }
   },
   "peerDependencies": {
