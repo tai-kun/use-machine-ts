@@ -25,7 +25,7 @@ import type {
 /**
  * Infer all event types from the state machine definition.
  * 
- * @template D - The type of definition for state machine.
+ * @template D The type of definition for state machine.
  * @see {@link TransitionEvent}
  */
 type _InferAllTransitionEventTypes<D> =
@@ -39,7 +39,7 @@ type _InferAllTransitionEventTypes<D> =
 /**
  * The type of event that triggered the transition.
  * 
- * @template T - The type of event type.
+ * @template T The type of event type.
  * @see {@link TransitionEvent}
  */
 type _TransitionEvent<T> = [T] extends [never] ? never : {
@@ -52,8 +52,8 @@ type _TransitionEvent<T> = [T] extends [never] ? never : {
 /**
  * The type of event that triggered the transition.
  * 
- * @template D - The type of state machine definition.
- * @template _S - (internal) The type of events schema.
+ * @template D The type of state machine definition.
+ * @template _S (internal) The type of events schema.
  */
 // Indicates that it is an event for a transition
 // to avoid conflict with the global `Event` type.
@@ -119,8 +119,8 @@ export type TransitionEventSignature = {
 /**
  * The type of event that triggered the transition for the given event type.
  * 
- * @template E - The type of event to extract from.
- * @template T - The type of event type to extract.
+ * @template E The type of event to extract from.
+ * @template T The type of event type to extract.
  * @see {@link TransitionEventForType}
  */
 type _TransitionEventForType<E, T> =
@@ -133,8 +133,8 @@ type _TransitionEventForType<E, T> =
 /**
  * The type of event that triggered the transition for the given event type.
  * 
- * @template D - The type of state machine definition.
- * @template T - The type of event type to extract.
+ * @template D The type of state machine definition.
+ * @template T The type of event type to extract.
  */
 type TransitionEventForType<D, T> =
   _TransitionEventForType<TransitionEvent<D>, T>;
@@ -148,7 +148,7 @@ type TransitionEventForType<D, T> =
 /**
  * Extract the target state value from the event.
  * 
- * @template E - The event type.
+ * @template E The event type.
  * @see {@link _InferAllTransitionEventTypesForStateValue}
  */
 type _InferTransitionTarget<E> =
@@ -162,10 +162,11 @@ type _InferTransitionTarget<E> =
   : never;
 
 /**
- * Infer all event types from the state machine definition for the given state value.
+ * Infer all event types from the state machine definition for the given state
+ * value.
  * 
- * @template D - The state machine definition.
- * @template V - The state value.
+ * @template D The state machine definition.
+ * @template V The state value.
  * @see {@link TransitionEventForStateValue}
  */
 type _InferAllTransitionEventTypesForStateValue<D, V> =
@@ -189,8 +190,8 @@ type _InferAllTransitionEventTypesForStateValue<D, V> =
 /**
  * The type of event that triggered the transition for the given state value.
  * 
- * @template D - The state machine definition.
- * @template V - The state value.
+ * @template D The state machine definition.
+ * @template V The state value.
  */
 export type TransitionEventForStateValue<D, V> =
   // Reserved event types.
@@ -213,7 +214,8 @@ export type TransitionEventForStateValue<D, V> =
     >;
 
 /**
- * The type of signature for event that triggered the transition for the given state value.
+ * The type of signature for event that triggered the transition for the given
+ * state value.
  */
 export type TransitionEventForStateValueSignature = TransitionEventSignature;
 
@@ -224,11 +226,12 @@ export type TransitionEventForStateValueSignature = TransitionEventSignature;
  ******************************************************************************/
 
 /**
- * Infer the event type from the state machine definition for the given guard name.
+ * Infer the event type from the state machine definition for the given guard
+ * name.
  * 
- * @template D - The type of the state machine definition.
- * @template P - The type of path from definition root to here.
- * @template N - The type of guard name.
+ * @template D The type of the state machine definition.
+ * @template P The type of path from definition root to here.
+ * @template N The type of guard name.
  * @template _O (Internal) The type of the `on` property.
  */
 type _InferGuardEventType<
@@ -245,13 +248,13 @@ type _InferGuardEventType<
     // Else, return `never`.
     : never
     : never;
-}>
+}>;
 
 /**
  * The type of event that triggered the transition for the given guard name.
  * 
- * @template D - The type of state machine definition.
- * @template N - The type of guard name.
+ * @template D The type of state machine definition.
+ * @template N The type of guard name.
  */
 export type GuardEvent<
   D,
@@ -268,15 +271,16 @@ export type GuardEvent<
 >;
 
 /**
- * The type of signature for event that triggered the transition for the given guard name.
+ * The type of signature for event that triggered the transition for the given
+ * guard name.
  */
 export type GuardEventSignature = TransitionEventSignature;
 
 /**
  * The type of parameters for the guard function.
  * 
- * @template D - The type of the state machine definition.
- * @template N - The type of guard name.
+ * @template D The type of the state machine definition.
+ * @template N The type of guard name.
  */
 export type GuardParams<
   D,
@@ -309,29 +313,34 @@ export type GuardParamsSignature = {
 /**
  * The type of guard function to check before the transition.
  * 
- * @template D - The type of the state machine definition.
- * @template N - The type of guard name.
+ * @template D The type of the state machine definition.
+ * @template N The type of guard name.
  */
-export type Guard<
+export interface Guard<
   D,
   N extends string,
-> = {
+> {
   /**
    * Checks if the transition is allowed.
    * 
-   * @param params - The parameters for the guard function.
+   * @param params The parameters for the guard function.
    * @returns `true` if the transition is allowed, `false` otherwise.
    */
   (params: GuardParams<D, N>): boolean;
-};
+}
 
 /**
- * Checks if the transition is allowed.
- * 
- * @param params - The parameters for the guard function.
- * @returns `true` if the transition is allowed, `false` otherwise.
+ * The type of signature for guard function to check before the transition.
  */
-export type GuardSignature = (params: GuardParamsSignature) => boolean;
+export interface GuardSignature {
+  /**
+   * Checks if the transition is allowed.
+   * 
+   * @param params The parameters for the guard function.
+   * @returns `true` if the transition is allowed, `false` otherwise.
+   */
+  (params: GuardParamsSignature): boolean;
+}
 
 /*******************************************************************************
  * 
@@ -349,7 +358,7 @@ export type GuardSignature = (params: GuardParamsSignature) => boolean;
 export type Sendable<
   D,
   _E = TransitionEvent<D>,
-  _T = Get<_E, ["type"]>
+  _T = Get<_E, ["type"]>,
 > =
   // If the event does not have a `type` property, return an error.
     IsStringLiteral<_T> extends false
@@ -373,23 +382,29 @@ export type SendableSignature =
 /**
  * The type of the send function to send an event to the state machine.
  * 
- * @template D - The type of the state machine definition.
+ * @template D The type of the state machine definition.
  */
-export type Send<D> = {
+export interface Send<D> {
   /**
    * Sends an event to the state machine.
    * 
-   * @param event - The event to send to the state machine.
+   * @param event The event to send to the state machine.
    */
   (event: Sendable<D>): void;
-};
+}
 
 /**
- * Sends an event to the state machine.
- * 
- * @param event - The event to send to the state machine.
+ * The type of signature for the send function to send an event to the state
+ * machine.
  */
-export type SendSignature = (event: SendableSignature) => void;
+export interface SendSignature {
+  /**
+   * Sends an event to the state machine.
+   * 
+   * @param event The event to send to the state machine.
+   */
+  (event: SendableSignature): void;
+}
 
 /*******************************************************************************
  * 
@@ -400,8 +415,8 @@ export type SendSignature = (event: SendableSignature) => void;
 /**
  * The type of event that triggered the transition.
  * 
- * @template D - The type of the state machine definition.
- * @template V - The type of state value.
+ * @template D The type of the state machine definition.
+ * @template V The type of state value.
  */
 export type EntryEvent<D, V> = TransitionEventForStateValue<D, V>;
 
@@ -419,8 +434,8 @@ export type EntryEventSignature = TransitionEventSignature;
 /**
  * The next event types for the given state value.
  * 
- * @template D - The type of state machine definition.
- * @template V - The type of state value.
+ * @template D The type of state machine definition.
+ * @template V The type of state value.
  */
 export type NextEventTypesForStateValue<
   D,
@@ -437,8 +452,8 @@ export type NextEventTypesForStateValueSignature = Tagged<string, "EventType">;
 /**
  * The type of event that before the transition.
  * 
- * @template D - The type of state machine definition.
- * @template V - The type of state value.
+ * @template D The type of state machine definition.
+ * @template V The type of state value.
  */
 export type ExitEvent<D, V> = TransitionEventForType<
   D,
@@ -459,30 +474,37 @@ export type ExitEventSignature = TransitionEventSignature;
 /**
  * The type of the function to update the context of the state machine.
  * 
- * @template D - The type of the state machine definition.
+ * @template D The type of the state machine definition.
  */
-export type SetContextAction<D> = {
+export interface SetContextAction<D> {
   /**
    * The action to update the context of the state machine.
    * 
-   * @param prevContext - The type of the previous context of the state machine.
+   * @param prevContext The type of the previous context of the state machine.
    * @returns The type of the new context of the state machine.
    */
   (prevContext: Context<D>): Context<D>;
-};
+}
 
 /**
- * The action to update the context of the state machine.
- * 
- * @param prevContext - The type of the previous context of the state machine.
- * @returns The type of the new context of the state machine.
+ * The type of signature for the function to update the context of the state
+ * machine.
  */
-export type SetContextActionSignature = (prevContext: ContextSignature) => ContextSignature;
+export interface SetContextActionSignature {
+  /**
+   * The action to update the context of the state machine.
+   * 
+   * @param prevContext The type of the previous context of the state machine.
+   * @returns The type of the new context of the state machine.
+   */
+  (prevContext: ContextSignature): ContextSignature;
+}
 
 /**
- * The type of return value of the function to update the context of the state machine.
+ * The type of return value of the function to update the context of the state
+ * machine.
  * 
- * @template D - The type of the state machine definition.
+ * @template D The type of the state machine definition.
  */
 export type SetContextReturn<D> = {
   /**
@@ -492,7 +514,8 @@ export type SetContextReturn<D> = {
 };
 
 /**
- * The type of return value of the function to update the context of the state machine.
+ * The type of signature for return value of the function to update the context
+ * of the state machine.
  */
 export type SetContextReturnSignature = {
   /**
@@ -504,25 +527,33 @@ export type SetContextReturnSignature = {
 /**
  * The type of the function to update the context of the state machine.
  * 
- * @template D - The type of the state machine definition.
+ * @template D The type of the state machine definition.
  */
-export type SetContext<D> = {
+export interface SetContext<D> {
   /**
    * The function to update the context of the state machine.
    * 
-   * @param action - The action to update the context of the state machine.
-   * @returns The object with the `send` function to send an event to the state machine.
+   * @param action The action to update the context of the state machine.
+   * @returns The object with the `send` function to send an event to the state
+   * machine.
    */
   (action: SetContextAction<D>): SetContextReturn<D>;
-};
+}
 
 /**
- * The function to update the context of the state machine.
- * 
- * @param action - The action to update the context of the state machine.
- * @returns The object with the `send` function to send an event to the state machine.
+ * The type of signature for the function to update the context of the state
+ * machine.
  */
-export type SetContextSignature = (action: SetContextActionSignature) => SetContextReturnSignature;
+export interface SetContextSignature {
+  /**
+   * The function to update the context of the state machine.
+   * 
+   * @param action The action to update the context of the state machine.
+   * @returns The object with the `send` function to send an event to the state
+   * machine.
+   */
+  (action: SetContextActionSignature): SetContextReturnSignature;
+}
 
 /*******************************************************************************
  * 
@@ -531,10 +562,22 @@ export type SetContextSignature = (action: SetContextActionSignature) => SetCont
  ******************************************************************************/
 
 /**
+ * The function to check if the component is mounted.
+ */
+export interface IsMountedFunction {
+  /**
+   * Check if the component is mounted.
+   * 
+   * @returns `true` if the component is mounted, `false` otherwise.
+   */
+  (): boolean;
+}
+
+/**
  * The type of the effect parameters.
  * 
- * @template D - The type of the state machine definition.
- * @template V - The type of state value.
+ * @template D The type of the state machine definition.
+ * @template V The type of state value.
  */
 export type EffectParams<D, V> = {
   /**
@@ -556,18 +599,11 @@ export type EffectParams<D, V> = {
   /**
    * The function to check if the component is mounted.
    */
-  readonly isMounted: {
-    /**
-     * Check if the component is mounted.
-     * 
-     * @returns `true` if the component is mounted, `false` otherwise.
-     */
-    (): boolean;
-  };
+  readonly isMounted: IsMountedFunction;
 };
 
 /**
- * The type of the effect parameters.
+ * The type of signature for the effect parameters.
  */
 export type EffectParamsSignature = {
   /**
@@ -589,21 +625,14 @@ export type EffectParamsSignature = {
   /**
    * The function to check if the component is mounted.
    */
-  readonly isMounted: {
-    /**
-     * Check if the component is mounted.
-     * 
-     * @returns `true` if the component is mounted, `false` otherwise.
-     */
-    (): boolean;
-  };
+  readonly isMounted: IsMountedFunction;
 }
 
 /**
  * The type of cleanup parameters for the effect.
  * 
- * @template D - The type of the state machine definition.
- * @template V - The type of state value.
+ * @template D The type of the state machine definition.
+ * @template V The type of state value.
  */
 export type EffectCleanupParams<D, V> = {
   /**
@@ -625,18 +654,11 @@ export type EffectCleanupParams<D, V> = {
   /**
    * The function to check if the component is mounted.
    */
-  readonly isMounted: {
-    /**
-     * Check if the component is mounted.
-     * 
-     * @returns `true` if the component is mounted, `false` otherwise.
-     */
-    (): boolean;
-  };
+  readonly isMounted: IsMountedFunction;
 }
 
 /**
- * The type of cleanup parameters for the effect.
+ * The type of signature for cleanup parameters for the effect.
  */
 export type EffectCleanupParamsSignature = {
   /**
@@ -658,14 +680,7 @@ export type EffectCleanupParamsSignature = {
   /**
    * The function to check if the component is mounted.
    */
-  readonly isMounted: {
-    /**
-     * Check if the component is mounted.
-     * 
-     * @returns `true` if the component is mounted, `false` otherwise.
-     */
-    (): boolean;
-  };
+  readonly isMounted: IsMountedFunction;
 }
 
 declare const UNDEFINED_VOID_ONLY: unique symbol
@@ -673,32 +688,39 @@ declare const UNDEFINED_VOID_ONLY: unique symbol
 /**
  * The type of cleanup function for the effect.
  * 
- * @template D - The type of the state machine definition.
- * @template V - The type of state value.
+ * @template D The type of the state machine definition.
+ * @template V The type of state value.
  */
-export type EffectCleanup<D, V> = {
+export interface EffectCleanup<D, V> {
   /**
    * The cleanup function for the effect.
    * 
-   * @param params - The effect cleanup parameters.
+   * @param params The effect cleanup parameters.
    * @returns `void` or a cleanup function.
    */
   (params: EffectCleanupParams<D, V>): void | { [UNDEFINED_VOID_ONLY]: never };
-};
+}
 
 /**
- * The cleanup function for the effect.
- * 
- * @param params - The effect cleanup parameters.
- * @returns `void` or a cleanup function.
+ * The type of signature for cleanup function for the effect.
  */
-export type EffectCleanupSignature = (params: EffectCleanupParamsSignature) => void | { [UNDEFINED_VOID_ONLY]: never };
+export interface EffectCleanupSignature {
+  /**
+   * The cleanup function for the effect.
+   * 
+   * @param params The effect cleanup parameters.
+   * @returns `void` or a cleanup function.
+   */
+  (params: EffectCleanupParamsSignature):
+    | void
+    | { [UNDEFINED_VOID_ONLY]: never };
+}
 
 /**
  * The type of return value of the effect function.
  * 
- * @template D - The type of the state machine definition.
- * @template V - The type of state value.
+ * @template D The type of the state machine definition.
+ * @template V The type of state value.
  */
 export type EffectReturn<D, V> = void | EffectCleanup<D, V>;
 
@@ -710,27 +732,27 @@ export type EffectReturnSignature = void | EffectCleanupSignature;
 /**
  * The type of the effect function.
  * 
- * @template D - The type of the state machine definition.
- * @template V - The type of state value.
+ * @template D The type of the state machine definition.
+ * @template V The type of state value.
  * @see {@link Effect}
  */
-type _Effect<D, V> = {
+interface _Effect<D, V> {
   /**
    * The effect function to perform when the state is entered.
    * 
-   * @param params - The effect parameters.
+   * @param params The effect parameters.
    * @returns `void` or a cleanup function.
    */
   (params: EffectParams<D, V>): EffectReturn<D, V>;
-};
+}
 
 /**
  * The type of the effect function.
  * 
- * @template D - The type of the state machine definition.
- * @template N - The type of effect name.
+ * @template D The type of the state machine definition.
+ * @template N The type of effect name.
  */
-export type Effect<D, N> = _Effect<
+export interface Effect<D, N> extends _Effect<
   D,
   // Infer the state value from the effect name.
   ValueOf<{
@@ -741,15 +763,20 @@ export type Effect<D, N> = _Effect<
           : never
         : never;
   }>
->;
+> {}
 
 /**
- * The effect function to perform when the state is entered.
- * 
- * @param params - The effect parameters.
- * @returns `void` or a cleanup function.
-*/
-export type EffectSignature = (params: EffectParamsSignature) => EffectReturnSignature;
+ * The type of signature for the effect function.
+ */
+export interface EffectSignature {
+  /**
+   * The effect function to perform when the state is entered.
+   * 
+   * @param params The effect parameters.
+   * @returns `void` or a cleanup function.
+   */
+  (params: EffectParamsSignature): EffectReturnSignature;
+}
 
 /*******************************************************************************
  * 
@@ -769,29 +796,32 @@ export type Verbose = boolean | 0 | 1 | 2;
 /**
  * Interface for a console object.
  */
-export type ConsoleInterface = {
+export interface ConsoleInterface {
   /**
    * Logs a message to the console.
    * 
-   * @param format - A `printf`-like format string.
-   * @param param - The parameter to log.
+   * @param format A `printf`-like format string.
+   * @param param The parameter to log.
    */
   readonly log: (format: string, ...param: unknown[]) => void;
   /**
    * Logs a message to the console.
    * 
-   * @param format - A `printf`-like format string.
-   * @param param - The parameter to log.
+   * @param format A `printf`-like format string.
+   * @param param The parameter to log.
    */
   readonly error?: ((format: string, ...param: unknown[]) => void) | undefined;
   /**
-   * Increases indentation of subsequent lines by spaces for `groupIndentation`length.
+   * Increases indentation of subsequent lines by spaces for `groupIndentation`
+   * length.
    * 
-   * @param label - If one or more `label`s are provided, those are printed first without the additional indentation.
+   * @param label If one or more `label`s are provided, those are printed
+   * first without the additional indentation.
    */
   readonly group?: ((...label: string[]) => void) | undefined;
   /**
-   * Decreases indentation of subsequent lines by spaces for `groupIndentation`length.
+   * Decreases indentation of subsequent lines by spaces for `groupIndentation`
+   * length.
    */
   readonly groupEnd?: (() => void) | undefined;
   /**
@@ -809,9 +839,9 @@ export type ConsoleInterface = {
 /**
  * The type of state machine configuration.
  * 
- * @template D - The type of definition for state machine.
- * @template G - The type of guard names for state machine.
- * @template E - The type of effect names for state machine.
+ * @template D The type of definition for state machine.
+ * @template G The type of guard names for state machine.
+ * @template E The type of effect names for state machine.
  */
 export type Exact<
   D,
@@ -865,7 +895,7 @@ export type Exact<
 };
 
 /**
- * The typeof signature for state machine configuration.
+ * The type of signature for state machine configuration.
  */
 export type Signature = {
   /**

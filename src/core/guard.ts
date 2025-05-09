@@ -5,8 +5,8 @@ import { log, unreachable } from "./devutils";
 /**
  * Inverts the boolean value returned by the guard function.
  *
- * @template G - The type of the guard.
- * @param guard - The guard to invert.
+ * @template G The type of the guard.
+ * @param guard The guard to invert.
  * @returns The inverted guard.
  */
 export function not<const G extends string>(
@@ -21,8 +21,8 @@ export function not<const G extends string>(
 /**
  * Combines multiple guards into a single guard using the logical `&&` operator.
  *
- * @template G - The type of the guard.
- * @param guards - The guards to combine.
+ * @template G The type of the guard.
+ * @param guards The guards to combine.
  * @returns The combined guard.
  */
 export function and<const G extends string>(
@@ -34,8 +34,8 @@ export function and<const G extends string>(
 /**
  * Combines multiple guards into a single guard using the logical `||` operator.
  *
- * @template G - The type of the guard.
- * @param guards - The guards to combine.
+ * @template G The type of the guard.
+ * @param guards The guards to combine.
  * @returns The combined guard.
  */
 export function or<const G extends string>(
@@ -56,9 +56,9 @@ export const guards = {
 /**
  * Checks if the guard passes.
  *
- * @param conf - The configuration of the state machine.
- * @param guard - The guard to check.
- * @param params - The parameters to pass to the guard.
+ * @param conf The configuration of the state machine.
+ * @param guard The guard to check.
+ * @param params The parameters to pass to the guard.
  * @returns `true` if the guard passes, `false` otherwise.
  */
 export function doGuard(
@@ -94,8 +94,8 @@ type GuardContext = {
 /**
  * Checks if the guard passes for development.
  *
- * @param ctx - The context of the guard.
- * @param guard - The guard to check.
+ * @param ctx The context of the guard.
+ * @param guard The guard to check.
  * @returns The result of the guard.
  */
 function innerDoGuardForDev(
@@ -169,9 +169,9 @@ function innerDoGuardForDev(
 /**
  * Checks if the guard passes for development.
  *
- * @param conf - The configuration of the state machine.
- * @param guard - The guard to check.
- * @param params - The parameters to pass to the guard.
+ * @param conf The configuration of the state machine.
+ * @param guard The guard to check.
+ * @param params The parameters to pass to the guard.
  * @returns The result of the guard.
  */
 export function doGuardForDev(
@@ -285,7 +285,7 @@ function innerFormatGuardResult(ctx: FormatContext, res: GuardResult): void {
 /**
  * Formats the result of the guard for development.
  *
- * @param result - The result of the guard.
+ * @param result The result of the guard.
  * @returns The formatted result of the guard.
  */
 export function formatGuardResult(result: GuardResult): string {

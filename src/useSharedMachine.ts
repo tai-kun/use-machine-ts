@@ -10,9 +10,9 @@ import type { Send, SharedMachine, State } from "./types";
  * The shared state machine returned by `createSharedMachine` includes functions such as `.send()` to trigger state transitions and `.getState()` to return a snapshot of the current state.
  * These mechanisms are implemented using `React.useSyncExternalStore`.
  *
- * @template D - The type of state machine definition.
- * @param machine - The shared state machine.
- * @param getServerState - A function that returns the state on the server.
+ * @template D The type of state machine definition.
+ * @param machine The shared state machine.
+ * @param getServerState A function that returns the state on the server.
  * @returns An array with two elements:
  * - The first element is the current state of the state machine.
  * - The second element is a function that sends an event to the state machine.

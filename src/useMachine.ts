@@ -20,8 +20,8 @@ import type { Config, Definition, Machine, Send, State } from "./types";
  * The state machine constructor is executed only once per hook.
  * It is idempotent unless it depends on external mutable values within the constructor.
  *
- * @template D - The type of state machine definition.
- * @param machine - The state machine constructor.
+ * @template D The type of state machine definition.
+ * @param machine The state machine constructor.
  * @returns An array with two elements:
  * - The first element is the current state of the state machine.
  * - The second element is a function that sends an event to the state machine.
@@ -90,10 +90,10 @@ function useMachine<D>(
  * When this function is executed, it returns a reference to the `props` passed to the hook.
  * This mechanism is implemented using `React.useRef`, ensuring that it always returns a reference to the latest `props`.
  *
- * @template D - The type of state machine definition.
- * @template P - The type of props for the state machine constructor.
- * @param machine - The state machine constructor.
- * @param props - The props for the state machine constructor.
+ * @template D The type of state machine definition.
+ * @template P The type of props for the state machine constructor.
+ * @param machine The state machine constructor.
+ * @param props The props for the state machine constructor.
  * @returns An array with two elements:
  * - The first element is the current state of the state machine.
  * - The second element is a function that sends an event to the state machine.
@@ -165,8 +165,8 @@ function useMachine<D, P>(
  * To enable tree shaking, you can indicate to the bundler that this function has no side effects
  * by using the `@__PURE__` or `#__PURE__` annotation as needed.
  *
- * @template D - The type of state machine definition.
- * @param machine - The state machine instance.
+ * @template D The type of state machine definition.
+ * @param machine The state machine instance.
  * @returns An array with two elements:
  * - The first element is the current state of the state machine.
  * - The second element is a function that sends an event to the state machine.
@@ -230,8 +230,8 @@ function useMachine<D>(
  * For complex definitions, it is usually better to write them in a separate file and import it.
  * However, if the definition does not impair readability, keeping it within the component can actually make it more readable.
  *
- * @template D - The type of state machine definition.
- * @param definition - The state machine definition.
+ * @template D The type of state machine definition.
+ * @param definition The state machine definition.
  * @returns An array with two elements:
  * - The first element is the current state of the state machine.
  * - The second element is a function that sends an event to the state machine.
@@ -280,11 +280,11 @@ function useMachine<D extends Definition.Shape<D, never, never>>(
  * For complex definitions, it is usually better to write them in a separate file and import it.
  * However, if the definition does not impair readability, keeping it within the component can actually make it more readable.
  *
- * @template D - The type of state machine definition.
- * @template G - The type of guards for state machine functions.
- * @template E - The type of effects for state machine functions.
- * @param definition - The state machine definition.
- * @param config - The state machine configuration.
+ * @template D The type of state machine definition.
+ * @template G The type of guards for state machine functions.
+ * @template E The type of effects for state machine functions.
+ * @param definition The state machine definition.
+ * @param config The state machine configuration.
  * @returns An array with two elements:
  * - The first element is the current state of the state machine.
  * - The second element is a function that sends an event to the state machine.

@@ -24,7 +24,7 @@ export type ReservedKeyword =
 /**
  * The type of guard for state machine.
  * 
- * @template G - The type of guard names for state machine functions.
+ * @template G The type of guard names for state machine functions.
  */
 export type Guard<G extends string> = G | GuardOp<G>;
 
@@ -39,7 +39,7 @@ export type GuardSignature =
  * The type of guard for state machine.
  * Inverts the boolean value returned by the guard function.
  * 
- * @template G - The type of guard names for state machine functions.
+ * @template G The type of guard names for state machine functions.
  */
 export type GuardNot<G extends string> = {
   readonly op: "not";
@@ -48,21 +48,23 @@ export type GuardNot<G extends string> = {
 
 /**
  * The type of guard for state machine.
- * Combines the results of multiple guard functions using the logical `&&` operator.
+ * Combines the results of multiple guard functions using the logical `&&`
+ * operator.
  * 
  * **Note: An empty guards will be `true`.**
  * 
- * @template G - The type of guard names for state machine functions.
+ * @template G The type of guard names for state machine functions.
  */
 export type GuardAnd<G extends string> = readonly (G | GuardOp<G>)[];
 
 /**
  * The type of guard for state machine.
- * Combines the results of multiple guard functions using the logical `||` operator.
+ * Combines the results of multiple guard functions using the logical `||`
+ * operator.
  * 
  * **Note: An empty guards will be `false`.**
  * 
- * @template G - The type of guard names for state machine functions.
+ * @template G The type of guard names for state machine functions.
  */
 export type GuardOr<G extends string> = {
   readonly op: "or";
@@ -72,16 +74,16 @@ export type GuardOr<G extends string> = {
 /**
  * The type of guard for state machine.
  * 
- * @template G - The type of guard names for state machine functions.
+ * @template G The type of guard names for state machine functions.
  */
 export type GuardOp<G extends string> = GuardNot<G> | GuardAnd<G> | GuardOr<G>;
 
 /**
  * The type of transition for state machine.
  * 
- * @template D - The type of definition for state machine.
- * @template G - The type of guards for state machine functions.
- * @template _T - (internal) The type of state value.
+ * @template D The type of definition for state machine.
+ * @template G The type of guards for state machine functions.
+ * @template _T (internal) The type of state value.
  */
 export type Transition<
   D,
@@ -107,7 +109,8 @@ export type Transition<
           readonly target: _T;
           /**
            * The guards to check before the transition.
-           * Combines the results of multiple guard functions using the logical AND operator.
+           * Combines the results of multiple guard functions using the logical
+           * AND operator.
            * 
            * **Note: An empty guards will be `true`.**
            */
@@ -136,7 +139,8 @@ export type TransitionSignature = Tagged<string, "StateValue"> | {
   readonly target: Tagged<string, "StateValue">;
   /**
    * The guards to check before the transition.
-   * Combines the results of multiple guard functions using the logical AND operator.
+   * Combines the results of multiple guard functions using the logical AND
+   * operator.
    * 
    * **Note: An empty guards will be `true`.**
    */
@@ -146,7 +150,7 @@ export type TransitionSignature = Tagged<string, "StateValue"> | {
 /**
  * The type of event type constraint.
  * 
- * @template D - The type of definition for state machine.
+ * @template D The type of definition for state machine.
  * @see {@link On}
  */
 type _EventTypeConstraint<D> =
@@ -157,11 +161,12 @@ type _EventTypeConstraint<D> =
 declare const NEVER: unique symbol;
 
 /**
- * The type of definition how a state machine will transition when it receives a specific event.
+ * The type of definition how a state machine will transition when it receives
+ * a specific event.
  * 
- * @template D - The type of definition for state machine.
- * @template P - The type of path from definition root to here.
- * @template G - The type of guards for state machine functions.
+ * @template D The type of definition for state machine.
+ * @template P The type of path from definition root to here.
+ * @template G The type of guards for state machine functions.
  */
 export type On<
   D,
@@ -187,7 +192,8 @@ export type On<
     };
 
 /**
- * The type of definition how a state machine will transition when it receives a specific event.
+ * The type of definition how a state machine will transition when it receives
+ * a specific event.
  */
 export type OnSignature = {
   readonly [eventType: Tagged<string, "EventType">]: TransitionSignature;
@@ -196,7 +202,7 @@ export type OnSignature = {
 /**
  * The type of effect for state machine.
  * 
- * @template E - The type of effect names for state machine functions.
+ * @template E The type of effect names for state machine functions.
  */
 export type Effect<E extends string> = E | readonly E[];
 
@@ -208,10 +214,10 @@ export type EffectSignature = Effect<Tagged<string, "EffectName">>;
 /**
  * The state definition.
  * 
- * @template D - The type of definition for state machine.
- * @template P - The type of path from definition root to here.
- * @template G - The type of guards for state machine functions.
- * @template E - The type of effects for state machine functions.
+ * @template D The type of definition for state machine.
+ * @template P The type of path from definition root to here.
+ * @template G The type of guards for state machine functions.
+ * @template E The type of effects for state machine functions.
  */
 export type State<
   D,
@@ -220,9 +226,10 @@ export type State<
   E extends string,
 > = {
   /**
-   * The type of definition how a state machine will transition when it receives a specific event.
+   * The type of definition how a state machine will transition when it receives
+   * a specific event.
    */
-  readonly on?: On<D, [...P, "on"], G>
+  readonly on?: On<D, [...P, "on"], G>;
   /**
    * The actions to perform when the state is entered.
    */
@@ -234,7 +241,7 @@ export type State<
     : IsStringLiteral<E> extends false
     ? "Error: Effects must be literal strings."
     // Else, return the effect.
-    : Effect<E>
+    : Effect<E>;
 };
 
 /**
@@ -242,7 +249,8 @@ export type State<
  */
 export type StateSignature = {
   /**
-   * The type of definition how a state machine will transition when it receives a specific event.
+   * The type of definition how a state machine will transition when it receives
+   * a specific event.
    */
   readonly on?: OnSignature;
   /**
@@ -256,7 +264,7 @@ declare const ERROR: unique symbol
 /**
  * The type of context for state machine.
  * 
- * @template D - The type of definition for state machine.
+ * @template D The type of definition for state machine.
  */
 export type Context<D> =
   // If in strict mode, the context should be satisfies the schema.
@@ -285,12 +293,12 @@ export type ContextSignature = unknown;
 /**
  * The type of schema for state machine.
  * 
- * @template D - The type of definition for state machine.
- * @template P - The type of path from definition root to here.
- * @template _S - (internal) The type of schema.
- * @template _T - (internal) The type of `strict` property in schema.
- * @template _E - (internal) The type of `events` property in schema.
- * @template _C - (internal) The type of `context` property in schema.
+ * @template D The type of definition for state machine.
+ * @template P The type of path from definition root to here.
+ * @template _S (internal) The type of schema.
+ * @template _T (internal) The type of `strict` property in schema.
+ * @template _E (internal) The type of `events` property in schema.
+ * @template _C (internal) The type of `context` property in schema.
  */
 export type Schema<
   D,
@@ -301,8 +309,9 @@ export type Schema<
   _C = Get<_S, ["context"]>,
 > = {
   /**
-   * - `true` - Reports errors for contexts and events that are not defined in the schema.
-   * - `false` - Type inference is performed whenever possible.
+   * - `true`: Reports errors for contexts and events that are not defined in
+   * the schema.
+   * - `false`: Type inference is performed whenever possible.
    */
   readonly strict?:
     // If the `strict` property is not a literal boolean, return an error.
@@ -344,10 +353,10 @@ export type Schema<
 /**
  * The type of state machine definition.
  * 
- * @template D - The type of definition for state machine.
- * @template G - The type of guards for state machine functions.
- * @template E - The type of effects for state machine functions.
- * @template _S - (internal) The type of states.
+ * @template D The type of definition for state machine.
+ * @template G The type of guards for state machine functions.
+ * @template E The type of effects for state machine functions.
+ * @template _S (internal) The type of states.
  */
 export type Shape<
   D,
@@ -393,7 +402,8 @@ export type Shape<
           : State<D, ["states", V], G, E>
       };
   /**
-   * The definition how a state machine will transition when it receives a specific event.
+   * The definition how a state machine will transition when it receives
+   * a specific event.
    */
   readonly on?: On<D, ["on"], G>;
   readonly $schema?: Schema<D, ["$schema"]>;
@@ -416,7 +426,7 @@ export type Shape<
 /**
  * Infer the narrowest type from the state machine definition.
  * 
- * @template D - The type of state machine definition.
+ * @template D The type of state machine definition.
  */
 export type Exact<D> = {
   readonly [K in keyof D]:
@@ -440,7 +450,8 @@ export type Signature = {
     readonly [stateValue: Tagged<string, "StateValue">]: StateSignature;
   };
   /**
-   * The definition how a state machine will transition when it receives a specific event.
+   * The definition how a state machine will transition when it receives
+   * a specific event.
    */
   readonly on?: OnSignature;
   /**

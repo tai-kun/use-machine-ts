@@ -13,7 +13,7 @@ import { useEffect, useLayoutEffect, useMemo, useRef } from "./react";
 /**
  * Creates a initial state machine state.
  *
- * @param def - The state machine definition.
+ * @param def The state machine definition.
  * @returns Initial state machine state.
  */
 export function createInitialState(
@@ -30,8 +30,8 @@ export function createInitialState(
 /**
  * Basic action type.
  *
- * @template T - The typeof action.
- * @template P - The typeof action payload.
+ * @template T The typeof action.
+ * @template P The typeof action payload.
  */
 type ActionType<T extends string, P> = {
   readonly type: T;
@@ -48,10 +48,10 @@ export type Action =
 /**
  * Applies the action to the state machine.
  *
- * @param def - The state machine definition.
- * @param conf - The state machine configuration.
- * @param state - The current state of the state machine.
- * @param action - The action to apply to the state machine.
+ * @param def The state machine definition.
+ * @param conf The state machine configuration.
+ * @param state The current state of the state machine.
+ * @param action The action to apply to the state machine.
  * @returns The next state of the state machine.
  */
 export function applyDispatch(
@@ -212,12 +212,12 @@ export function applyDispatch(
 /**
  * Apply effects to the state machine.
  *
- * @param def - The state machine definition.
- * @param conf - The state machine configuration.
- * @param state - The current state of the state machine.
- * @param dispatch - The function to dispatch an action to the state machine.
- * @param isMounted - A reference to a boolean that is `true` if the component is mounted, otherwise `false`.
- * @param syncMode - Whether to run the effects synchronously.
+ * @param def The state machine definition.
+ * @param conf The state machine configuration.
+ * @param state The current state of the state machine.
+ * @param dispatch The function to dispatch an action to the state machine.
+ * @param isMounted A reference to a boolean that is `true` if the component is mounted, otherwise `false`.
+ * @param syncMode Whether to run the effects synchronously.
  * @returns The cleanup function to clean up the effects.
  */
 export function applyEffect(
@@ -354,8 +354,8 @@ const useIsomorphicLayoutEffect = typeof document === "undefined"
  * This React hook is used to memoize a value that is expensive to compute.
  * Similar to `useMemo`, but also does not have a dependency list and is computed only once, the first time.
  *
- * @template T - The type of the memoized value.
- * @param compute - A function that computes the memoized value.
+ * @template T The type of the memoized value.
+ * @param compute A function that computes the memoized value.
  * @returns The memoized value.
  */
 export function useSingleton<T>(compute: () => T): T {
@@ -386,8 +386,8 @@ export function useIsMounted(): { readonly current: boolean } {
 /**
  * A hook to use a state machine definition and configuration.
  *
- * @param arg0 - The state machine definition or factory.
- * @param arg1 - The state machine configuration or arguments for the factory.
+ * @param arg0 The state machine definition or factory.
+ * @param arg1 The state machine configuration or arguments for the factory.
  * @returns An array with two elements:
  * - The first element is the state machine definition.
  * - The second element is the state machine configuration.
@@ -455,11 +455,11 @@ export function useInstance(
 /**
  * A hook to use a state machine state.
  *
- * @param def - The state machine definition.
- * @param conf - The state machine configuration.
- * @param state - The state machine state.
- * @param dispatch - The state machine dispatch function.
- * @param isMounted - A reference to a boolean that is `true` if the component is mounted, otherwise `false`.
+ * @param def The state machine definition.
+ * @param conf The state machine configuration.
+ * @param state The state machine state.
+ * @param dispatch The state machine dispatch function.
+ * @param isMounted A reference to a boolean that is `true` if the component is mounted, otherwise `false`.
  */
 export function useSyncState(
   def: Definition.Signature,

@@ -7,8 +7,8 @@ import type { Config, Definition, Machine } from "./types";
  * It cannot be used with `useSharedMachine`.
  * In that case, use `createSharedMachine` instead.
  *
- * @template D - The type of state machine definition.
- * @param definition - The state machine definition.
+ * @template D The type of state machine definition.
+ * @param definition The state machine definition.
  * @returns The state machine.
  */
 function createMachine<D extends Definition.Shape<D, never, never>>(
@@ -22,11 +22,11 @@ function createMachine<D extends Definition.Shape<D, never, never>>(
  * It cannot be used with `useSharedMachine`.
  * In that case, use `createSharedMachine` instead.
  *
- * @template D - The type of state machine definition.
- * @template G - The type of guards for state machine functions.
- * @template E - The type of effects for state machine functions.
- * @param definition - The state machine definition.
- * @param config - The state machine configuration.
+ * @template D The type of state machine definition.
+ * @template G The type of guards for state machine functions.
+ * @template E The type of effects for state machine functions.
+ * @param definition The state machine definition.
+ * @param config The state machine configuration.
  * @returns The state machine.
  */
 function createMachine<

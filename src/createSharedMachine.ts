@@ -12,8 +12,8 @@ import type {
 /**
  * Create a shared state machine.
  *
- * @template D - The type of shared state machine definition.
- * @param definition - The shared state machine definition.
+ * @template D The type of shared state machine definition.
+ * @param definition The shared state machine definition.
  * @returns The shared state machine.
  */
 function createSharedMachine<D extends Definition.Shape<D, never, never>>(
@@ -27,11 +27,11 @@ function createSharedMachine<D extends Definition.Shape<D, never, never>>(
  * It cannot be used with `useMachine` or `useSyncedMachine`.
  * In those cases, use `createMachine` instead.
  *
- * @template D - The type of shared state machine definition.
- * @template G - The type of guards for shared state machine functions.
- * @template E - The type of effects for shared state machine functions.
- * @param definition - The shared state machine definition.
- * @param config - The shared state machine configuration.
+ * @template D The type of shared state machine definition.
+ * @template G The type of guards for shared state machine functions.
+ * @template E The type of effects for shared state machine functions.
+ * @param definition The shared state machine definition.
+ * @param config The shared state machine configuration.
  * @returns The shared state machine.
  */
 function createSharedMachine<

@@ -1,14 +1,14 @@
 // dprint-ignore-file
 
-import type * as Config from "./config"
-import type * as Definition from "./definition"
-import type { Get, Tagged } from "./utils"
+import type * as Config from "./config";
+import type * as Definition from "./definition";
+import type { Get, Tagged } from "./utils";
 
 /**
  * The current state of the state machine.
  * 
- * @template D - The type of definition for state machine.
- * @template V - The type of state value.
+ * @template D The type of definition for state machine.
+ * @template V The type of state value.
  */
 export type State<
   D,
@@ -57,7 +57,7 @@ export type StateSignature = {
 /**
  * The send function to send an event to the state machine.
  * 
- * @template D - The type of the state machine definition.
+ * @template D The type of the state machine definition.
  */
 export type Send<D> = Config.Send<D>;
 
@@ -69,7 +69,7 @@ export type SendSignature = Config.SendSignature;
 /**
  * The state machine.
  * 
- * @template D - The type of the state machine definition.
+ * @template D The type of the state machine definition.
  */
 export type Machine<D = Definition.Signature> = readonly [
   definition: D,
@@ -87,7 +87,7 @@ export type MachineSignature = readonly [
 /**
  * The action to send an event to the shared state machine.
  * 
- * @template D - The type of the shared state machine definition.
+ * @template D The type of the shared state machine definition.
  */
 export type Action<D> = {
   readonly type: "SEND";
@@ -109,9 +109,102 @@ export type ActionSignature = {
 };
 
 /**
+ * The dispatch function to send an event to the shared state machine.
+ * 
+ * @template D The type of the shared state machine definition.
+ */
+export interface DispatchFunction<D = Definition.Signature> {
+  /**
+   * Dispatch an action to the shared state machine.
+   * 
+   * @param action The action to send to the shared state machine.
+   */
+  (action: Action<D>): void;
+}
+
+/**
+ * The type of signature for the dispatch function to send an event to
+ * the shared state machine.
+ */
+export interface DispatchFunctionSignature {
+  /**
+   * Dispatch an action to the shared state machine.
+   * 
+   * @param action The action to send to the shared state machine.
+   */
+  (action: ActionSignature): void;
+}
+
+/**
+ * The current state of the shared state machine.
+ * 
+ * @template D The type of the shared state machine definition.
+ */
+export interface GetStateFunction<D = Definition.Signature> {
+  /**
+   * The current state of the shared state machine.
+   * 
+   * @returns The current state of the shared state machine.
+   */
+  (): State<D>;
+}
+
+/**
+ * The current state of the shared state machine.
+ */
+export interface GetStateFunctionSignature {
+  /**
+   * The current state of the shared state machine.
+   * 
+   * @returns The current state of the shared state machine.
+   */
+  (): StateSignature;
+}
+
+/**
+ * Subscribes to state changes in the shared state machine.
+ * 
+ * @template D The type of the shared state machine definition.
+ */
+export interface SubscribeFunction<D = Definition.Signature> {
+  /**
+   * Subscribes to state changes in the shared state machine.
+   * 
+   * @param callback A function that is called whenever the state machine
+   * changes state.
+   * @returns A function to unsubscribe from state changes.
+   */
+  (callback: (state: State<D>) => void): {
+    /**
+     * Unsubscribe from state changes.
+     */
+    (): void;
+  };
+}
+
+/**
+ * Subscribes to state changes in the shared state machine.
+ */
+export interface SubscribeFunctionSignature {
+  /**
+   * Subscribes to state changes in the shared state machine.
+   * 
+   * @param callback A function that is called whenever the state machine
+   * changes state.
+   * @returns A function to unsubscribe from state changes.
+   */
+  (callback: (state: StateSignature) => void): {
+    /**
+     * Unsubscribe from state changes.
+     */
+    (): void;
+  };
+}
+
+/**
  * The shared state machine.
  * 
- * @template D - The type of the shared state machine definition.
+ * @template D The type of the shared state machine definition.
  */
 export type SharedMachine<D = Definition.Signature> = {
   /**
@@ -121,31 +214,19 @@ export type SharedMachine<D = Definition.Signature> = {
   /**
    * The dispatch function to send an event to the shared state machine.
    */
-  readonly dispatch: {
-    /**
-     * Dispatch an action to the shared state machine.
-     * 
-     * @param action - The action to send to the shared state machine.
-     */
-    (action: Action<D>): void;
-  };
+  readonly dispatch: DispatchFunction<D>;
   /**
    * The send function to send an event to the shared state machine.
    */
   readonly send: Send<D>;
   /**
    * The current state of the shared state machine.
-   * 
-   * @returns The current state of the shared state machine.
    */
-  readonly getState: () => State<D>;
+  readonly getState: GetStateFunction<D>;
   /**
    * Subscribes to state changes in the shared state machine.
-   * 
-   * @param callback A function that is called whenever the state machine changes state.
-   * @returns A function to unsubscribe from state changes.
    */
-  readonly subscribe: (callback: (state: State<D>) => void) => () => void;
+  readonly subscribe: SubscribeFunction<D>;
   /**
    * The function to set the context of the shared state machine.
    */
@@ -163,14 +244,7 @@ export type SharedMachineSignature = {
   /**
    * The dispatch function to send an event to the shared state machine.
    */
-  readonly dispatch: {
-    /**
-     * Dispatch an action to the shared state machine.
-     * 
-     * @param action - The action to send to the shared state machine.
-     */
-    (action: ActionSignature): void;
-  };
+  readonly dispatch: DispatchFunctionSignature;
   /**
    * The send function to send an event to the shared state machine.
    */
@@ -180,14 +254,11 @@ export type SharedMachineSignature = {
    * 
    * @returns The current state of the shared state machine.
    */
-  readonly getState: () => StateSignature;
+  readonly getState: GetStateFunctionSignature;
   /**
    * Subscribes to state changes in the shared state machine.
-   * 
-   * @param callback A function that is called whenever the state machine changes state.
-   * @returns A function to unsubscribe from state changes.
    */
-  readonly subscribe: (callback: (state: StateSignature) => void) => () => void;
+  readonly subscribe: SubscribeFunctionSignature;
   /**
    * The function to set the context of the shared state machine.
    */
