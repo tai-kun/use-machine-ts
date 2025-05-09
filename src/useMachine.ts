@@ -361,7 +361,7 @@ function useMachine(arg0: any, arg1?: any): [any, any] {
     }
 
     return {
-      send(payload: Config.Sendable.Signature) {
+      send(payload: Config.SendableSignature) {
         dispatch({
           type: "SEND",
           payload,

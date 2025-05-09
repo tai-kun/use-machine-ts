@@ -9,7 +9,14 @@ import {
   useSingleton,
 } from "./core/logic";
 import { useEffect, useRef } from "./core/react";
-import type { Config, Definition, Machine, Send, State } from "./types";
+import type {
+  Config,
+  Definition,
+  Machine,
+  Send,
+  State,
+  StateSignature,
+} from "./types";
 
 /**
  * Uses a synced state machine with the constructor.
@@ -321,7 +328,7 @@ function useSyncedMachine(arg0: any, arg1?: any): [any, any] {
   const exitFnRef = useRef<void | (() => void)>(undefined);
   const [def, conf = {}] = useInstance(arg0, arg1);
   const [reqSync, api] = useSingleton(() => {
-    const queue: ((prevState: State.Signature) => State.Signature)[] = [];
+    const queue: ((prevState: StateSignature) => StateSignature)[] = [];
     let machineState = createInitialState(def);
     let previousDeps: readonly unknown[] | undefined;
 
@@ -411,7 +418,7 @@ function useSyncedMachine(arg0: any, arg1?: any): [any, any] {
       () => act(flushSync),
       [
         () => machineState,
-        function send(payload: Config.Sendable.Signature) {
+        function send(payload: Config.SendableSignature) {
           act(() => {
             dispatch({
               type: "SEND",

@@ -11,7 +11,7 @@ import { log, unreachable } from "./devutils";
  */
 export function not<const G extends string>(
   guard: Definition.Guard<G>,
-): Definition.Guard.Not<G> {
+): Definition.GuardNot<G> {
   return {
     op: "not",
     value: guard,
@@ -27,7 +27,7 @@ export function not<const G extends string>(
  */
 export function and<const G extends string>(
   ...guards: Definition.Guard<G>[]
-): Definition.Guard.And<G> {
+): Definition.GuardAnd<G> {
   return guards;
 }
 
@@ -40,7 +40,7 @@ export function and<const G extends string>(
  */
 export function or<const G extends string>(
   ...guards: Definition.Guard<G>[]
-): Definition.Guard.Or<G> {
+): Definition.GuardOr<G> {
   return {
     op: "or",
     value: guards,
@@ -63,8 +63,8 @@ export const guards = {
  */
 export function doGuard(
   conf: Config.Signature,
-  guard: Definition.Guard.Signature,
-  params: Config.GuardParams.Signature,
+  guard: Definition.GuardSignature,
+  params: Config.GuardParamsSignature,
 ): boolean {
   return typeof guard === "string"
     ? conf.guards![guard]!(params)
@@ -100,7 +100,7 @@ type GuardContext = {
  */
 function innerDoGuardForDev(
   ctx: GuardContext,
-  guard: Definition.Guard.Signature,
+  guard: Definition.GuardSignature,
 ): GuardResult {
   if (typeof guard === "string") {
     const { done } = ctx;
@@ -176,8 +176,8 @@ function innerDoGuardForDev(
  */
 export function doGuardForDev(
   conf: Config.Signature,
-  guard: Definition.Guard.Signature,
-  params: Config.GuardParams.Signature,
+  guard: Definition.GuardSignature,
+  params: Config.GuardParamsSignature,
 ): GuardResult {
   let done = false;
   const ctx: GuardContext = {
@@ -304,12 +304,11 @@ if (cfgTest && cfgTest.url === import.meta.url) {
   function doGuardForTest(
     setup: {
       guards: NonNullable<Config.Signature["guards"]>;
-      guard: Definition.Guard.Signature;
-      params?: Config.GuardParams.Signature;
+      guard: Definition.GuardSignature;
+      params?: Config.GuardParamsSignature;
     },
   ) {
-    const { guards, guard, params = {} as Config.GuardParams.Signature } =
-      setup;
+    const { guards, guard, params = {} as Config.GuardParamsSignature } = setup;
     const dev = doGuardForDev({ guards }, guard, params);
 
     return {

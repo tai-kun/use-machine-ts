@@ -1,12 +1,13 @@
 import { applyDispatch, createInitialState } from "./core/logic";
 import { createMachine } from "./createMachine";
 import type {
-  Action,
+  ActionSignature,
   Config,
   Definition,
-  Machine,
+  MachineSignature,
   SharedMachine,
-  State,
+  SharedMachineSignature,
+  StateSignature,
 } from "./types";
 
 /**
@@ -44,12 +45,12 @@ function createSharedMachine<
 ): SharedMachine<D>;
 
 function createSharedMachine(...args: [any, any?]) {
-  const instance = createMachine(...args) as unknown as Machine.Signature;
+  const instance = createMachine(...args) as unknown as MachineSignature;
   const [def, conf = {}] = instance;
   let state = createInitialState(def);
-  const callbacks = new Set<(state: State.Signature) => void>();
+  const callbacks = new Set<(state: StateSignature) => void>();
 
-  function dispatch(action: Action.Signature) {
+  function dispatch(action: ActionSignature) {
     const nextState = applyDispatch(def, conf, state, action);
 
     if (!Object.is(state, nextState)) {
@@ -61,28 +62,28 @@ function createSharedMachine(...args: [any, any?]) {
     }
   }
 
-  function send(event: Config.Sendable.Signature) {
+  function send(event: Config.SendableSignature) {
     dispatch({
       type: "SEND",
       payload: event,
     });
   }
 
-  const machine: SharedMachine.Signature = {
+  const machine: SharedMachineSignature = {
     send,
     instance,
     dispatch,
     getState() {
       return state;
     },
-    subscribe(callback: (state: State.Signature) => void) {
+    subscribe(callback: (state: StateSignature) => void) {
       callbacks.add(callback);
 
       return () => {
         callbacks.delete(callback);
       };
     },
-    setContext(action: Config.SetContextAction.Signature) {
+    setContext(action: Config.SetContextActionSignature) {
       dispatch({
         type: "SET_CONTEXT",
         payload: action,

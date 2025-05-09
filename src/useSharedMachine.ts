@@ -1,6 +1,12 @@
 import { useIsMounted, useSyncState } from "./core/logic";
 import { useSyncExternalStore } from "./core/react";
-import type { Send, SharedMachine, State } from "./types";
+import type {
+  Send,
+  SharedMachine,
+  SharedMachineSignature,
+  State,
+  StateSignature,
+} from "./types";
 
 /**
  * Uses a shared state machine.
@@ -63,12 +69,12 @@ function useSharedMachine<D>(
     dispatch,
     getState,
     subscribe,
-  } = machine as unknown as SharedMachine.Signature;
+  } = machine as unknown as SharedMachineSignature;
   const state = useSyncExternalStore(
     subscribe,
     getState,
-    (getServerState as () => State.Signature) || getState,
-  ) as State.Signature;
+    (getServerState as () => StateSignature) || getState,
+  ) as StateSignature;
 
   useSyncState(def, conf, state, dispatch, isMounted);
 

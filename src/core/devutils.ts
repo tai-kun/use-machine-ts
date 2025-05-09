@@ -21,7 +21,7 @@ export function log(
     /**
      * The level of logging.
      */
-    level: "debug" | "error";
+    readonly level: "debug" | "error";
   },
   groupLabel: string | readonly [string, ...string[]],
   ...messages: readonly (readonly [string, unknown?])[]
