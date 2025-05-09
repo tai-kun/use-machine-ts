@@ -1,5 +1,5 @@
 import { applyDispatch, createInitialState } from "./core/logic";
-import { createMachine } from "./createMachine";
+import { createMachine } from "./create-machine";
 import type {
   ActionSignature,
   Config,
