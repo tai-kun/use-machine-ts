@@ -12,16 +12,16 @@ export type LogOptions = Pick<Config.Signature, "verbose" | "console">;
  * Logs messages to the console.
  *
  * @internal
- * @param options - The options for logging.
- * @param groupLabel - The label for the group of messages.
- * @param messages - The messages to log.
+ * @param options The options for logging.
+ * @param groupLabel The label for the group of messages.
+ * @param messages The messages to log.
  */
 export function log(
   options: LogOptions & {
     /**
      * The level of logging.
      */
-    level: "debug" | "error";
+    readonly level: "debug" | "error";
   },
   groupLabel: string | readonly [string, ...string[]],
   ...messages: readonly (readonly [string, unknown?])[]
@@ -84,10 +84,10 @@ export function log(
  * Calls the callback when the value changes.
  *
  * @internal
- * @template T - The type of the value.
- * @param value - The value to detect changes.
- * @param callback - The callback to call when the value changes.
- * @param options - The options for detecting changes.
+ * @template T The type of the value.
+ * @param value The value to detect changes.
+ * @param callback The callback to call when the value changes.
+ * @param options The options for detecting changes.
  */
 export function useDetectChanges<T>(
   value: T,
@@ -110,8 +110,8 @@ export function useDetectChanges<T>(
 /**
  * Checks if the value is a plain object.
  *
- * @template T - The type of the value to check.
- * @param value - The value to check.
+ * @template T The type of the value to check.
+ * @param value The value to check.
  * @returns `true` if the value is a plain object, or `false` otherwise.
  */
 export function isPlainObject<T>(value: T): value is Exclude<
@@ -129,7 +129,7 @@ export function isPlainObject<T>(value: T): value is Exclude<
 /**
  * Throws an error if the value is never.
  *
- * @param cause - Cause of the error.
+ * @param cause Cause of the error.
  */
 export function unreachable(cause: never): never {
   throw new Error("unreachable", { cause });

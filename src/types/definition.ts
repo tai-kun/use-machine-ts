@@ -9,7 +9,7 @@ import type {
   IsPlainObject,
   RequiredKeysOf,
   Tagged,
-} from "./utils"
+} from "./utils";
 
 /**
  * The type of reserved keywords for library use.
@@ -19,68 +19,71 @@ import type {
  */
 export type ReservedKeyword =
   | "$init"
-  | `Error:${any}`
+  | `Error:${any}`;
 
 /**
  * The type of guard for state machine.
  * 
- * @template G - The type of guard names for state machine functions.
+ * @template G The type of guard names for state machine functions.
  */
-export type Guard<G extends string> = G | Guard.Op<G>
+export type Guard<G extends string> = G | GuardOp<G>;
 
-export namespace Guard {
-  export type Signature =
-    | Tagged<string, "GuardName">
-    | Op<Tagged<string, "GuardName">>
+/**
+ * The type of guard for state machine.
+ */
+export type GuardSignature =
+  | Tagged<string, "GuardName">
+  | GuardOp<Tagged<string, "GuardName">>;
 
-  /**
-   * The type of guard for state machine.
-   * Inverts the boolean value returned by the guard function.
-   * 
-   * @template G - The type of guard names for state machine functions.
-   */
-  export type Not<G extends string> = {
-    readonly op: "not"
-    readonly value: G | Op<G>
-  }
+/**
+ * The type of guard for state machine.
+ * Inverts the boolean value returned by the guard function.
+ * 
+ * @template G The type of guard names for state machine functions.
+ */
+export type GuardNot<G extends string> = {
+  readonly op: "not";
+  readonly value: G | GuardOp<G>;
+};
 
-  /**
-   * The type of guard for state machine.
-   * Combines the results of multiple guard functions using the logical `&&` operator.
-   * 
-   * **Note: An empty guards will be `true`.**
-   * 
-   * @template G - The type of guard names for state machine functions.
-   */
-  export type And<G extends string> = readonly (G | Op<G>)[]
+/**
+ * The type of guard for state machine.
+ * Combines the results of multiple guard functions using the logical `&&`
+ * operator.
+ * 
+ * **Note: An empty guards will be `true`.**
+ * 
+ * @template G The type of guard names for state machine functions.
+ */
+export type GuardAnd<G extends string> = readonly (G | GuardOp<G>)[];
 
-  /**
-   * The type of guard for state machine.
-   * Combines the results of multiple guard functions using the logical `||` operator.
-   * 
-   * **Note: An empty guards will be `false`.**
-   * 
-   * @template G - The type of guard names for state machine functions.
-   */
-  export type Or<G extends string> = {
-    readonly op: "or"
-    readonly value: readonly (G | Op<G>)[]
-  }
+/**
+ * The type of guard for state machine.
+ * Combines the results of multiple guard functions using the logical `||`
+ * operator.
+ * 
+ * **Note: An empty guards will be `false`.**
+ * 
+ * @template G The type of guard names for state machine functions.
+ */
+export type GuardOr<G extends string> = {
+  readonly op: "or";
+  readonly value: readonly (G | GuardOp<G>)[];
+};
 
-  /**
-   * The type of guard for state machine.
-   * 
-   * @template G - The type of guard names for state machine functions.
-   */
-  export type Op<G extends string> = Not<G> | And<G> | Or<G>
-}
+/**
+ * The type of guard for state machine.
+ * 
+ * @template G The type of guard names for state machine functions.
+ */
+export type GuardOp<G extends string> = GuardNot<G> | GuardAnd<G> | GuardOr<G>;
 
 /**
  * The type of transition for state machine.
  * 
- * @template D - The type of definition for state machine.
- * @template G - The type of guards for state machine functions.
- * @template _T - (internal) The type of state value.
+ * @template D The type of definition for state machine.
+ * @template G The type of guards for state machine functions.
+ * @template _T (internal) The type of state value.
  */
 export type Transition<
   D,
@@ -103,10 +106,11 @@ export type Transition<
           /**
            * The state value to transition to.
            */
-          readonly target: _T
+          readonly target: _T;
           /**
            * The guards to check before the transition.
-           * Combines the results of multiple guard functions using the logical AND operator.
+           * Combines the results of multiple guard functions using the logical
+           * AND operator.
            * 
            * **Note: An empty guards will be `true`.**
            */
@@ -121,45 +125,48 @@ export type Transition<
             : Extends<G, ReservedKeyword> extends true
             ? `Error: Guard name '${G}' is reserved.`
             // Else, return the guard.
-            : Guard<G>
+            : Guard<G>;
         }
-    )
+    );
 
-export namespace Transition {
-  export type Signature = Tagged<string, "StateValue"> | {
-    /**
-     * The state value to transition to.
-     */
-    readonly target: Tagged<string, "StateValue">
-    /**
-     * The guards to check before the transition.
-     * Combines the results of multiple guard functions using the logical AND operator.
-     * 
-     * **Note: An empty guards will be `true`.**
-     */
-    readonly guard?: Guard.Signature
-  }
-}
+/**
+ * The type of transition for state machine.
+ */
+export type TransitionSignature = Tagged<string, "StateValue"> | {
+  /**
+   * The state value to transition to.
+   */
+  readonly target: Tagged<string, "StateValue">;
+  /**
+   * The guards to check before the transition.
+   * Combines the results of multiple guard functions using the logical AND
+   * operator.
+   * 
+   * **Note: An empty guards will be `true`.**
+   */
+  readonly guard?: GuardSignature;
+};
 
 /**
  * The type of event type constraint.
  * 
- * @template D - The type of definition for state machine.
+ * @template D The type of definition for state machine.
  * @see {@link On}
  */
 type _EventTypeConstraint<D> =
   Get<D, ["$schema", "strict"]> extends true
     ? keyof Get<D, ["$schema", "events"]>
-    : string
+    : string;
 
-declare const NEVER: unique symbol
+declare const NEVER: unique symbol;
 
 /**
- * The type of definition how a state machine will transition when it receives a specific event.
+ * The type of definition how a state machine will transition when it receives
+ * a specific event.
  * 
- * @template D - The type of definition for state machine.
- * @template P - The type of path from definition root to here.
- * @template G - The type of guards for state machine functions.
+ * @template D The type of definition for state machine.
+ * @template P The type of path from definition root to here.
+ * @template G The type of guards for state machine functions.
  */
 export type On<
   D,
@@ -181,33 +188,36 @@ export type On<
         : Extends<T, _EventTypeConstraint<D>> extends false
         ? "Error: Event type is not defined in `$schema.events`."
         // Else, return the transition.
-        : Transition<D, G>
-    }
+        : Transition<D, G>;
+    };
 
-export namespace On {
-  export type Signature = {
-    readonly [eventType: Tagged<string, "EventType">]: Transition.Signature
-  }
-}
+/**
+ * The type of definition how a state machine will transition when it receives
+ * a specific event.
+ */
+export type OnSignature = {
+  readonly [eventType: Tagged<string, "EventType">]: TransitionSignature;
+};
 
 /**
  * The type of effect for state machine.
  * 
- * @template E - The type of effect names for state machine functions.
+ * @template E The type of effect names for state machine functions.
  */
-export type Effect<E extends string> = E | readonly E[]
+export type Effect<E extends string> = E | readonly E[];
 
-export namespace Effect {
-  export type Signature = Effect<Tagged<string, "EffectName">>
-}
+/**
+ * The type of effect for state machine.
+ */
+export type EffectSignature = Effect<Tagged<string, "EffectName">>;
 
 /**
  * The state definition.
  * 
- * @template D - The type of definition for state machine.
- * @template P - The type of path from definition root to here.
- * @template G - The type of guards for state machine functions.
- * @template E - The type of effects for state machine functions.
+ * @template D The type of definition for state machine.
+ * @template P The type of path from definition root to here.
+ * @template G The type of guards for state machine functions.
+ * @template E The type of effects for state machine functions.
  */
 export type State<
   D,
@@ -216,9 +226,10 @@ export type State<
   E extends string,
 > = {
   /**
-   * The type of definition how a state machine will transition when it receives a specific event.
+   * The type of definition how a state machine will transition when it receives
+   * a specific event.
    */
-  readonly on?: On<D, [...P, "on"], G>
+  readonly on?: On<D, [...P, "on"], G>;
   /**
    * The actions to perform when the state is entered.
    */
@@ -230,28 +241,30 @@ export type State<
     : IsStringLiteral<E> extends false
     ? "Error: Effects must be literal strings."
     // Else, return the effect.
-    : Effect<E>
-}
+    : Effect<E>;
+};
 
-export namespace State {
-  export type Signature = {
-    /**
-     * The type of definition how a state machine will transition when it receives a specific event.
-     */
-    readonly on?: On.Signature
-    /**
-     * The actions to perform when the state is entered.
-     */
-    readonly effect?: Effect.Signature
-  }
-}
+/**
+ * The state definition.
+ */
+export type StateSignature = {
+  /**
+   * The type of definition how a state machine will transition when it receives
+   * a specific event.
+   */
+  readonly on?: OnSignature;
+  /**
+   * The actions to perform when the state is entered.
+   */
+  readonly effect?: EffectSignature;
+};
 
 declare const ERROR: unique symbol
 
 /**
  * The type of context for state machine.
  * 
- * @template D - The type of definition for state machine.
+ * @template D The type of definition for state machine.
  */
 export type Context<D> =
   // If in strict mode, the context should be satisfies the schema.
@@ -270,21 +283,22 @@ export type Context<D> =
         // Else, return `undefined`.
         undefined
       >
-    >
+    >;
 
-export namespace Context {
-  export type Signature = unknown
-}
+/**
+ * The type of context for state machine.
+ */
+export type ContextSignature = unknown;
 
 /**
  * The type of schema for state machine.
  * 
- * @template D - The type of definition for state machine.
- * @template P - The type of path from definition root to here.
- * @template _S - (internal) The type of schema.
- * @template _T - (internal) The type of `strict` property in schema.
- * @template _E - (internal) The type of `events` property in schema.
- * @template _C - (internal) The type of `context` property in schema.
+ * @template D The type of definition for state machine.
+ * @template P The type of path from definition root to here.
+ * @template _S (internal) The type of schema.
+ * @template _T (internal) The type of `strict` property in schema.
+ * @template _E (internal) The type of `events` property in schema.
+ * @template _C (internal) The type of `context` property in schema.
  */
 export type Schema<
   D,
@@ -295,15 +309,16 @@ export type Schema<
   _C = Get<_S, ["context"]>,
 > = {
   /**
-   * - `true` - Reports errors for contexts and events that are not defined in the schema.
-   * - `false` - Type inference is performed whenever possible.
+   * - `true`: Reports errors for contexts and events that are not defined in
+   * the schema.
+   * - `false`: Type inference is performed whenever possible.
    */
   readonly strict?:
     // If the `strict` property is not a literal boolean, return an error.
       IsBooleanLiteral<_T> extends false
     ? "Error: `strict` must be a `true` or `false`."
     // Else, return the `strict` property.
-    : _T
+    : _T;
   /**
    * The event types that are allowed in the state machine.
    */
@@ -327,21 +342,21 @@ export type Schema<
           : "type" extends keyof _E[T]
           ? "Error: Event cannot have a reserved property 'type'."
           // Else, return the event.
-          : _E[T]
-      }
+          : _E[T];
+      };
   /**
    * The context of the state machine.
    */
-  readonly context?: _C
-}
+  readonly context?: _C;
+};
 
 /**
  * The type of state machine definition.
  * 
- * @template D - The type of definition for state machine.
- * @template G - The type of guards for state machine functions.
- * @template E - The type of effects for state machine functions.
- * @template _S - (internal) The type of states.
+ * @template D The type of definition for state machine.
+ * @template G The type of guards for state machine functions.
+ * @template E The type of effects for state machine functions.
+ * @template _S (internal) The type of states.
  */
 export type Shape<
   D,
@@ -363,7 +378,7 @@ export type Shape<
     : IsStringLiteral<keyof _S> extends false
     ? "Error: States have no literal string value."
     // Else, return the initial state value.
-    : keyof _S
+    : keyof _S;
   /**
    * The state definitions.
    */
@@ -385,60 +400,65 @@ export type Shape<
           ? `Error: State value '${V}' is reserved.`
           // Else, return the state definition.
           : State<D, ["states", V], G, E>
-      }
+      };
   /**
-   * The definition how a state machine will transition when it receives a specific event.
+   * The definition how a state machine will transition when it receives
+   * a specific event.
    */
-  readonly on?: On<D, ["on"], G>
-  readonly $schema?: Schema<D, ["$schema"]>
+  readonly on?: On<D, ["on"], G>;
+  readonly $schema?: Schema<D, ["$schema"]>;
 } & (
   "context" extends keyof Get<D, ["$schema"]>
     ? {
       /**
        * The context of the state machine.
        */
-      readonly context: Context<D>
+      readonly context: Context<D>;
     }
     : {
       /**
        * The context of the state machine.
        */
-      readonly context?: Context<D>
+      readonly context?: Context<D>;
     }
-)
+);
 
 /**
  * Infer the narrowest type from the state machine definition.
  * 
- * @template D - The type of state machine definition.
+ * @template D The type of state machine definition.
  */
 export type Exact<D> = {
   readonly [K in keyof D]:
     K extends "$schema"
       ? D[K]
-      : InferNarrowestValue<D[K]>
-}
+      : InferNarrowestValue<D[K]>;
+};
 
+/**
+ * The definition type.
+ */
 export type Signature = {
   /**
    * The initial state value.
    */
-  readonly initial: Tagged<string, "StateValue">
+  readonly initial: Tagged<string, "StateValue">;
   /**
    * The state definitions.
    */
   readonly states: {
-    readonly [stateValue: Tagged<string, "StateValue">]: State.Signature
-  }
+    readonly [stateValue: Tagged<string, "StateValue">]: StateSignature;
+  };
   /**
-   * The definition how a state machine will transition when it receives a specific event.
+   * The definition how a state machine will transition when it receives
+   * a specific event.
    */
-  readonly on?: On.Signature
+  readonly on?: OnSignature;
   /**
    * The context of the state machine.
    */
-  readonly context?: Context.Signature
-}
+  readonly context?: ContextSignature;
+};
 
 if (cfgTest && cfgTest.url === import.meta.url) {
   const { expectType } = await import("tsd")

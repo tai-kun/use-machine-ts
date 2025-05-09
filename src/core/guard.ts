@@ -5,13 +5,13 @@ import { log, unreachable } from "./devutils";
 /**
  * Inverts the boolean value returned by the guard function.
  *
- * @template G - The type of the guard.
- * @param guard - The guard to invert.
+ * @template G The type of the guard.
+ * @param guard The guard to invert.
  * @returns The inverted guard.
  */
 export function not<const G extends string>(
   guard: Definition.Guard<G>,
-): Definition.Guard.Not<G> {
+): Definition.GuardNot<G> {
   return {
     op: "not",
     value: guard,
@@ -21,26 +21,26 @@ export function not<const G extends string>(
 /**
  * Combines multiple guards into a single guard using the logical `&&` operator.
  *
- * @template G - The type of the guard.
- * @param guards - The guards to combine.
+ * @template G The type of the guard.
+ * @param guards The guards to combine.
  * @returns The combined guard.
  */
 export function and<const G extends string>(
   ...guards: Definition.Guard<G>[]
-): Definition.Guard.And<G> {
+): Definition.GuardAnd<G> {
   return guards;
 }
 
 /**
  * Combines multiple guards into a single guard using the logical `||` operator.
  *
- * @template G - The type of the guard.
- * @param guards - The guards to combine.
+ * @template G The type of the guard.
+ * @param guards The guards to combine.
  * @returns The combined guard.
  */
 export function or<const G extends string>(
   ...guards: Definition.Guard<G>[]
-): Definition.Guard.Or<G> {
+): Definition.GuardOr<G> {
   return {
     op: "or",
     value: guards,
@@ -56,15 +56,15 @@ export const guards = {
 /**
  * Checks if the guard passes.
  *
- * @param conf - The configuration of the state machine.
- * @param guard - The guard to check.
- * @param params - The parameters to pass to the guard.
+ * @param conf The configuration of the state machine.
+ * @param guard The guard to check.
+ * @param params The parameters to pass to the guard.
  * @returns `true` if the guard passes, `false` otherwise.
  */
 export function doGuard(
   conf: Config.Signature,
-  guard: Definition.Guard.Signature,
-  params: Config.GuardParams.Signature,
+  guard: Definition.GuardSignature,
+  params: Config.GuardParamsSignature,
 ): boolean {
   return typeof guard === "string"
     ? conf.guards![guard]!(params)
@@ -94,13 +94,13 @@ type GuardContext = {
 /**
  * Checks if the guard passes for development.
  *
- * @param ctx - The context of the guard.
- * @param guard - The guard to check.
+ * @param ctx The context of the guard.
+ * @param guard The guard to check.
  * @returns The result of the guard.
  */
 function innerDoGuardForDev(
   ctx: GuardContext,
-  guard: Definition.Guard.Signature,
+  guard: Definition.GuardSignature,
 ): GuardResult {
   if (typeof guard === "string") {
     const { done } = ctx;
@@ -169,15 +169,15 @@ function innerDoGuardForDev(
 /**
  * Checks if the guard passes for development.
  *
- * @param conf - The configuration of the state machine.
- * @param guard - The guard to check.
- * @param params - The parameters to pass to the guard.
+ * @param conf The configuration of the state machine.
+ * @param guard The guard to check.
+ * @param params The parameters to pass to the guard.
  * @returns The result of the guard.
  */
 export function doGuardForDev(
   conf: Config.Signature,
-  guard: Definition.Guard.Signature,
-  params: Config.GuardParams.Signature,
+  guard: Definition.GuardSignature,
+  params: Config.GuardParamsSignature,
 ): GuardResult {
   let done = false;
   const ctx: GuardContext = {
@@ -285,7 +285,7 @@ function innerFormatGuardResult(ctx: FormatContext, res: GuardResult): void {
 /**
  * Formats the result of the guard for development.
  *
- * @param result - The result of the guard.
+ * @param result The result of the guard.
  * @returns The formatted result of the guard.
  */
 export function formatGuardResult(result: GuardResult): string {
@@ -304,12 +304,11 @@ if (cfgTest && cfgTest.url === import.meta.url) {
   function doGuardForTest(
     setup: {
       guards: NonNullable<Config.Signature["guards"]>;
-      guard: Definition.Guard.Signature;
-      params?: Config.GuardParams.Signature;
+      guard: Definition.GuardSignature;
+      params?: Config.GuardParamsSignature;
     },
   ) {
-    const { guards, guard, params = {} as Config.GuardParams.Signature } =
-      setup;
+    const { guards, guard, params = {} as Config.GuardParamsSignature } = setup;
     const dev = doGuardForDev({ guards }, guard, params);
 
     return {

@@ -1,4 +1,9 @@
-import type { Config, Definition, Machine, State } from "../types";
+import type {
+  Config,
+  Definition,
+  MachineSignature,
+  StateSignature,
+} from "../types";
 import type { Tagged } from "../types/utils";
 import {
   isPlainObject,
@@ -13,12 +18,12 @@ import { useEffect, useLayoutEffect, useMemo, useRef } from "./react";
 /**
  * Creates a initial state machine state.
  *
- * @param def - The state machine definition.
+ * @param def The state machine definition.
  * @returns Initial state machine state.
  */
 export function createInitialState(
   def: Definition.Signature,
-): State.Signature {
+): StateSignature {
   return {
     event: { type: "$init" as Tagged<string, "EventType"> },
     value: def.initial,
@@ -30,8 +35,8 @@ export function createInitialState(
 /**
  * Basic action type.
  *
- * @template T - The typeof action.
- * @template P - The typeof action payload.
+ * @template T The typeof action.
+ * @template P The typeof action payload.
  */
 type ActionType<T extends string, P> = {
   readonly type: T;
@@ -42,24 +47,24 @@ type ActionType<T extends string, P> = {
  * Actions to update state machine state.
  */
 export type Action =
-  | ActionType<"SEND", Config.Sendable.Signature>
-  | ActionType<"SET_CONTEXT", Config.SetContextAction.Signature>;
+  | ActionType<"SEND", Config.SendableSignature>
+  | ActionType<"SET_CONTEXT", Config.SetContextActionSignature>;
 
 /**
  * Applies the action to the state machine.
  *
- * @param def - The state machine definition.
- * @param conf - The state machine configuration.
- * @param state - The current state of the state machine.
- * @param action - The action to apply to the state machine.
+ * @param def The state machine definition.
+ * @param conf The state machine configuration.
+ * @param state The current state of the state machine.
+ * @param action The action to apply to the state machine.
  * @returns The next state of the state machine.
  */
 export function applyDispatch(
   def: Definition.Signature,
   conf: Config.Signature,
-  state: State.Signature,
+  state: StateSignature,
   action: Action,
-): State.Signature {
+): StateSignature {
   switch (action.type) {
     case "SEND": {
       const { payload } = action;
@@ -212,24 +217,24 @@ export function applyDispatch(
 /**
  * Apply effects to the state machine.
  *
- * @param def - The state machine definition.
- * @param conf - The state machine configuration.
- * @param state - The current state of the state machine.
- * @param dispatch - The function to dispatch an action to the state machine.
- * @param isMounted - A reference to a boolean that is `true` if the component is mounted, otherwise `false`.
- * @param syncMode - Whether to run the effects synchronously.
+ * @param def The state machine definition.
+ * @param conf The state machine configuration.
+ * @param state The current state of the state machine.
+ * @param dispatch The function to dispatch an action to the state machine.
+ * @param isMounted A reference to a boolean that is `true` if the component is mounted, otherwise `false`.
+ * @param syncMode Whether to run the effects synchronously.
  * @returns The cleanup function to clean up the effects.
  */
 export function applyEffect(
   def: Definition.Signature,
   conf: Config.Signature,
-  state: State.Signature,
+  state: StateSignature,
   dispatch: (action: Action) => void,
   isMounted: { readonly current: boolean },
   syncMode: boolean = false,
 ): void | {
   (
-    params: Pick<Config.EffectCleanupParams.Signature, "event" | "context">,
+    params: Pick<Config.EffectCleanupParamsSignature, "event" | "context">,
   ): void;
 } {
   const { effect = [] } = def.states[state.value] || {};
@@ -249,7 +254,7 @@ export function applyEffect(
       }
     }
 
-    function send(event: Config.Sendable.Signature) {
+    function send(event: Config.SendableSignature) {
       if (__DEV__) {
         if (typeof event !== "string" && !isPlainObject(event)) {
           log(
@@ -279,7 +284,7 @@ export function applyEffect(
       }
     }
 
-    function setContext(action: Config.SetContextAction.Signature) {
+    function setContext(action: Config.SetContextActionSignature) {
       if (!isLocked) {
         dispatch({
           type: "SET_CONTEXT",
@@ -354,8 +359,8 @@ const useIsomorphicLayoutEffect = typeof document === "undefined"
  * This React hook is used to memoize a value that is expensive to compute.
  * Similar to `useMemo`, but also does not have a dependency list and is computed only once, the first time.
  *
- * @template T - The type of the memoized value.
- * @param compute - A function that computes the memoized value.
+ * @template T The type of the memoized value.
+ * @param compute A function that computes the memoized value.
  * @returns The memoized value.
  */
 export function useSingleton<T>(compute: () => T): T {
@@ -386,8 +391,8 @@ export function useIsMounted(): { readonly current: boolean } {
 /**
  * A hook to use a state machine definition and configuration.
  *
- * @param arg0 - The state machine definition or factory.
- * @param arg1 - The state machine configuration or arguments for the factory.
+ * @param arg0 The state machine definition or factory.
+ * @param arg1 The state machine configuration or arguments for the factory.
  * @returns An array with two elements:
  * - The first element is the state machine definition.
  * - The second element is the state machine configuration.
@@ -395,10 +400,10 @@ export function useIsMounted(): { readonly current: boolean } {
 export function useInstance(
   arg0:
     | Definition.Signature
-    | Machine.Signature
-    | ((props?: () => any) => Machine.Signature),
+    | MachineSignature
+    | ((props?: () => any) => MachineSignature),
   arg1: Config.Signature | {/* props */} | undefined,
-): Machine.Signature {
+): MachineSignature {
   if (__DEV__) {
     useDetectChanges(
       arg0,
@@ -442,7 +447,7 @@ export function useInstance(
   const machine = useSingleton(() =>
     typeof arg0 === "function"
       ? arg0(() => propsRef.current)
-      : arg0 as Machine.Signature // cast for tsd
+      : arg0 as MachineSignature // cast for tsd
   );
 
   if (__DEV__) {
@@ -455,16 +460,16 @@ export function useInstance(
 /**
  * A hook to use a state machine state.
  *
- * @param def - The state machine definition.
- * @param conf - The state machine configuration.
- * @param state - The state machine state.
- * @param dispatch - The state machine dispatch function.
- * @param isMounted - A reference to a boolean that is `true` if the component is mounted, otherwise `false`.
+ * @param def The state machine definition.
+ * @param conf The state machine configuration.
+ * @param state The state machine state.
+ * @param dispatch The state machine dispatch function.
+ * @param isMounted A reference to a boolean that is `true` if the component is mounted, otherwise `false`.
  */
 export function useSyncState(
   def: Definition.Signature,
   conf: Config.Signature,
-  state: State.Signature,
+  state: StateSignature,
   dispatch: (action: Action) => void,
   isMounted: { readonly current: boolean },
 ): void {
@@ -752,7 +757,7 @@ if (cfgTest && cfgTest.url === import.meta.url) {
 
     describe("applyEffect", () => {
       test("it should apply the effect", () => {
-        const cleanupSpy = spy<Config.EffectCleanup.Signature>(() => {});
+        const cleanupSpy = spy<Config.EffectCleanupSignature>(() => {});
         const dispatchSpy = spy();
         const def = {
           initial: "idle",
@@ -765,7 +770,7 @@ if (cfgTest && cfgTest.url === import.meta.url) {
         };
         const conf = {
           effects: {
-            onIdle: ({ send }: Config.EffectParams.Signature) => {
+            onIdle: ({ send }: Config.EffectParamsSignature) => {
               send({
                 type: "FETCH",
               });
@@ -828,7 +833,7 @@ if (cfgTest && cfgTest.url === import.meta.url) {
             error: errorSpy,
           },
           effects: {
-            onIdle: ({ send }: Config.EffectParams.Signature) => {
+            onIdle: ({ send }: Config.EffectParamsSignature) => {
               setTimeout(
                 () => {
                   send("FETCH");
@@ -921,8 +926,8 @@ if (cfgTest && cfgTest.url === import.meta.url) {
 
     describe("useSyncState", () => {
       test("it should apply the effect", () => {
-        const cleanup = spy<Config.EffectCleanup.Signature>(() => {});
-        const effect = spy<Config.Effect.Signature>(() => cleanup);
+        const cleanup = spy<Config.EffectCleanupSignature>(() => {});
+        const effect = spy<Config.EffectSignature>(() => cleanup);
         const def: Definition.Signature = {
           initial: "a",
           states: {

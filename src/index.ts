@@ -1,10 +1,10 @@
 export { and, guards, not, or } from "./core/guard";
-export { createMachine } from "./createMachine";
-export { createSharedMachine } from "./createSharedMachine";
+export { createMachine } from "./create-machine";
+export { createSharedMachine } from "./create-shared-machine";
 export type * from "./types";
-export { useMachine } from "./useMachine";
-export { useSharedMachine } from "./useSharedMachine";
-export { useSyncedMachine } from "./useSyncedMachine";
+export { useMachine } from "./use-machine";
+export { useSharedMachine } from "./use-shared-machine";
+export { useSyncedMachine } from "./use-synced-machine";
 
 if (cfgTest && cfgTest.url === import.meta.url) {
   const tty = await import("node:tty");
@@ -22,11 +22,11 @@ if (cfgTest && cfgTest.url === import.meta.url) {
     render,
     renderHook,
   } = await import("@testing-library/react");
-  const { createMachine } = await import("./createMachine");
-  const { createSharedMachine } = await import("./createSharedMachine");
-  const { useMachine } = await import("./useMachine");
-  const { useSharedMachine } = await import("./useSharedMachine");
-  const { useSyncedMachine } = await import("./useSyncedMachine");
+  const { createMachine } = await import("./create-machine");
+  const { createSharedMachine } = await import("./create-shared-machine");
+  const { useMachine } = await import("./use-machine");
+  const { useSharedMachine } = await import("./use-shared-machine");
+  const { useSyncedMachine } = await import("./use-synced-machine");
   const { assert, describe, sinon, test } = cfgTest;
   const { spy } = sinon;
 

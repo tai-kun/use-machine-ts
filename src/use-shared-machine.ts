@@ -1,6 +1,12 @@
 import { useIsMounted, useSyncState } from "./core/logic";
 import { useSyncExternalStore } from "./core/react";
-import type { Send, SharedMachine, State } from "./types";
+import type {
+  Send,
+  SharedMachine,
+  SharedMachineSignature,
+  State,
+  StateSignature,
+} from "./types";
 
 /**
  * Uses a shared state machine.
@@ -10,9 +16,9 @@ import type { Send, SharedMachine, State } from "./types";
  * The shared state machine returned by `createSharedMachine` includes functions such as `.send()` to trigger state transitions and `.getState()` to return a snapshot of the current state.
  * These mechanisms are implemented using `React.useSyncExternalStore`.
  *
- * @template D - The type of state machine definition.
- * @param machine - The shared state machine.
- * @param getServerState - A function that returns the state on the server.
+ * @template D The type of state machine definition.
+ * @param machine The shared state machine.
+ * @param getServerState A function that returns the state on the server.
  * @returns An array with two elements:
  * - The first element is the current state of the state machine.
  * - The second element is a function that sends an event to the state machine.
@@ -63,12 +69,12 @@ function useSharedMachine<D>(
     dispatch,
     getState,
     subscribe,
-  } = machine as unknown as SharedMachine.Signature;
+  } = machine as unknown as SharedMachineSignature;
   const state = useSyncExternalStore(
     subscribe,
     getState,
-    (getServerState as () => State.Signature) || getState,
-  ) as State.Signature;
+    (getServerState as () => StateSignature) || getState,
+  ) as StateSignature;
 
   useSyncState(def, conf, state, dispatch, isMounted);
 
@@ -77,5 +83,5 @@ function useSharedMachine<D>(
 
 export { useSharedMachine };
 export { and, guards, not, or } from "./core/guard";
-export { createSharedMachine } from "./createSharedMachine";
+export { createSharedMachine } from "./create-shared-machine";
 export type * from "./types";

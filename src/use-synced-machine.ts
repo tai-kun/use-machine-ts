@@ -9,7 +9,14 @@ import {
   useSingleton,
 } from "./core/logic";
 import { useEffect, useRef } from "./core/react";
-import type { Config, Definition, Machine, Send, State } from "./types";
+import type {
+  Config,
+  Definition,
+  Machine,
+  Send,
+  State,
+  StateSignature,
+} from "./types";
 
 /**
  * Uses a synced state machine with the constructor.
@@ -23,8 +30,8 @@ import type { Config, Definition, Machine, Send, State } from "./types";
  * It is intended to serve as a filter to determine whether multiple event sources,
  * including the DOM, have triggered a state transition.
  *
- * @template D - The type of state machine definition.
- * @param machine - The state machine factory.
+ * @template D The type of state machine definition.
+ * @param machine The state machine factory.
  * @returns An array with two elements:
  * - The first element is a function that returns the current state of the state machine.
  * - The second element is a function that sends an event to the state machine.
@@ -95,10 +102,10 @@ function useSyncedMachine<D>(
  * It is intended to serve as a filter to determine whether multiple event sources,
  * including the DOM, have triggered a state transition.
  *
- * @template D - The type of state machine definition.
- * @template P - The type of props for the state machine factory.
- * @param machine - The state machine factory.
- * @param props - The props for the state machine factory.
+ * @template D The type of state machine definition.
+ * @template P The type of props for the state machine factory.
+ * @param machine The state machine factory.
+ * @param props The props for the state machine factory.
  * @returns An array with two elements:
  * - The first element is a function that returns the current state of the state machine.
  * - The second element is a function that sends an event to the state machine.
@@ -173,8 +180,8 @@ function useSyncedMachine<D, P>(
  * It is intended to serve as a filter to determine whether multiple event sources,
  * including the DOM, have triggered a state transition.
  *
- * @template D - The type of state machine definition.
- * @param machine - The state machine.
+ * @template D The type of state machine definition.
+ * @param machine The state machine.
  * @returns An array with two elements:
  * - The first element is a function that returns the current state of the state machine.
  * - The second element is a function that sends an event to the state machine.
@@ -241,8 +248,8 @@ function useSyncedMachine<D>(
  * It is intended to serve as a filter to determine whether multiple event sources,
  * including the DOM, have triggered a state transition.
  *
- * @template D - The type of state machine definition.
- * @param definition - The state machine definition.
+ * @template D The type of state machine definition.
+ * @param definition The state machine definition.
  * @returns An array with two elements:
  * - The first element is a function that returns the current state of the state machine.
  * - The second element is a function that sends an event to the state machine.
@@ -294,11 +301,11 @@ function useSyncedMachine<D extends Definition.Shape<D, never, never>>(
  * It is intended to serve as a filter to determine whether multiple event sources,
  * including the DOM, have triggered a state transition.
  *
- * @template D - The type of state machine definition.
- * @template G - The type of guards for state machine functions.
- * @template E - The type of effects for state machine functions.
- * @param definition - The state machine definition.
- * @param config - The state machine configuration.
+ * @template D The type of state machine definition.
+ * @template G The type of guards for state machine functions.
+ * @template E The type of effects for state machine functions.
+ * @param definition The state machine definition.
+ * @param config The state machine configuration.
  * @returns An array with two elements:
  * - The first element is a function that returns the current state of the state machine.
  * - The second element is a function that sends an event to the state machine.
@@ -321,7 +328,7 @@ function useSyncedMachine(arg0: any, arg1?: any): [any, any] {
   const exitFnRef = useRef<void | (() => void)>(undefined);
   const [def, conf = {}] = useInstance(arg0, arg1);
   const [reqSync, api] = useSingleton(() => {
-    const queue: ((prevState: State.Signature) => State.Signature)[] = [];
+    const queue: ((prevState: StateSignature) => StateSignature)[] = [];
     let machineState = createInitialState(def);
     let previousDeps: readonly unknown[] | undefined;
 
@@ -411,7 +418,7 @@ function useSyncedMachine(arg0: any, arg1?: any): [any, any] {
       () => act(flushSync),
       [
         () => machineState,
-        function send(payload: Config.Sendable.Signature) {
+        function send(payload: Config.SendableSignature) {
           act(() => {
             dispatch({
               type: "SEND",
@@ -439,5 +446,5 @@ function useSyncedMachine(arg0: any, arg1?: any): [any, any] {
 
 export { useSyncedMachine };
 export { and, guards, not, or } from "./core/guard";
-export { createMachine } from "./createMachine";
+export { createMachine } from "./create-machine";
 export type * from "./types";

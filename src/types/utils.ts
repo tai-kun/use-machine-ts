@@ -3,9 +3,9 @@
 /**
  * Get the value at the given path.
  * 
- * @template T - The type of object to get the value from.
- * @template P - The type of path to get the value at.
- * @template F - The type of fallback value. Default is `undefined`.
+ * @template T The type of object to get the value from.
+ * @template P The type of path to get the value at.
+ * @template F The type of fallback value. Default is `undefined`.
  * @see {@link Get}
  */
 type _Get<T, P, F> =
@@ -20,16 +20,16 @@ type _Get<T, P, F> =
 /**
  * Get the value at the given path.
  * 
- * @template T - The type of object to get the value from.
- * @template P - The type of path to get the value at.
- * @template F - The type of fallback value. Default is `undefined`.
+ * @template T The type of object to get the value from.
+ * @template P The type of path to get the value at.
+ * @template F The type of fallback value. Default is `undefined`.
  */
 export type Get<T, P extends ReadonlyArray<any>, F = undefined> = _Get<T, P, F>
 
 /**
  * Check if the given type is a literal string.
  * 
- * @template T - The type of value to check.
+ * @template T The type of value to check.
  */
 export type IsStringLiteral<T> =
   T extends string
@@ -40,7 +40,7 @@ export type IsStringLiteral<T> =
 /**
  * Check if the given type is a literal boolean.
  * 
- * @template T - The type of value to check.
+ * @template T The type of value to check.
  */
 export type IsBooleanLiteral<T> =
   [(T extends true ? 1 : 0) & (T extends false ? 1 : 0)] extends [never]
@@ -50,7 +50,7 @@ export type IsBooleanLiteral<T> =
 /**
  * Check if the given type is a plain object.
  * 
- * @template T - The type of value to check.
+ * @template T The type of value to check.
  */
 export type IsPlainObject<T> =
   T extends Record<keyof any, any>
@@ -62,15 +62,15 @@ export type IsPlainObject<T> =
 /**
  * Check if the given type extends the other type.
  * 
- * @template T - The type of value to check.
- * @template U - The type to check against.
+ * @template T The type of value to check.
+ * @template U The type to check against.
  */
 export type Extends<T, U> = T extends U ? true : false
 
 /**
  * Infer the value of the given object type.
  * 
- * @template T - The type of object to infer the value from.
+ * @template T The type of object to infer the value from.
  */
 export type ValueOf<T> = T[keyof T]
 
@@ -84,7 +84,7 @@ export type AnyRoRec = {
 /**
  * Infer the narrowest type of an object.
  * 
- * @template T - The type of object.
+ * @template T The type of object.
  * @see {@link InferNarrowestValue}
  */
 export type InferNarrowestObject<T> = {
@@ -94,7 +94,7 @@ export type InferNarrowestObject<T> = {
 /**
  * Infer the narrowest type.
  * 
- * @template T - The type of value to infer the narrowest type.
+ * @template T The type of value to infer the narrowest type.
  * @see {@link InferNarrowestObject}
  */
 export type InferNarrowestValue<T> =
