@@ -105,14 +105,11 @@ jobs:
           registry-url: "https://registry.npmjs.org"
 
       - name: Verify NPM Token
+        shell: bash -euo pipefail {0}
         run: |
-          echo "//registry.npmjs.org/:_authToken=${NPM_TOKEN}" > ~/.npmrc
-          if npm whoami > /dev/null 2>&1; then
-            echo "✅ NPM token is valid. Logged in as: $(npm whoami)"
-          else
-            echo "❌ NPM token is invalid or expired." >&2
-            exit 1
-          fi
+          echo "//registry.npmjs.org/:_authToken=${NPM_TOKEN}" >"$NPM_CONFIG_USERCONFIG"
+          npm whoami
+          echo "✅ NPM token is valid. Logged in as: $(npm whoami)"
         env:
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
 
