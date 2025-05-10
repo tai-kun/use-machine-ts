@@ -1,5 +1,14 @@
 # Changelog
 
+## [1.0.1](https://github.com/tai-kun/use-machine-ts/compare/v1.0.0...v1.0.1) (2025-05-10)
+
+
+### Continuous Integration
+
+* add jobs ([35f0639](https://github.com/tai-kun/use-machine-ts/commit/35f063901a47ff69f3c4fd0083a3af89bdfb6ac1))
+* fix ([bf57398](https://github.com/tai-kun/use-machine-ts/commit/bf57398633ecc7b741d881b44402404a644ae28e))
+* fix ([c4bd2d2](https://github.com/tai-kun/use-machine-ts/commit/c4bd2d2661a1dd19dde7e3d27cccdf0568f8d270))
+
 ## [1.0.0](https://github.com/tai-kun/use-machine-ts/compare/v0.4.0...v1.0.0) (2025-05-09)
 
 
