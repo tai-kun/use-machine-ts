@@ -20,7 +20,7 @@ jobs:
           target-branch: ${{ github.ref_name }}
         id: rp
 
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
         if: ${{ steps.rp.outputs.release_created }}
 
       - name: Node.js v22.x
