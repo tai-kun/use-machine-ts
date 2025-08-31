@@ -6,6 +6,10 @@ on:
       - main
   pull_request:
 
+defaults:
+  run:
+    shell: bash -euo pipefail {0}
+
 jobs:
   format-check:
     runs-on: ubuntu-latest
