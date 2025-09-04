@@ -24,7 +24,7 @@ jobs:
         if: ${{ steps.rp.outputs.release_created }}
 
       - name: Node.js v22.x
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v5
         with:
           node-version: "22.x"
           registry-url: "https://registry.npmjs.org"
