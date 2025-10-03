@@ -32,7 +32,7 @@ run = "npx typedoc src/index.ts"
 [tasks.update]
 run = [
   "mise upgrade",
-  "npx npm-check-updates --target minor -u",
+  "npx npm-check-updates --cooldown 7 --target minor -u",
   "npm install",
   "npx dprint config update",
   "npm audit",
