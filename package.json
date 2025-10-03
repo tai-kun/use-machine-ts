@@ -60,7 +60,6 @@
     "global-jsdom": "^27.0.0",
     "jsdom": "^27.0.0",
     "npm-check-updates": "^18.0.3",
-    "npm-run-all2": "^8.0.4",
     "plop": "^4.0.1",
     "react": "^19.1.1",
     "react-dom": "^19.1.1",
@@ -69,21 +68,6 @@
     "tsx": "^4.20.5",
     "typedoc": "^0.28.11",
     "typescript": "^5.9.2"
-  },
-  "scripts": {
-    "add": "plop --plopfile config/code/plopfile.mjs",
-    "tsc": "tsc --noEmit && tsd -f '@types/**/*.d.ts' -f 'src/**/*.{ts,tsx}'",
-    "fmt": "dprint fmt",
-    "lint": "exit 0",
-    "test": "tsx --import cfg-test --test 'src/**/*.ts' --test 'src/**/*.tsx'",
-    "build": "scripts/build.sh",
-    "size-check": "npm run build && (cd size-check && npm ci && npm run build) && size-limit",
-    "docs": "typedoc src/index.ts",
-    "update": "run-s update:*",
-    "update:nodejs": "volta pin node@lts",
-    "update:module": "npm-check-updates --target minor -u",
-    "update:dprint": "dprint config update",
-    "update:install": "npm install"
   },
   "size-limit": [
     {

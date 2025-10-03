@@ -1,0 +1,51 @@
+#!/usr/bin/env -S node
+// @ts-check
+
+import { build } from "esbuild";
+import { spawn } from "node:child_process";
+import { rm, copyFile as cp } from "node:fs/promises";
+import { join } from "node:path";
+import options from "../../build/esbuild.config.mjs";
+
+/**
+ * @param {string} command
+ * @param {string[]} args
+ */
+function run(command, args = []) {
+  return new Promise((resolve, reject) => {
+    const proc = spawn(command, args, { stdio: "inherit", shell: true });
+
+    proc.on("close", (code) => {
+      if (code === 0) {
+        resolve(null);
+      } else {
+        reject(new Error(`Error code ${code}: ${command} ${args.join(" ")}`));
+      }
+    });
+
+    proc.on("error", (err) => {
+      reject(err);
+    });
+  });
+}
+
+const rootDir = process.cwd();
+const tempTsConfig = join(rootDir, "tsconfig.build.json");
+
+try {
+  const distDir = join(rootDir, "dist");
+  await rm(distDir, { recursive: true, force: true });
+
+  await Promise.all(options.map(opts => build(opts)));
+
+  const srcTsConfig = join(rootDir, ".config", "build", "tsconfig.build.json");
+  await cp(srcTsConfig, tempTsConfig);
+
+  await run("npx", ["tsc", "-p", tempTsConfig]);
+
+} catch (error) {
+  console.error(error.message);
+  process.exit(1);
+} finally {
+  await rm(tempTsConfig).catch(() => {});
+}

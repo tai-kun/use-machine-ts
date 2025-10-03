@@ -4,9 +4,7 @@
     "./node_modules/@tsconfig/strictest/tsconfig.json"
   ],
   "include": [
-    "./config/**/*",
-    "./examples/**/*",
-    "./scripts/**/*",
+    "./.config/**/*",
     "./src/**/*"
   ],
   "compilerOptions": {

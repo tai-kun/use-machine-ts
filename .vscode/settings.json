@@ -1,29 +1,13 @@
 {
   "editor.rulers": [80],
-  "[json]": {
-    "editor.formatOnSave": true,
-    "editor.defaultFormatter": "dprint.dprint"
-  },
-  "[jsonc]": {
-    "editor.formatOnSave": true,
-    "editor.defaultFormatter": "dprint.dprint"
-  },
-  "[shellscript]": {
-    "editor.formatOnSave": true,
-    "editor.defaultFormatter": "foxundermoon.shell-format"
-  },
-  "[javascript]": {
-    "editor.formatOnSave": true,
-    "editor.defaultFormatter": "dprint.dprint"
-  },
-  "[typescript]": {
-    "editor.formatOnSave": true,
-    "editor.defaultFormatter": "dprint.dprint"
-  },
-  "[typescriptreact]": {
-    "editor.formatOnSave": true,
-    "editor.defaultFormatter": "dprint.dprint"
-  },
+
+  "dprint.path": "node_modules/dprint/dprint",
+
   "typescript.tsdk": "node_modules/typescript/lib",
-  "typescript.referencesCodeLens.enabled": true
+  "typescript.referencesCodeLens.enabled": true,
+
+  "[json][jsonc][javascript][typescript][typescriptreact]": {
+    "editor.formatOnSave": true,
+    "editor.defaultFormatter": "dprint.dprint"
+  }
 }
