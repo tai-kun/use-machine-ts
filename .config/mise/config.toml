@@ -9,8 +9,8 @@ run = "npx dprint fmt"
 
 [tasks.tsc]
 run = [
-    "npx tsc --noEmit",
-    "npx tsd -f .config/env.d.ts -f 'src/**/*.{ts,tsx}'",
+  "npx tsc --noEmit",
+  "npx tsd -f .config/env.d.ts -f 'src/**/*.{ts,tsx}'",
 ]
 
 [tasks.lint]
@@ -22,8 +22,8 @@ run = "npx tsx --import cfg-test --test 'src/**/*.ts' --test 'src/**/*.tsx'"
 [tasks.size-check]
 depends = "build"
 run = [
-    "cd size-check && npm ci && npm run build",
-    "npx size-limit",
+  "cd size-check && npm ci && npm run build",
+  "npx size-limit",
 ]
 
 [tasks.doc]
@@ -31,9 +31,9 @@ run = "npx typedoc src/index.ts"
 
 [tasks.update]
 run = [
-    "mise upgrade",
-    "npx npm-check-updates --target minor -u",
-    "npm install",
-    "npx dprint config update",
-    "npm audit",
+  "mise upgrade",
+  "npx npm-check-updates --target minor -u",
+  "npm install",
+  "npx dprint config update",
+  "npm audit",
 ]
