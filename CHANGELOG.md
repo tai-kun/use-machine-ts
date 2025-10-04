@@ -1,5 +1,29 @@
 # Changelog
 
+## [1.0.1](https://github.com/tai-kun/use-machine-ts/compare/v1.0.0...v1.0.1) (2025-10-04)
+
+
+### Miscellaneous Chores
+
+* **deps-dev:** bump dprint from 0.49.1 to 0.50.0 ([#176](https://github.com/tai-kun/use-machine-ts/issues/176)) ([3aed636](https://github.com/tai-kun/use-machine-ts/commit/3aed6362af8446dc1061107a1eb6ec9fd5bef32b))
+* **deps-dev:** bump the dev-dependencies group across 1 directory with 4 updates ([#173](https://github.com/tai-kun/use-machine-ts/issues/173)) ([4d19c52](https://github.com/tai-kun/use-machine-ts/commit/4d19c52f0c5ab4af47c7a626c2d78eac10b7a9de))
+* **deps-dev:** bump the dev-dependencies group across 1 directory with 8 updates ([#182](https://github.com/tai-kun/use-machine-ts/issues/182)) ([3a2cc81](https://github.com/tai-kun/use-machine-ts/commit/3a2cc81467e9eb38966f0261632fcd6789291633))
+* **deps-dev:** bump the dev-dependencies group across 1 directory with 8 updates ([#194](https://github.com/tai-kun/use-machine-ts/issues/194)) ([e1638eb](https://github.com/tai-kun/use-machine-ts/commit/e1638eba4c26220177ae0aa466c16e230ef663f9))
+* **deps-dev:** bump tsx from 4.19.4 to 4.20.3 ([#175](https://github.com/tai-kun/use-machine-ts/issues/175)) ([c5c6c5c](https://github.com/tai-kun/use-machine-ts/commit/c5c6c5c3d23e9ebd0d475df03167f750554c3211))
+* **deps-dev:** bump typescript from 5.8.3 to 5.9.2 ([#184](https://github.com/tai-kun/use-machine-ts/issues/184)) ([2d7b398](https://github.com/tai-kun/use-machine-ts/commit/2d7b3989852ec07739aa1e7c4524b15eb32d9e44))
+* **deps:** bump actions/setup-node from 4 to 5 ([#190](https://github.com/tai-kun/use-machine-ts/issues/190)) ([455f0a9](https://github.com/tai-kun/use-machine-ts/commit/455f0a9ea2e014a07cd4efcc3132a7eb269b60f6))
+* update ([025b100](https://github.com/tai-kun/use-machine-ts/commit/025b100533ff2cda8b6f5dd52db31dac1e4cfe63))
+* volta to mise ([552d16b](https://github.com/tai-kun/use-machine-ts/commit/552d16b0bd214b8c677813995253f9a6158c25eb))
+
+
+### Continuous Integration
+
+* add jobs ([35f0639](https://github.com/tai-kun/use-machine-ts/commit/35f063901a47ff69f3c4fd0083a3af89bdfb6ac1))
+* fix ([779e9e7](https://github.com/tai-kun/use-machine-ts/commit/779e9e70583663a1f0398629943ce5e84b456b60))
+* fix ([e75890b](https://github.com/tai-kun/use-machine-ts/commit/e75890b004cac42bbf1ddf70878d1556fde0f32b))
+* fix ([bf57398](https://github.com/tai-kun/use-machine-ts/commit/bf57398633ecc7b741d881b44402404a644ae28e))
+* fix ([c4bd2d2](https://github.com/tai-kun/use-machine-ts/commit/c4bd2d2661a1dd19dde7e3d27cccdf0568f8d270))
+
 ## [1.0.0](https://github.com/tai-kun/use-machine-ts/compare/v0.4.0...v1.0.0) (2025-05-09)
 
 
