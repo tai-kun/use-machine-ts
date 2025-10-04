@@ -123,6 +123,7 @@ if (import.meta.vitest) {
             })
           );
           const [state] = result.current;
+          state.nextEvents;
 
           assert.deepEqual(state, {
             context: undefined,

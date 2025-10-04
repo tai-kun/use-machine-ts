@@ -72,7 +72,7 @@ export type Extends<T, U> = T extends U ? true : false
  * 
  * @template T The type of object to infer the value from.
  */
-export type ValueOf<T> = T[keyof T]
+export type ValueOf<T> = T[KeysOfUnion<T>]
 
 /**
  * The type of any readonly record.
@@ -125,6 +125,19 @@ export type RequiredKeysOf<T extends object> = Exclude<ValueOf<{
     : never
 }>, undefined>
 
+/**
+ * Extracts the union of all property keys from a union type.
+ *
+ * @template T - The union type to extract keys from
+ * @example
+ * ```
+ * type A = { foo: number };
+ * type B = { bar: string };
+ * type K = KeysOfUnion<A | B>; // "foo" | "bar"
+ * ```
+ */
+export type KeysOfUnion<T> = T extends T ? keyof T : never;
+
 if (import.meta.vitest) {
   const { expectType } = await import("tsd");
   const { describe, test } = import.meta.vitest;
@@ -146,6 +159,12 @@ if (import.meta.vitest) {
         >({} as {
           c: string
         });
+        expectType<
+          Get<
+            { a: { b: { d: string }, c: { d: number } } },
+            ["a", "b" | "c", "d"]
+          >
+        >({} as string | number);
       });
 
       test("it should return `undefined` if the path is not found", () => {
@@ -257,6 +276,17 @@ if (import.meta.vitest) {
         >({} as "a" | "c");
       });
     });
+
+    describe("KeysOfUnion", () => {
+      test("it should extract all keys from a union type", () => {
+        type Union =
+          | { foo: string }
+          | { bar: number }
+
+        expectType<keyof Union>({} as never)
+        expectType<KeysOfUnion<Union>>({} as "foo" | "bar")
+      })
+    })
   });
 }
 
