@@ -98,7 +98,8 @@ jobs:
       - name: Verify NPM Token
         run: |
           echo "//registry.npmjs.org/:_authToken=${NPM_TOKEN}" >~/.npmrc
-          echo "✅ NPM token is valid. Logged in as: $(npm whoami || exit 1)"
+          USER=$(npm whoami)
+          echo "✅ NPM token is valid. Logged in as: $USER"
         env:
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
 
