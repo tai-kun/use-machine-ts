@@ -125,9 +125,9 @@ export type RequiredKeysOf<T extends object> = Exclude<ValueOf<{
     : never
 }>, undefined>
 
-if (cfgTest && cfgTest.url === import.meta.url) {
-  const { expectType } = await import("tsd")
-  const { describe, test } = cfgTest
+if (import.meta.vitest) {
+  const { expectType } = await import("tsd");
+  const { describe, test } = import.meta.vitest;
 
   describe("src/types/utils", () => {
     describe("Get", () => {
@@ -137,7 +137,7 @@ if (cfgTest && cfgTest.url === import.meta.url) {
             { a: { b: { c: string } } },
             ["a", "b", "c"]
           >
-        >({} as string)
+        >({} as string);
         expectType<
           Get<
             { a: { b: { c: string } } },
@@ -145,8 +145,8 @@ if (cfgTest && cfgTest.url === import.meta.url) {
           >
         >({} as {
           c: string
-        })
-      })
+        });
+      });
 
       test("it should return `undefined` if the path is not found", () => {
         expectType<
@@ -154,8 +154,8 @@ if (cfgTest && cfgTest.url === import.meta.url) {
             { a: { b: { c: string } } },
             ["a", "c"]
           >
-        >(undefined)
-      })
+        >(undefined);
+      });
 
       test("it should return the fallback value if the path is not found", () => {
         expectType<
@@ -164,76 +164,76 @@ if (cfgTest && cfgTest.url === import.meta.url) {
             ["a", "c"],
             "fallback"
           >
-        >({} as "fallback")
-      })
-    })
+        >({} as "fallback");
+      });
+    });
 
     describe("IsStringLiteral", () => {
       test("it should return `true` if the given type is a literal string", () => {
         expectType<
           IsStringLiteral<"a">
-        >(true as const)
-      })
+        >(true as const);
+      });
 
       test("it should return `false` if the given type is not a literal string", () => {
         expectType<
           IsStringLiteral<string>
-        >(false as const)
-      })
-    })
+        >(false as const);
+      });
+    });
 
     describe("IsBooleanLiteral", () => {
       test("it should return `true` if the given type is a literal boolean", () => {
         expectType<
           IsBooleanLiteral<true>
-        >(true as const)
-      })
+        >(true as const);
+      });
 
       test("it should return `false` if the given type is not a literal boolean", () => {
         expectType<
           IsBooleanLiteral<boolean>
-        >(false as const)
-      })
-    })
+        >(false as const);
+      });
+    });
 
     describe("IsPlainObject", () => {
       test("it should return `true` if the given type is a plain object", () => {
         expectType<
           IsPlainObject<{}>
-        >(true as const)
+        >(true as const);
         // ! This is a known limitation of TypeScript.
         // ! Non-plain objects should be rejected at runtime.
         expectType<
           IsPlainObject<Date>
-        >(true as const)
-      })
+        >(true as const);
+      });
 
       test("it should return `false` if the given type is not a plain object", () => {
         expectType<
           IsPlainObject<string>
-        >(false as const)
+        >(false as const);
         expectType<
           IsPlainObject<any[]>
-        >(false as const)
+        >(false as const);
         expectType<
           IsPlainObject<() => void>
-        >(false as const)
-      })
-    })
+        >(false as const);
+      });
+    });
 
     describe("Extends", () => {
       test("it should return `true` if the given type extends the other type", () => {
         expectType<
           Extends<"a", string>
-        >(true as const)
-      })
+        >(true as const);
+      });
 
       test("it should return `false` if the given type does not extend the other type", () => {
         expectType<
           Extends<"a", number>
-        >(false as const)
-      })
-    })
+        >(false as const);
+      });
+    });
 
     describe("ValueOf", () => {
       test("it should infer the value of the given object type", () => {
@@ -242,9 +242,9 @@ if (cfgTest && cfgTest.url === import.meta.url) {
             a: string
             b: number
           }>
-        >({} as string | number)
-      })
-    })
+        >({} as string | number);
+      });
+    });
 
     describe("RequiredKeysOf", () => {
       test("it should extract all required keys from the given type", () => {
@@ -254,9 +254,9 @@ if (cfgTest && cfgTest.url === import.meta.url) {
             b?: number
             c: string | undefined
           }>
-        >({} as "a" | "c")
-      })
-    })
-  })
+        >({} as "a" | "c");
+      });
+    });
+  });
 }
 

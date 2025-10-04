@@ -380,3 +380,11 @@ export { useMachine };
 export { and, guards, not, or } from "./core/guard";
 export { createMachine } from "./create-machine";
 export type * from "./types";
+
+if (import.meta.vitest) {
+  const { describe, test } = import.meta.vitest;
+
+  describe("src/use-machine", () => {
+    test.skip("Should be tested");
+  });
+}

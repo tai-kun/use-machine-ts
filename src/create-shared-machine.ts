@@ -100,10 +100,9 @@ export { createSharedMachine };
 export { and, guards, not, or } from "./core/guard";
 export type * from "./types";
 
-if (cfgTest && cfgTest.url === import.meta.url) {
+if (import.meta.vitest) {
   const { expectType } = await import("tsd");
-  const { assert, describe, sinon, test } = cfgTest;
-  const { stub } = sinon;
+  const { assert, describe, test, vi } = import.meta.vitest;
 
   describe("src/createSharedMachine", () => {
     test("strict: false", () => {
@@ -248,14 +247,14 @@ if (cfgTest && cfgTest.url === import.meta.url) {
         },
       });
 
-      const callback = stub();
+      const callback = vi.fn();
       const unsubscribe = machine.subscribe(callback);
 
       machine.send("NEXT");
 
-      assert.equal(callback.callCount, 1);
+      assert.equal(callback.mock.calls.length, 1);
       assert.deepEqual(
-        callback.getCalls().map(call => call.args),
+        callback.mock.calls,
         [
           [
             {
@@ -268,12 +267,12 @@ if (cfgTest && cfgTest.url === import.meta.url) {
         ],
       );
 
-      callback.reset();
+      callback.mockClear();
       unsubscribe();
 
       machine.send("NEXT");
 
-      assert.equal(callback.callCount, 0);
+      assert.equal(callback.mock.calls.length, 0);
     });
   });
 }

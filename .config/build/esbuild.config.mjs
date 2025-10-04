@@ -1,6 +1,5 @@
 // @ts-check
 
-import { buildDefine } from "cfg-test/define";
 import fs from "node:fs";
 import path from "node:path";
 
@@ -78,8 +77,7 @@ function create(options) {
       "Symbol",
     ],
     define: {
-      ...buildDefine,
-      "import.meta.url": "undefined",
+      "import.meta.vitest": "undefined",
     },
     minifySyntax: true,
 

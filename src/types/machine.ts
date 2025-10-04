@@ -265,11 +265,10 @@ export type SharedMachineSignature = {
   readonly setContext: Config.SetContextSignature;
 };
 
-if (cfgTest && cfgTest.url === import.meta.url) {
-  // const { expectType } = await import("tsd")
-  const { describe, test } = cfgTest
+if (import.meta.vitest) {
+  const { describe, test } = import.meta.vitest;
 
   describe("src/types/machine", () => {
-    test.skip("Should be tested", () => {})
-  })
+    test.skip("Should be tested");
+  });
 }

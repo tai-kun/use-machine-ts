@@ -17,7 +17,7 @@ run = [
 run = "exit 0"
 
 [tasks.test]
-run = "npx tsx --import cfg-test --test 'src/**/*.ts' --test 'src/**/*.tsx'"
+run = "npx vitest -c .config/vitest.config.ts src/"
 
 [tasks.size-check]
 depends = "build"
