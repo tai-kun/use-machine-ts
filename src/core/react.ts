@@ -7,10 +7,10 @@ export {
   useSyncExternalStore,
 } from "react";
 
-if (cfgTest && cfgTest.url === import.meta.url) {
-  const { describe, test } = cfgTest;
+if (import.meta.vitest) {
+  const { describe, test } = import.meta.vitest;
 
   describe("src/core/react", () => {
-    test.skip("Should be tested", () => {});
+    test.skip("Should be tested");
   });
 }

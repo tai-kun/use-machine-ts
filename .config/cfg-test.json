@@ -1,6 +1,0 @@
-{
-  "$schema": "../node_modules/cfg-test/schema.json",
-  "globals": {
-    "__DEV__": true
-  }
-}

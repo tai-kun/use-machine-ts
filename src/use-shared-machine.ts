@@ -85,3 +85,11 @@ export { useSharedMachine };
 export { and, guards, not, or } from "./core/guard";
 export { createSharedMachine } from "./create-shared-machine";
 export type * from "./types";
+
+if (import.meta.vitest) {
+  const { describe, test } = import.meta.vitest;
+
+  describe("src/use-shared-machine", () => {
+    test.skip("Should be tested");
+  });
+}

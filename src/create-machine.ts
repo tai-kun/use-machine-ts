@@ -46,9 +46,9 @@ export { createMachine };
 export { and, guards, not, or } from "./core/guard";
 export type * from "./types";
 
-if (cfgTest && cfgTest.url === import.meta.url) {
+if (import.meta.vitest) {
   const { expectType } = await import("tsd");
-  const { assert, describe, test } = cfgTest;
+  const { assert, describe, test } = import.meta.vitest;
 
   describe("src/createMachine", () => {
     test("strict: false", () => {

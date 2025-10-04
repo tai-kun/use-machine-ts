@@ -1,12 +1,10 @@
 {
   "extends": [
-    "./node_modules/@tsconfig/node21/tsconfig.json",
+    "./node_modules/@tsconfig/node22/tsconfig.json",
     "./node_modules/@tsconfig/strictest/tsconfig.json"
   ],
   "include": [
-    "./config/**/*",
-    "./examples/**/*",
-    "./scripts/**/*",
+    "./.config/**/*",
     "./src/**/*"
   ],
   "compilerOptions": {

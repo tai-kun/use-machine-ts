@@ -32,7 +32,7 @@ jobs:
         if: ${{ steps.rp.outputs.release_created }}
 
       - name: Build
-        run: npm run build
+        run: mise run build
         if: ${{ steps.rp.outputs.release_created }}
 
       - name: Publish

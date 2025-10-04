@@ -135,16 +135,15 @@ export function unreachable(cause: never): never {
   throw new Error("unreachable", { cause });
 }
 
-if (cfgTest && cfgTest.url === import.meta.url) {
+if (import.meta.vitest) {
   await import("global-jsdom/register");
   const { renderHook } = await import("@testing-library/react");
-  const { assert, describe, sinon, test } = cfgTest;
-  const { spy } = sinon;
+  const { assert, describe, test, vi } = import.meta.vitest;
 
   describe("src/core/devutils", () => {
     describe("log", () => {
       test("it should log messages", () => {
-        const logSpy = spy();
+        const logSpy = vi.fn();
         const options: LogOptions = {
           verbose: true,
           console: {
@@ -159,7 +158,7 @@ if (cfgTest && cfgTest.url === import.meta.url) {
         );
 
         assert.deepEqual(
-          logSpy.getCalls().map(call => call.args),
+          logSpy.mock.calls,
           [
             ["Group label"],
             ["Label", "Value"],
@@ -168,7 +167,7 @@ if (cfgTest && cfgTest.url === import.meta.url) {
       });
 
       test("it should log messages with group label", () => {
-        const logSpy = spy();
+        const logSpy = vi.fn();
         const options: LogOptions = {
           verbose: true,
           console: {
@@ -185,7 +184,7 @@ if (cfgTest && cfgTest.url === import.meta.url) {
         );
 
         assert.deepEqual(
-          logSpy.getCalls().map(call => call.args),
+          logSpy.mock.calls,
           [
             ["Group label", "Sub label"],
             ["Label", "Value"],
@@ -195,7 +194,7 @@ if (cfgTest && cfgTest.url === import.meta.url) {
       });
 
       test("it should not log messages if verbose is false", () => {
-        const logSpy = spy();
+        const logSpy = vi.fn();
         const options: LogOptions = {
           verbose: false,
           console: {
@@ -209,11 +208,11 @@ if (cfgTest && cfgTest.url === import.meta.url) {
           ["Label", "Value"],
         );
 
-        assert.deepEqual(logSpy.getCalls(), []);
+        assert.deepEqual(logSpy.mock.calls, []);
       });
 
       test("it should not log messages if level is debug and verbose is 1", () => {
-        const logSpy = spy();
+        const logSpy = vi.fn();
         const options: LogOptions = {
           verbose: 1,
           console: {
@@ -227,11 +226,11 @@ if (cfgTest && cfgTest.url === import.meta.url) {
           ["Label", "Value"],
         );
 
-        assert.deepEqual(logSpy.getCalls(), []);
+        assert.deepEqual(logSpy.mock.calls, []);
       });
 
       test("it should log messages if level is error", () => {
-        const logSpy = spy();
+        const logSpy = vi.fn();
         const options: LogOptions = {
           verbose: 1,
           console: {
@@ -247,7 +246,7 @@ if (cfgTest && cfgTest.url === import.meta.url) {
         );
 
         assert.deepEqual(
-          logSpy.getCalls().map(call => call.args),
+          logSpy.mock.calls,
           [
             ["Group label"],
             ["Label", "Value"],
@@ -256,7 +255,7 @@ if (cfgTest && cfgTest.url === import.meta.url) {
       });
 
       test("it should fallback to log if error is not available", () => {
-        const logSpy = spy();
+        const logSpy = vi.fn();
         const options: LogOptions = {
           verbose: 1,
           console: {
@@ -271,7 +270,7 @@ if (cfgTest && cfgTest.url === import.meta.url) {
         );
 
         assert.deepEqual(
-          logSpy.getCalls().map(call => call.args),
+          logSpy.mock.calls,
           [
             ["Group label"],
             ["Label", "Value"],
@@ -280,7 +279,7 @@ if (cfgTest && cfgTest.url === import.meta.url) {
       });
 
       test("it should not group messages if groupEnd is not available", () => {
-        const logSpy = spy();
+        const logSpy = vi.fn();
         const options: LogOptions = {
           verbose: true,
           console: {
@@ -296,7 +295,7 @@ if (cfgTest && cfgTest.url === import.meta.url) {
         );
 
         assert.deepEqual(
-          logSpy.getCalls().map(call => call.args),
+          logSpy.mock.calls,
           [
             ["Group label"],
             ["Label", "Value"],
@@ -308,9 +307,9 @@ if (cfgTest && cfgTest.url === import.meta.url) {
         const options: LogOptions = {
           verbose: 2,
         };
-        const consoleLogSpy = spy(console, "log");
-        const consoleGroupSpy = spy(console, "group");
-        const consoleGroupEndSpy = spy(console, "groupEnd");
+        using consoleLogSpy = vi.spyOn(console, "log");
+        using consoleGroupSpy = vi.spyOn(console, "group");
+        using consoleGroupEndSpy = vi.spyOn(console, "groupEnd");
 
         log(
           { ...options, level: "debug" },
@@ -320,9 +319,9 @@ if (cfgTest && cfgTest.url === import.meta.url) {
 
         assert.deepEqual(
           [
-            ...consoleGroupSpy.getCalls().map(call => call.args),
-            ...consoleLogSpy.getCalls().map(call => call.args),
-            ...consoleGroupEndSpy.getCalls().map(call => call.args),
+            ...consoleGroupSpy.mock.calls,
+            ...consoleLogSpy.mock.calls,
+            ...consoleGroupEndSpy.mock.calls,
           ],
           [
             ["Group label"],
@@ -330,16 +329,12 @@ if (cfgTest && cfgTest.url === import.meta.url) {
             [],
           ],
         );
-
-        consoleLogSpy.restore();
-        consoleGroupSpy.restore();
-        consoleGroupEndSpy.restore();
       });
     });
 
     describe("useDetectChanges", () => {
       test("it should call the callback when the value changes", () => {
-        const callback = spy();
+        const callback = vi.fn();
         const { rerender } = renderHook(
           ({ value }) => {
             useDetectChanges(value, callback);
@@ -356,7 +351,7 @@ if (cfgTest && cfgTest.url === import.meta.url) {
         });
 
         assert.deepEqual(
-          callback.getCalls().map(call => call.args),
+          callback.mock.calls,
           [
             [1, 2],
           ],
@@ -364,7 +359,7 @@ if (cfgTest && cfgTest.url === import.meta.url) {
       });
 
       test("it should call the callback with the custom equality function", () => {
-        const callback = spy();
+        const callback = vi.fn();
         const { rerender } = renderHook(
           props => {
             useDetectChanges<{ prop: number }>(props, callback, {
@@ -382,14 +377,14 @@ if (cfgTest && cfgTest.url === import.meta.url) {
           prop: 1,
         });
 
-        assert.deepEqual(callback.getCalls(), []);
+        assert.deepEqual(callback.mock.calls, []);
 
         rerender({
           prop: 2,
         });
 
         assert.deepEqual(
-          callback.getCalls().map(call => call.args),
+          callback.mock.calls,
           [
             [{ prop: 1 }, { prop: 2 }],
           ],
@@ -399,18 +394,18 @@ if (cfgTest && cfgTest.url === import.meta.url) {
 
     describe("isPlainObject", () => {
       test("it should return true if the value is a plain object", () => {
-        assert(isPlainObject({}));
-        assert(isPlainObject(Object.create(null)));
+        assert.equal(isPlainObject({}), true);
+        assert.equal(isPlainObject(Object.create(null)), true);
       });
 
       test("it should return false if the value is not a plain object", () => {
-        assert(!isPlainObject([]));
-        assert(!isPlainObject(() => {}));
-        assert(!isPlainObject(null));
-        assert(!isPlainObject(undefined));
-        assert(!isPlainObject(1));
-        assert(!isPlainObject("string"));
-        assert(!isPlainObject(Symbol()));
+        assert.equal(!isPlainObject([]), true);
+        assert.equal(!isPlainObject(() => {}), true);
+        assert.equal(!isPlainObject(null), true);
+        assert.equal(!isPlainObject(undefined), true);
+        assert.equal(!isPlainObject(1), true);
+        assert.equal(!isPlainObject("string"), true);
+        assert.equal(!isPlainObject(Symbol()), true);
       });
     });
 
@@ -420,9 +415,7 @@ if (cfgTest && cfgTest.url === import.meta.url) {
           () => {
             unreachable("value" as never);
           },
-          {
-            message: "unreachable",
-          },
+          "unreachable",
         );
       });
     });

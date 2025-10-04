@@ -460,264 +460,264 @@ export type Signature = {
   readonly context?: ContextSignature;
 };
 
-if (cfgTest && cfgTest.url === import.meta.url) {
-  const { expectType } = await import("tsd")
-  const { describe, test } = cfgTest
+if (import.meta.vitest) {
+  const { expectType } = await import("tsd");
+  const { describe, test } = import.meta.vitest;
 
   describe("src/types/definition", () => {
     describe("Transition", () => {
       test("it should be inferred as an error when no states are defined", () => {
-        type Expected = "Error: State values are not defined."
-        type Actual = Transition<{}, never>
+        type Expected = "Error: State values are not defined.";
+        type Actual = Transition<{}, never>;
 
-        expectType<Expected>({} as Actual)
-      })
+        expectType<Expected>({} as Actual);
+      });
 
       test("it should be inferred as an error when the state values are not literal strings", () => {
-        type Expected = "Error: State values must be literal strings."
-        type Actual = Transition<{ states: { [key: string]: {} } }, never>
+        type Expected = "Error: State values must be literal strings.";
+        type Actual = Transition<{ states: { [key: string]: {} } }, never>;
 
-        expectType<Expected>({} as Actual)
-      })
+        expectType<Expected>({} as Actual);
+      });
 
       test("it should be inferred as an error when the state value is reserved", () => {
         type Def = {
           states: {
-            $init: {}
-          }
-        }
-        type Expected = "Error: State value '$init' is reserved."
-        type Actual = Transition<Def, never>
+            $init: {},
+          },
+        };
+        type Expected = "Error: State value '$init' is reserved.";
+        type Actual = Transition<Def, never>;
 
-        expectType<Expected>({} as Actual)
-      })
+        expectType<Expected>({} as Actual);
+      });
 
       test("`guard` should be inferred as an error when no guards are defined", () => {
         type Def = {
           states: {
             active: {
-              target: "active"
-              guard: "guard"
-            }
-          }
-        }
+              target: "active",
+              guard: "guard",
+            },
+          },
+        };
         type Expected = "active" | {
-          readonly target: "active"
-          readonly guard?: "Error: Guards are not defined."
-        }
-        type Actual = Transition<Def, never>
+          readonly target: "active";
+          readonly guard?: "Error: Guards are not defined.";
+        };
+        type Actual = Transition<Def, never>;
 
-        expectType<Expected>({} as Actual)
-      })
+        expectType<Expected>({} as Actual);
+      });
 
       test("`guard` should be inferred as an error when the guard is not a literal string", () => {
         type Def = {
           states: {
             active: {
-              target: "active"
-              guard: "guard"
-            }
-          }
-        }
+              target: "active",
+              guard: "guard",
+            },
+          },
+        };
         type Expected = "active" | {
-          readonly target: "active"
-          readonly guard?: "Error: Guards must be literal strings."
-        }
-        type Actual = Transition<Def, string>
+          readonly target: "active";
+          readonly guard?: "Error: Guards must be literal strings.";
+        };
+        type Actual = Transition<Def, string>;
 
-        expectType<Expected>({} as Actual)
-      })
+        expectType<Expected>({} as Actual);
+      });
 
       test("`guard` should be inferred as an error when the guard is reserved", () => {
         type Def = {
           states: {
             active: {
-              target: "active"
-              guard: "Error:"
-            }
-          }
-        }
+              target: "active",
+              guard: "Error:",
+            },
+          },
+        };
         type Expected = "active" | {
-          readonly target: "active"
-          readonly guard?: "Error: Guard name 'Error:' is reserved."
-        }
-        type Actual = Transition<Def, "Error:">
+          readonly target: "active";
+          readonly guard?: "Error: Guard name 'Error:' is reserved.";
+        };
+        type Actual = Transition<Def, "Error:">;
 
-        expectType<Expected>({} as Actual)
-      })
+        expectType<Expected>({} as Actual);
+      });
 
       test("it should be inferred as an Transition object", () => {
         type Expected = "active" | {
-          readonly target: "active"
-          readonly guard?: Guard<"guard">
-        }
-        type Actual = Transition<{ states: { active: {} } }, "guard">
+          readonly target: "active";
+          readonly guard?: Guard<"guard">;
+        };
+        type Actual = Transition<{ states: { active: {} } }, "guard">;
 
-        expectType<Expected>({} as Actual)
-      })
-    })
+        expectType<Expected>({} as Actual);
+      });
+    });
 
     describe("On", () => {
       test("it should be inferred as an empty object the event types are not defined", () => {
-        type Expected = { [NEVER]?: never }
-        type Actual = On<{}, ["on"], never>
+        type Expected = { [NEVER]?: never };
+        type Actual = On<{}, ["on"], never>;
 
-        expectType<Expected>({} as Actual)
-      })
+        expectType<Expected>({} as Actual);
+      });
 
       test("it should be inferred as an error when the event types are not literal strings", () => {
-        type Expected = "Error: Event types must be literal strings."
-        type Actual = On<{ on: { 1: {} } }, ["on"], never>
+        type Expected = "Error: Event types must be literal strings.";
+        type Actual = On<{ on: { 1: {} } }, ["on"], never>;
 
-        expectType<Expected>({} as Actual)
-      })
+        expectType<Expected>({} as Actual);
+      });
 
       test("it should be inferred as an error when the event types are reserved", () => {
         type Def = {
           on: {
-            $init: {}
-            "Error:": {}
-            validEvent: {}
-          }
-        }
+            $init: {},
+            "Error:": {},
+            validEvent: {},
+          },
+        };
         type Expected = {
-          readonly $init: "Error: Event type '$init' is reserved."
-          readonly "Error:": "Error: Event type 'Error:' is reserved."
-          readonly validEvent: Transition<Def, never>
-        }
-        type Actual = On<Def, ["on"], never>
+          readonly $init: "Error: Event type '$init' is reserved.";
+          readonly "Error:": "Error: Event type 'Error:' is reserved.";
+          readonly validEvent: Transition<Def, never>;
+        };
+        type Actual = On<Def, ["on"], never>;
 
-        expectType<Expected>({} as Actual)
-      })
-    })
+        expectType<Expected>({} as Actual);
+      });
+    });
 
     describe("State", () => {
       test("`effect` should be inferred as an error when no effects are defined", () => {
         type Def = {
           states: {
             active: {
-              effect: "effect"
-            }
-          }
-        }
-        type Expected = "Error: Effects are not defined." | undefined
-        type Actual = State<Def, ["states", "active"], never, never>["effect"]
+              effect: "effect",
+            },
+          },
+        };
+        type Expected = "Error: Effects are not defined." | undefined;
+        type Actual = State<Def, ["states", "active"], never, never>["effect"];
 
-        expectType<Expected>({} as Actual)
-      })
+        expectType<Expected>({} as Actual);
+      });
 
       test("`effect` should be inferred as an error when the effect is not a literal string", () => {
         type Def = {
           states: {
             active: {
-              effect: "effect"
-            }
-          }
-        }
-        type Expected = "Error: Effects must be literal strings." | undefined
-        type Actual = State<Def, ["states", "active"], never, string>["effect"]
+              effect: "effect",
+            },
+          },
+        };
+        type Expected = "Error: Effects must be literal strings." | undefined;
+        type Actual = State<Def, ["states", "active"], never, string>["effect"];
 
-        expectType<Expected>({} as Actual)
-      })
+        expectType<Expected>({} as Actual);
+      });
 
       test("`effect` should be inferred as an Effect object", () => {
         type Def = {
           states: {
             active: {
-              effect: "effect"
-            }
-          }
-        }
-        type Expected = "effect" | readonly "effect"[] | undefined
-        type Actual = State<Def, ["states", "active"], never, "effect">["effect"]
+              effect: "effect",
+            },
+          },
+        };
+        type Expected = "effect" | readonly "effect"[] | undefined;
+        type Actual = State<Def, ["states", "active"], never, "effect">["effect"];
 
-        expectType<Expected>({} as Actual)
-      })
-    })
+        expectType<Expected>({} as Actual);
+      });
+    });
 
     describe("Context", () => {
       test("it should be inferred as an error when `context` is not defined in `$schema` in strict-mode", () => {
         type Def = {
           $schema: {
-            strict: true
-          }
-        }
-        type Expected = { [ERROR]: "Error: `context` is not defined in `$schema`." }
-        type Actual = Context<Def>
+            strict: true,
+          },
+        };
+        type Expected = { [ERROR]: "Error: `context` is not defined in `$schema`." };
+        type Actual = Context<Def>;
 
-        expectType<Expected>({} as Actual)
-      })
+        expectType<Expected>({} as Actual);
+      });
 
       test("it should prefer the context schema over the context", () => {
         type Def = {
           $schema: {
-            context: { a: 1 }
-          }
-          context: { a: 2 }
-        }
-        type Expected = { a: 1 }
-        type Actual = Context<Def>
+            context: { a: 1 },
+          },
+          context: { a: 2 },
+        };
+        type Expected = { a: 1 };
+        type Actual = Context<Def>;
 
-        expectType<Expected>({} as Actual)
-      })
-    })
+        expectType<Expected>({} as Actual);
+      });
+    });
 
     describe("Shape", () => {
       test("`initial `should be inferred as an error when no states are defined", () => {
-        type Expected = "Error: No states defined."
-        type Actual = Shape<{ states: {} }, never, never>["initial"]
+        type Expected = "Error: No states defined.";
+        type Actual = Shape<{ states: {} }, never, never>["initial"];
 
-        expectType<Expected>({} as Actual)
-      })
+        expectType<Expected>({} as Actual);
+      });
 
       test("`initial` should be inferred as an error when the state values are not literal strings", () => {
-        type Expected = "Error: States have no literal string value."
-        type Actual = Shape<{ states: { [key: number]: {} } }, never, never>["initial"]
+        type Expected = "Error: States have no literal string value.";
+        type Actual = Shape<{ states: { [key: number]: {} } }, never, never>["initial"];
 
-        expectType<Expected>({} as Actual)
-      })
+        expectType<Expected>({} as Actual);
+      });
 
       test("`states` should be inferred as an error when the state values are not literal string", () => {
-        type Expected = "Error: State values must be literal strings."
-        type Actual = Shape<{ states: { [key: string]: {} } }, never, never>["states"]
+        type Expected = "Error: State values must be literal strings.";
+        type Actual = Shape<{ states: { [key: string]: {} } }, never, never>["states"];
 
-        expectType<Expected>({} as Actual)
-      })
+        expectType<Expected>({} as Actual);
+      });
 
       test("`states` should be inferred as an error when the state value is reserved", () => {
         type Def = {
           states: {
-            $init: {}
-            "Error:": {}
-            validValue: {}
-          }
-        }
+            $init: {},
+            "Error:": {},
+            validValue: {},
+          },
+        };
         type Expected = {
-          readonly $init: "Error: State value '$init' is reserved."
-          readonly "Error:": "Error: State value 'Error:' is reserved."
-          readonly validValue: State<Def, ["states", "validValue"], never, never>
-        }
-        type Actual = Shape<Def, never, never>["states"]
+          readonly $init: "Error: State value '$init' is reserved.";
+          readonly "Error:": "Error: State value 'Error:' is reserved.";
+          readonly validValue: State<Def, ["states", "validValue"], never, never>;
+        };
+        type Actual = Shape<Def, never, never>["states"];
 
-        expectType<Expected>({} as Actual)
-      })
+        expectType<Expected>({} as Actual);
+      });
 
       test("it should require `context` when it is defined in `$schema`", () => {
-        type DefHasNoCtx1 = {}
+        type DefHasNoCtx1 = {};
         type DefHasNoCtx2 = {
-          $schema: {}
-        }
+          $schema: {},
+        };
         type DefHasCtx = {
           $schema: {
-            context: {}
-          }
-        }
-        type Actual<D> = RequiredKeysOf<Shape<D, never, never>>
+            context: {},
+          },
+        };
+        type Actual<D> = RequiredKeysOf<Shape<D, never, never>>;
 
-        expectType<"initial" | "states">({} as Actual<DefHasNoCtx1>)
-        expectType<"initial" | "states">({} as Actual<DefHasNoCtx2>)
-        expectType<"initial" | "states" | "context">({} as Actual<DefHasCtx>)
-      })
-    })
-  })
+        expectType<"initial" | "states">({} as Actual<DefHasNoCtx1>);
+        expectType<"initial" | "states">({} as Actual<DefHasNoCtx2>);
+        expectType<"initial" | "states" | "context">({} as Actual<DefHasCtx>);
+      });
+    });
+  });
 }

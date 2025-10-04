@@ -1,4 +1,4 @@
-/// <reference types="cfg-test/globals" />
+/// <reference types="vitest/importMeta" />
 
 declare const __DEV__: boolean;
 

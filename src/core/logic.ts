@@ -489,11 +489,10 @@ export function useSyncState(
   );
 }
 
-if (cfgTest && cfgTest.url === import.meta.url) {
+if (import.meta.vitest) {
   await import("global-jsdom/register");
   const { renderHook } = await import("@testing-library/react");
-  const { assert, describe, sinon, test } = cfgTest;
-  const { spy } = sinon;
+  const { assert, describe, test, vi } = import.meta.vitest;
 
   describe("src/core/logic", () => {
     describe("createInitialState", () => {
@@ -602,7 +601,7 @@ if (cfgTest && cfgTest.url === import.meta.url) {
         });
 
         test("it should log the event type not found", () => {
-          const logSpy = spy();
+          const logSpy = vi.fn();
           const def = {
             initial: "idle",
             context: {},
@@ -632,7 +631,7 @@ if (cfgTest && cfgTest.url === import.meta.url) {
 
           assert.deepEqual(newState, state);
           assert.deepEqual(
-            logSpy.getCalls().map(call => call.args),
+            logSpy.mock.calls,
             [
               ["Current state 'idle' doesn't listen to event type 'FETCH'."],
               ["State", state],
@@ -642,7 +641,7 @@ if (cfgTest && cfgTest.url === import.meta.url) {
         });
 
         test("it should log the transition denied by guard", () => {
-          const logSpy = spy();
+          const logSpy = vi.fn();
           const def = {
             initial: "idle",
             context: {},
@@ -683,7 +682,7 @@ if (cfgTest && cfgTest.url === import.meta.url) {
 
           assert.deepEqual(newState, state);
           assert.deepEqual(
-            logSpy.getCalls().map(call => call.args),
+            logSpy.mock.calls,
             [
               ["Transition from 'idle' to 'loading' denied by guard."],
               [
@@ -704,7 +703,7 @@ if (cfgTest && cfgTest.url === import.meta.url) {
 
       describe("SET_CONTEXT", () => {
         test("it should update the context", () => {
-          const logSpy = spy();
+          const logSpy = vi.fn();
           const def = {
             initial: "idle",
             context: {
@@ -744,7 +743,7 @@ if (cfgTest && cfgTest.url === import.meta.url) {
             nextEvents: [],
           });
           assert.deepEqual(
-            logSpy.getCalls().map(call => call.args),
+            logSpy.mock.calls,
             [
               ["Context updated."],
               ["Prev Context", { foo: 1 }],
@@ -757,8 +756,8 @@ if (cfgTest && cfgTest.url === import.meta.url) {
 
     describe("applyEffect", () => {
       test("it should apply the effect", () => {
-        const cleanupSpy = spy<Config.EffectCleanupSignature>(() => {});
-        const dispatchSpy = spy();
+        const cleanupSpy = vi.fn<Config.EffectCleanupSignature>();
+        const dispatchSpy = vi.fn();
         const def = {
           initial: "idle",
           context: {},
@@ -788,7 +787,7 @@ if (cfgTest && cfgTest.url === import.meta.url) {
         });
 
         assert.deepEqual(
-          dispatchSpy.getCalls().map(call => call.args),
+          dispatchSpy.mock.calls,
           [
             [
               {
@@ -800,9 +799,9 @@ if (cfgTest && cfgTest.url === import.meta.url) {
             ],
           ],
         );
-        assert.equal(cleanupSpy.callCount, 1);
+        assert.equal(cleanupSpy.mock.calls.length, 1);
 
-        const params = cleanupSpy.getCall(0).args[0];
+        const params = cleanupSpy.mock.calls[0]![0];
 
         assert.equal(typeof params.send, "function");
         assert.equal(typeof params.setContext, "function");
@@ -812,8 +811,8 @@ if (cfgTest && cfgTest.url === import.meta.url) {
 
       test("it should error if dispatch is called asynchronously in sync mode", async () => {
         const { promise, resolve } = Promise.withResolvers<void>();
-        const errorSpy = spy();
-        const dispatchSpy = spy();
+        const errorSpy = vi.fn();
+        const dispatchSpy = vi.fn();
         const def = {
           initial: "idle",
           context: {},
@@ -850,9 +849,9 @@ if (cfgTest && cfgTest.url === import.meta.url) {
 
         await promise;
 
-        assert.equal(dispatchSpy.callCount, 0);
+        assert.equal(dispatchSpy.mock.calls.length, 0);
         assert.deepEqual(
-          errorSpy.getCalls().map(call => call.args),
+          errorSpy.mock.calls,
           [
             [
               "`send()` not available. Must be used synchronously within an effect.",
@@ -926,8 +925,8 @@ if (cfgTest && cfgTest.url === import.meta.url) {
 
     describe("useSyncState", () => {
       test("it should apply the effect", () => {
-        const cleanup = spy<Config.EffectCleanupSignature>(() => {});
-        const effect = spy<Config.EffectSignature>(() => cleanup);
+        const cleanup = vi.fn<Config.EffectCleanupSignature>(() => {});
+        const effect = vi.fn<Config.EffectSignature>(() => cleanup);
         const def: Definition.Signature = {
           initial: "a",
           states: {
@@ -954,10 +953,10 @@ if (cfgTest && cfgTest.url === import.meta.url) {
           },
         });
 
-        assert.equal(effect.callCount, 1);
-        assert.equal(cleanup.callCount, 0);
+        assert.equal(effect.mock.calls.length, 1);
+        assert.equal(cleanup.mock.calls.length, 0);
 
-        const params = effect.getCall(0).args[0];
+        const params = effect.mock.calls[0]![0];
 
         assert.deepEqual(params.event, { type: "$init" });
 
@@ -970,10 +969,10 @@ if (cfgTest && cfgTest.url === import.meta.url) {
           },
         });
 
-        assert.equal(effect.callCount, 1);
-        assert.equal(cleanup.callCount, 1);
+        assert.equal(effect.mock.calls.length, 1);
+        assert.equal(cleanup.mock.calls.length, 1);
 
-        const cleanupParams = cleanup.getCall(0).args[0];
+        const cleanupParams = cleanup.mock.calls[0]![0];
 
         assert.deepEqual(cleanupParams.event, { type: "NEXT" });
       });

@@ -6,7 +6,7 @@ export { useMachine } from "./use-machine";
 export { useSharedMachine } from "./use-shared-machine";
 export { useSyncedMachine } from "./use-synced-machine";
 
-if (cfgTest && cfgTest.url === import.meta.url) {
+if (import.meta.vitest) {
   const tty = await import("node:tty");
   const { Console } = await import("node:console");
   await import("global-jsdom/register");
@@ -27,8 +27,7 @@ if (cfgTest && cfgTest.url === import.meta.url) {
   const { useMachine } = await import("./use-machine");
   const { useSharedMachine } = await import("./use-shared-machine");
   const { useSyncedMachine } = await import("./use-synced-machine");
-  const { assert, describe, sinon, test } = cfgTest;
-  const { spy } = sinon;
+  const { assert, describe, test, vi } = import.meta.vitest;
 
   function createInvocationCallOrder() {
     const order: string[] = [];
@@ -124,6 +123,7 @@ if (cfgTest && cfgTest.url === import.meta.url) {
             })
           );
           const [state] = result.current;
+          state.nextEvents;
 
           assert.deepEqual(state, {
             context: undefined,
@@ -306,8 +306,8 @@ if (cfgTest && cfgTest.url === import.meta.url) {
 
         test("it should invoke effect callbacks", () => {
           const invocationCallOrder = createInvocationCallOrder();
-          const entry = spy(invocationCallOrder.register("entry"));
-          const exit = spy(invocationCallOrder.register("exit"));
+          const entry = vi.fn(invocationCallOrder.register("entry"));
+          const exit = vi.fn(invocationCallOrder.register("exit"));
           const { result } = renderHook(() =>
             useHook(
               {
@@ -345,8 +345,8 @@ if (cfgTest && cfgTest.url === import.meta.url) {
             send("TOGGLE");
           });
 
-          assert.equal(entry.callCount, 2);
-          assert.equal(exit.callCount, 1);
+          assert.equal(entry.mock.calls.length, 2);
+          assert.equal(exit.mock.calls.length, 1);
 
           assert.deepEqual(invocationCallOrder.current, [
             "entry",
@@ -354,10 +354,10 @@ if (cfgTest && cfgTest.url === import.meta.url) {
             "entry",
           ]);
 
-          assert.equal(entry.getCall(0)?.args[0], "inactive");
-          assert.equal(entry.getCall(1)?.args[0], "active");
+          assert.equal(entry.mock.calls[0]?.[0], "inactive");
+          assert.equal(entry.mock.calls[1]?.[0], "active");
 
-          assert.equal(exit.getCall(0)?.args[0], "inactive");
+          assert.equal(exit.mock.calls[0]?.[0], "inactive");
         });
 
         test("it should transition from effect", () => {
@@ -397,7 +397,7 @@ if (cfgTest && cfgTest.url === import.meta.url) {
         });
 
         test("it should get payload sent with event object", () => {
-          const effect = spy();
+          const effect = vi.fn();
           const { result } = renderHook(() =>
             useHook(
               {
@@ -434,15 +434,15 @@ if (cfgTest && cfgTest.url === import.meta.url) {
             });
           });
 
-          assert.deepEqual(effect.getCalls().at(0)?.args[0].event, {
+          assert.deepEqual(effect.mock.calls[0]?.[0].event, {
             type: "ACTIVATE",
             number: 10,
           });
         });
 
         test("it should invoke effect with context as a parameter", () => {
-          const finalEffect = spy();
-          const initialEffect = spy(({ setContext }) => {
+          const finalEffect = vi.fn();
+          const initialEffect = vi.fn(({ setContext }) => {
             setContext((context: boolean) => !context)
               .send("TOGGLE");
           });
@@ -471,20 +471,20 @@ if (cfgTest && cfgTest.url === import.meta.url) {
             )
           );
 
-          assert.equal(initialEffect.callCount, 1);
+          assert.equal(initialEffect.mock.calls.length, 1);
           assert.equal(
-            initialEffect.getCalls().at(0)?.args[0].context,
+            initialEffect.mock.calls[0]?.[0].context,
             false, // initial context
           );
 
-          assert.equal(finalEffect.callCount, 1);
-          assert.equal(finalEffect.getCalls().at(0)?.args[0].context, true);
+          assert.equal(finalEffect.mock.calls.length, 1);
+          assert.equal(finalEffect.mock.calls[0]?.[0].context, true);
         });
       });
 
       describe("guarded transitions", () => {
         test("it should block transitions with guard returning false", () => {
-          const guard = spy(() => false);
+          const guard = vi.fn(() => false);
           const { result } = renderHook(() =>
             useHook(
               {
@@ -518,7 +518,7 @@ if (cfgTest && cfgTest.url === import.meta.url) {
 
           const [state] = result.current;
 
-          assert.equal(guard.callCount, 2); // Called twice in development environment
+          assert.equal(guard.mock.calls.length, 2); // Called twice in development environment
           assert.deepEqual(state, {
             context: undefined,
             event: { type: "$init" },
@@ -528,7 +528,7 @@ if (cfgTest && cfgTest.url === import.meta.url) {
         });
 
         test("it should allow transitions with guard returning true", () => {
-          const guard = spy(() => true);
+          const guard = vi.fn(() => true);
           const { result } = renderHook(() =>
             useHook(
               {
@@ -562,7 +562,7 @@ if (cfgTest && cfgTest.url === import.meta.url) {
 
           const [state] = result.current;
 
-          assert.equal(guard.callCount, 2); // Called twice in development environment
+          assert.equal(guard.mock.calls.length, 2); // Called twice in development environment
           assert.deepEqual(state, {
             context: undefined,
             event: {
@@ -601,7 +601,7 @@ if (cfgTest && cfgTest.url === import.meta.url) {
         });
 
         test("it should get the context inside effects", () => {
-          const effect = spy();
+          const effect = vi.fn();
           const { result } = renderHook(() =>
             useHook(
               {
@@ -625,11 +625,11 @@ if (cfgTest && cfgTest.url === import.meta.url) {
             )
           );
 
-          assert.equal(effect.callCount, 1);
-          assert.deepEqual(effect.getCalls().at(0)?.args[0].context, {
+          assert.equal(effect.mock.calls.length, 1);
+          assert.deepEqual(effect.mock.calls[0]?.[0].context, {
             foo: "bar",
           });
-          assert.deepEqual(effect.getCalls().at(0)?.args[0].event, {
+          assert.deepEqual(effect.mock.calls[0]?.[0].event, {
             type: "$init",
           });
 
@@ -748,9 +748,9 @@ if (cfgTest && cfgTest.url === import.meta.url) {
 
         function createConsole() {
           const console_ = {
-            log: spy(format),
-            error: spy(format),
-            group: spy(format),
+            log: vi.fn(format),
+            error: vi.fn(format),
+            group: vi.fn(format),
             groupEnd() {},
           };
 
@@ -758,9 +758,9 @@ if (cfgTest && cfgTest.url === import.meta.url) {
             ...console_,
             get results() {
               return {
-                group: console_.group.getCalls().map(call => call.returnValue),
-                error: console_.error.getCalls().map(call => call.returnValue),
-                log: console_.log.getCalls().map(call => call.returnValue),
+                group: console_.group.mock.results.map(r => r.value),
+                error: console_.error.mock.results.map(r => r.value),
+                log: console_.log.mock.results.map(r => r.value),
               };
             },
           };
@@ -875,8 +875,8 @@ if (cfgTest && cfgTest.url === import.meta.url) {
 
   describe("useMachine", () => {
     test("definition and config should be immutable", () => {
-      const onToggle1 = spy();
-      const onToggle2 = spy();
+      const onToggle1 = vi.fn();
+      const onToggle2 = vi.fn();
       const { result, rerender } = renderHook(
         ({ onToggle }) =>
           useMachine(
@@ -907,9 +907,9 @@ if (cfgTest && cfgTest.url === import.meta.url) {
           },
         },
       );
-      const callCountOfOnToggle1 = onToggle1.callCount;
+      const callCountOfOnToggle1 = onToggle1.mock.calls.length;
 
-      assert(callCountOfOnToggle1 > 0);
+      assert.equal(callCountOfOnToggle1 > 0, true);
 
       rerender({
         onToggle: onToggle2,
@@ -921,8 +921,8 @@ if (cfgTest && cfgTest.url === import.meta.url) {
         send("TOGGLE");
       });
 
-      assert(onToggle1.callCount > callCountOfOnToggle1);
-      assert(onToggle2.callCount === 0);
+      assert.equal(onToggle1.mock.calls.length > callCountOfOnToggle1, true);
+      assert.equal(onToggle2.mock.calls.length === 0, true);
     });
 
     test("it should transfer props to state machine", () => {
@@ -951,8 +951,8 @@ if (cfgTest && cfgTest.url === import.meta.url) {
           },
         );
       };
-      const onToggle1 = spy();
-      const onToggle2 = spy();
+      const onToggle1 = vi.fn();
+      const onToggle2 = vi.fn();
       const { result, rerender } = renderHook(
         ({ onToggle }) => useMachine(machine, { onToggle }),
         {
@@ -961,9 +961,9 @@ if (cfgTest && cfgTest.url === import.meta.url) {
           },
         },
       );
-      const callCountOfOnToggle1 = onToggle1.callCount;
+      const callCountOfOnToggle1 = onToggle1.mock.calls.length;
 
-      assert(callCountOfOnToggle1 > 0);
+      assert.equal(callCountOfOnToggle1 > 0, true);
 
       rerender({
         onToggle: onToggle2,
@@ -975,13 +975,13 @@ if (cfgTest && cfgTest.url === import.meta.url) {
         send("TOGGLE");
       });
 
-      assert(onToggle1.callCount === callCountOfOnToggle1);
-      assert(onToggle2.callCount > 0);
+      assert.equal(onToggle1.mock.calls.length === callCountOfOnToggle1, true);
+      assert.equal(onToggle2.mock.calls.length > 0, true);
     });
 
     test("it should logs when `send` function is called asynchronously", () => {
-      const groupSpy = spy();
-      const errorSpy = spy();
+      const groupSpy = vi.fn();
+      const errorSpy = vi.fn();
       let sendFn: () => void;
       const { unmount } = renderHook(() =>
         useMachine(
@@ -1026,15 +1026,16 @@ if (cfgTest && cfgTest.url === import.meta.url) {
       sendFn!();
 
       assert.deepEqual(
-        groupSpy.getCalls().map(call => call.args),
+        groupSpy.mock.calls,
         [
           [
-            "Cannot dispatch an action to the state machine after the component is unmounted.",
+            "Cannot dispatch an action to the state machine "
+            + "after the component is unmounted.",
           ],
         ],
       );
       assert.deepEqual(
-        errorSpy.getCalls().map(call => call.args),
+        errorSpy.mock.calls,
         [
           [
             "Action",
@@ -1164,7 +1165,7 @@ if (cfgTest && cfgTest.url === import.meta.url) {
     test("it should update the state synchronously", () => {
       const stdout = new tty.WriteStream(1);
       const console = new Console(stdout);
-      const write = spy(stdout, "write");
+      using write = vi.spyOn(stdout, "write");
 
       function Switch(_: {}) {
         const [getState, send] = useSyncedMachine({
@@ -1216,8 +1217,8 @@ if (cfgTest && cfgTest.url === import.meta.url) {
       unmount();
 
       assert.deepEqual(
-        write.getCalls().map(call => {
-          let data = call.args[0];
+        write.mock.calls.map(call => {
+          let data = call[0];
 
           return (data = data.toString().trim()).startsWith("<JSON> ")
             ? JSON.parse(data.slice("<JSON> ".length))

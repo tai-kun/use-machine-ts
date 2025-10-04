@@ -1,9 +1,9 @@
 export function {{basename outpath}}() {}
 
-if (cfgTest && cfgTest.url === import.meta.url) {
-  const { describe, test } = cfgTest
+if (import.meta.vitest) {
+  const { describe, test } = import.meta.vitest;
 
   describe("{{dirname outpath}}/{{basename outpath}}", () => {
-    test.skip("Should be tested", () => {})
-  })
+    test.skip("Should be tested");
+  });
 }

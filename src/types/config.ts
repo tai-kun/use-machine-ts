@@ -12,6 +12,7 @@ import type {
   Extends,
   Get,
   IsStringLiteral,
+  KeysOfUnion,
   Tagged,
   ValueOf,
 } from "./utils";
@@ -30,10 +31,10 @@ import type {
  */
 type _InferAllTransitionEventTypes<D> =
   // The event types defined in the root.
-  | keyof Get<D, ["on"]>
+  | KeysOfUnion<Get<D, ["on"]>>
   // The event types defined in each state.
   | ValueOf<{
-      [V in keyof Get<D, ["states"]>]: keyof Get<D, ["states", V, "on"]>;
+      [V in keyof Get<D, ["states"]>]: KeysOfUnion<Get<D, ["states", V, "on"]>>;
     }>;
 
 /**
@@ -173,7 +174,7 @@ type _InferAllTransitionEventTypesForStateValue<D, V> =
   // The event types defined in the state.
   | ValueOf<{
       [SV in keyof Get<D, ["states"]>]: ValueOf<{
-        [E in keyof Get<D, ["states", SV, "on"]>]:
+        [E in KeysOfUnion<Get<D, ["states", SV, "on"]>>]:
           _InferTransitionTarget<Get<D, ["states", SV, "on", E]>> extends V
             ? E
             : never;
@@ -181,7 +182,7 @@ type _InferAllTransitionEventTypesForStateValue<D, V> =
     }>
   // The event types defined in the root.
   | ValueOf<{
-      [E in keyof Get<D, ["on"]>]:
+      [E in KeysOfUnion<Get<D, ["on"]>>]:
         _InferTransitionTarget<Get<D, ["on", E]>> extends V
           ? E
           : never;
@@ -240,7 +241,7 @@ type _InferGuardEventType<
   N extends string,
   _O = Get<D, P>,
 > = ValueOf<{
-  [E in keyof _O]:
+  [E in KeysOfUnion<_O>]:
     // If the event has given guard name, return the event type.
       Get<_O, [E, "guard"]> extends GuardDefinition<infer G>
     ? N extends G
@@ -441,8 +442,8 @@ export type NextEventTypesForStateValue<
   D,
   V,
 > =
-  | keyof Get<D, ["states", V, "on"]>
-  | keyof Get<D, ["on"]>;
+  | KeysOfUnion<Get<D, ["states", V, "on"]>>
+  | KeysOfUnion<Get<D, ["on"]>>;
 
 /**
  * The signature for next event types for the given state value.
@@ -928,12 +929,11 @@ export type Signature = {
   readonly console?: ConsoleInterface;
 };
 
-if (cfgTest && cfgTest.url === import.meta.url) {
-  // const { expectType } = await import("tsd")
-  const { describe, test } = cfgTest
+if (import.meta.vitest) {
+  const { describe, test } = import.meta.vitest;
 
   describe("src/types/config", () => {
-    test.skip("Should be tested", () => {})
-  })
+    test.skip("Should be tested");
+  });
 }
 

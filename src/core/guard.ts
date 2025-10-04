@@ -298,8 +298,8 @@ export function formatGuardResult(result: GuardResult): string {
     : ctx.code;
 }
 
-if (cfgTest && cfgTest.url === import.meta.url) {
-  const { assert, describe, test } = cfgTest;
+if (import.meta.vitest) {
+  const { assert, describe, test } = import.meta.vitest;
 
   function doGuardForTest(
     setup: {

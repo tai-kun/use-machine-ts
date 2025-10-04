@@ -42,7 +42,7 @@ jobs:
         run: mkdir dist && touch dist/index.d.ts
 
       - name: Type check
-        run: npm run tsc
+        run: mise run tsc
 
   lint:
     runs-on: ubuntu-latest
@@ -57,7 +57,7 @@ jobs:
         run: npm ci
 
       - name: Lint
-        run: npm run lint
+        run: mise run lint
 
   unit:
     runs-on: ubuntu-latest
@@ -72,7 +72,7 @@ jobs:
         run: npm ci
 
       - name: Test
-        run: npm test
+        run: mise run test
 
   size-check:
     runs-on: ubuntu-latest
@@ -87,7 +87,7 @@ jobs:
         run: npm ci
 
       - name: Size check
-        run: npm run size-check
+        run: mise run size-check
 
   check-npm-token:
     runs-on: ubuntu-latest
@@ -115,7 +115,7 @@ jobs:
         run: npm ci
 
       - name: Build
-        run: npm run build
+        run: mise run build
 
       - name: Dry run publish to NPM
         run: npm publish --dry-run
