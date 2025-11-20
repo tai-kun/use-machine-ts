@@ -20,7 +20,7 @@ jobs:
           target-branch: ${{ github.ref_name }}
         id: rp
 
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
         if: ${{ steps.rp.outputs.release_created }}
 
       - name: Set up mise
