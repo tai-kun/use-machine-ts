@@ -5,8 +5,7 @@
   "description": "The tiny state machine hook for React",
   "sideEffects": false,
   "repository": {
-    "type": "git",
-    "url": "git+https://github.com/tai-kun/use-machine-ts.git"
+    "url": "https://github.com/tai-kun/use-machine-ts"
   },
   "homepage": "https://tai-kun.github.io/use-machine-ts/",
   "author": {
@@ -49,23 +48,23 @@
   },
   "devDependencies": {
     "@size-limit/preset-small-lib": "^11.2.0",
-    "@testing-library/react": "^16.3.0",
-    "@tsconfig/node22": "^22.0.2",
-    "@tsconfig/strictest": "^2.0.6",
-    "@types/node": "^22.18.6",
-    "@types/react": "^19.1.13",
-    "dprint": "^0.50.2",
-    "esbuild": "^0.25.10",
+    "@testing-library/react": "^16.3.2",
+    "@tsconfig/node22": "^22.0.5",
+    "@tsconfig/strictest": "^2.0.8",
+    "@types/node": "^22.19.7",
+    "@types/react": "^19.2.10",
+    "dprint": "^0.51.1",
+    "esbuild": "^0.27.2",
     "global-jsdom": "^27.0.0",
-    "jsdom": "^27.0.0",
-    "npm-check-updates": "^19.0.0",
-    "plop": "^4.0.3",
-    "react": "^19.1.1",
-    "react-dom": "^19.1.1",
+    "jsdom": "^27.4.0",
+    "npm-check-updates": "^19.3.2",
+    "plop": "^4.0.5",
+    "react": "^19.2.4",
+    "react-dom": "^19.2.4",
     "size-limit": "^11.2.0",
     "tsd": "^0.33.0",
-    "typedoc": "^0.28.13",
-    "typescript": "^5.9.2",
+    "typedoc": "^0.28.16",
+    "typescript": "^5.9.3",
     "vitest": "^3.2.4"
   },
   "size-limit": [
@@ -97,5 +96,8 @@
     "typescript",
     "react",
     "hooks"
-  ]
+  ],
+  "scripts": {
+    "build": "tsc --project ./.config/tsconfig.build.json"
+  }
 }
