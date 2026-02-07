@@ -10,6 +10,7 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: write
+      id-token: write
       pull-requests: write
     steps:
       - uses: googleapis/release-please-action@v4
@@ -20,11 +21,18 @@ jobs:
           target-branch: ${{ github.ref_name }}
         id: rp
 
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
         if: ${{ steps.rp.outputs.release_created }}
 
-      - name: Set up mise
-        uses: jdx/mise-action@v3
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 24.x
+          cache: npm
+          registry-url: https://registry.npmjs.org
+        if: ${{ steps.rp.outputs.release_created }}
+
+      - name: Install latest npm
+        run: npm install -g npm@latest
         if: ${{ steps.rp.outputs.release_created }}
 
       - name: Install dependencies
@@ -32,14 +40,11 @@ jobs:
         if: ${{ steps.rp.outputs.release_created }}
 
       - name: Build
-        run: mise run build
+        run: npm run build
         if: ${{ steps.rp.outputs.release_created }}
 
       - name: Publish
         run: |
-          echo "//registry.npmjs.org/:_authToken=${NODE_AUTH_TOKEN}" > ~/.npmrc
-          npm publish --access public
-
           ver="$(jq -r .version <package.json)"
           suf="${ver#*-}"
 
@@ -49,6 +54,4 @@ jobs:
             tag="${suf%%.*}"
             npm publish --access=public --tag="$tag"
           fi
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
         if: ${{ steps.rp.outputs.release_created }}
