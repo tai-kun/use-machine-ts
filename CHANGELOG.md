@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.0.3](https://github.com/tai-kun/use-machine-ts/compare/v1.0.2...v1.0.3) (2026-02-07)
+
+
+### Continuous Integration
+
+* fix ([389cd0f](https://github.com/tai-kun/use-machine-ts/commit/389cd0f014e1b609fc2885dbf94ff4521afb79c9))
+
 ## [1.0.2](https://github.com/tai-kun/use-machine-ts/compare/v1.0.1...v1.0.2) (2026-02-07)
 
 
