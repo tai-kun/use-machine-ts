@@ -1,5 +1,22 @@
 # Changelog
 
+## [1.0.2](https://github.com/tai-kun/use-machine-ts/compare/v1.0.1...v1.0.2) (2026-02-07)
+
+
+### Bug Fixes
+
+* Fix build command ([421a746](https://github.com/tai-kun/use-machine-ts/commit/421a74687403821a9852072f80e796730a7c868f))
+
+
+### Miscellaneous Chores
+
+* **deps:** update ([475bca5](https://github.com/tai-kun/use-machine-ts/commit/475bca5e8cb20271f7dde1ed0ce518545c844c18))
+
+
+### Continuous Integration
+
+* fix ([c9ed60b](https://github.com/tai-kun/use-machine-ts/commit/c9ed60bcdcf7589573723cf15bfeecc5ab2dfb8c))
+
 ## [1.0.1](https://github.com/tai-kun/use-machine-ts/compare/v1.0.0...v1.0.1) (2025-10-04)
 
 
