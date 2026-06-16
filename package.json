@@ -1,6 +1,6 @@
 {
   "name": "use-machine-ts",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "license": "MIT",
   "description": "The tiny state machine hook for React",
   "sideEffects": false,

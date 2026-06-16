@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.0.4](https://github.com/tai-kun/use-machine-ts/compare/v1.0.3...v1.0.4) (2026-06-16)
+
+
+### Miscellaneous Chores
+
+* **deps:** bump googleapis/release-please-action from 4 to 5 ([#227](https://github.com/tai-kun/use-machine-ts/issues/227)) ([d723a26](https://github.com/tai-kun/use-machine-ts/commit/d723a266fb93119b79f8b33bd4713aaa3a00de10))
+* **deps:** bump jdx/mise-action from 3 to 4 ([#222](https://github.com/tai-kun/use-machine-ts/issues/222)) ([edfef56](https://github.com/tai-kun/use-machine-ts/commit/edfef56ce7c595ce73ae776416049b111547f6de))
+
 ## [1.0.3](https://github.com/tai-kun/use-machine-ts/compare/v1.0.2...v1.0.3) (2026-02-07)
 
 
