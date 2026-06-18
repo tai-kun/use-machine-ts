@@ -21,7 +21,7 @@ jobs:
           target-branch: ${{ github.ref_name }}
         id: rp
 
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
         if: ${{ steps.rp.outputs.release_created }}
 
       - uses: actions/setup-node@v6
